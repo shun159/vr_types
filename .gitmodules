@@ -1,0 +1,6 @@
+[submodule "contrail-sandesh"]
+	path = contrail-sandesh
+	url = git@github.com:shun159/contrail-sandesh.git
+[submodule "sandesh"]
+	path = sandesh
+	url = git@github.com:shun159/contrail-sandesh.git
