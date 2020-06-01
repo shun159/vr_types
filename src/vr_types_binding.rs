@@ -1200,28 +1200,30 @@ extern "C" {
     pub fn drand48() -> f64;
 }
 extern "C" {
-    pub fn erand48(__xsubi: *mut ::std::os::raw::c_ushort) -> f64;
+    pub fn erand48(__xsubi: *mut [::std::os::raw::c_ushort; 3usize]) -> f64;
 }
 extern "C" {
     pub fn lrand48() -> ::std::os::raw::c_long;
 }
 extern "C" {
-    pub fn nrand48(__xsubi: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long;
+    pub fn nrand48(__xsubi: *mut [::std::os::raw::c_ushort; 3usize]) -> ::std::os::raw::c_long;
 }
 extern "C" {
     pub fn mrand48() -> ::std::os::raw::c_long;
 }
 extern "C" {
-    pub fn jrand48(__xsubi: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long;
+    pub fn jrand48(__xsubi: *mut [::std::os::raw::c_ushort; 3usize]) -> ::std::os::raw::c_long;
 }
 extern "C" {
     pub fn srand48(__seedval: ::std::os::raw::c_long);
 }
 extern "C" {
-    pub fn seed48(__seed16v: *mut ::std::os::raw::c_ushort) -> *mut ::std::os::raw::c_ushort;
+    pub fn seed48(
+        __seed16v: *mut [::std::os::raw::c_ushort; 3usize],
+    ) -> *mut ::std::os::raw::c_ushort;
 }
 extern "C" {
-    pub fn lcong48(__param: *mut ::std::os::raw::c_ushort);
+    pub fn lcong48(__param: *mut [::std::os::raw::c_ushort; 7usize]);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -1237,7 +1239,7 @@ extern "C" {
 }
 extern "C" {
     pub fn erand48_r(
-        __xsubi: *mut ::std::os::raw::c_ushort,
+        __xsubi: *mut [::std::os::raw::c_ushort; 3usize],
         __buffer: *mut drand48_data,
         __result: *mut f64,
     ) -> ::std::os::raw::c_int;
@@ -1250,7 +1252,7 @@ extern "C" {
 }
 extern "C" {
     pub fn nrand48_r(
-        __xsubi: *mut ::std::os::raw::c_ushort,
+        __xsubi: *mut [::std::os::raw::c_ushort; 3usize],
         __buffer: *mut drand48_data,
         __result: *mut ::std::os::raw::c_long,
     ) -> ::std::os::raw::c_int;
@@ -1263,7 +1265,7 @@ extern "C" {
 }
 extern "C" {
     pub fn jrand48_r(
-        __xsubi: *mut ::std::os::raw::c_ushort,
+        __xsubi: *mut [::std::os::raw::c_ushort; 3usize],
         __buffer: *mut drand48_data,
         __result: *mut ::std::os::raw::c_long,
     ) -> ::std::os::raw::c_int;
@@ -1276,13 +1278,13 @@ extern "C" {
 }
 extern "C" {
     pub fn seed48_r(
-        __seed16v: *mut ::std::os::raw::c_ushort,
+        __seed16v: *mut [::std::os::raw::c_ushort; 3usize],
         __buffer: *mut drand48_data,
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn lcong48_r(
-        __param: *mut ::std::os::raw::c_ushort,
+        __param: *mut [::std::os::raw::c_ushort; 7usize],
         __buffer: *mut drand48_data,
     ) -> ::std::os::raw::c_int;
 }
@@ -1561,8 +1563,10 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn getloadavg(__loadavg: *mut f64, __nelem: ::std::os::raw::c_int)
-        -> ::std::os::raw::c_int;
+    pub fn getloadavg(
+        __loadavg: *mut [f64; 0usize],
+        __nelem: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn memcpy(
@@ -2024,7 +2028,7 @@ extern "C" {
         __domain: ::std::os::raw::c_int,
         __type: ::std::os::raw::c_int,
         __protocol: ::std::os::raw::c_int,
-        __fds: *mut ::std::os::raw::c_int,
+        __fds: *mut [::std::os::raw::c_int; 2usize],
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
@@ -2447,7 +2451,7 @@ extern "C" {
     pub fn vsyslog(
         __pri: ::std::os::raw::c_int,
         __fmt: *const ::std::os::raw::c_char,
-        __ap: *mut __va_list_tag,
+        __ap: *mut __gnuc_va_list,
     );
 }
 extern "C" {
@@ -2775,7 +2779,7 @@ extern "C" {
     pub fn vdprintf(
         __fd: ::std::os::raw::c_int,
         __fmt: *const ::std::os::raw::c_char,
-        __arg: *mut __va_list_tag,
+        __arg: *mut __gnuc_va_list,
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
@@ -3293,7 +3297,7 @@ pub struct _ThriftProtocol {
     pub write_uuid_t: ::std::option::Option<
         unsafe extern "C" fn(
             protocol: *mut _ThriftProtocol,
-            value: *mut ::std::os::raw::c_uchar,
+            value: *mut ct_uuid_t,
             error: *mut ::std::os::raw::c_int,
         ) -> i32,
     >,
