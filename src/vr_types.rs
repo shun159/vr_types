@@ -5,7 +5,9 @@ use crate::vr_nexthop;
 use crate::vr_pkt_droplog;
 use crate::vr_types_binding::*;
 
+use byteorder::{NetworkEndian, ReadBytesExt};
 use libc::{time_t, AF_INET6};
+use std::io::Cursor;
 use std::mem::{size_of, size_of_val};
 use std::os::raw::{c_int, c_uint, c_void};
 
@@ -910,8 +912,22 @@ impl sandesh_info_t {
                 wxfer if wxfer >= 0 && error == 0 => {
                     Ok(utils::free_buf(buf, wxfer as usize))
                 }
-                _ => Err(error),
+                _ =>
+                    Err(error),
             }
+        }
+    }
+
+    pub fn sname_from_bytes<'a>(buf: &'a Vec<u8>) -> &'a str {
+        let buf_len = buf.len();
+        let mut c = Cursor::new(&buf);
+        let sname_len = c.read_u32::<NetworkEndian>().unwrap() as usize;
+        let offset = c.position() as usize;
+        if sname_len + offset <= buf_len {
+            let v = &buf[offset..sname_len + offset];
+            std::str::from_utf8(v).unwrap()
+        } else {
+            ""
         }
     }
 
@@ -931,6 +947,7 @@ mod test_encode_types {
     fn vr_nexthop_req() {
         let req = vr_nexthop_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_nexthop_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(214, res.len())
     }
 
@@ -938,6 +955,7 @@ mod test_encode_types {
     fn vr_interface_req() {
         let req = vr_interface_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_interface_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(724, res.len())
     }
 
@@ -945,6 +963,7 @@ mod test_encode_types {
     fn vr_vxlan_req() {
         let req = vr_vxlan_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_vxlan_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(43, res.len())
     }
 
@@ -952,6 +971,7 @@ mod test_encode_types {
     fn vr_route_req() {
         let req = vr_route_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_route_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(114, res.len())
     }
 
@@ -959,6 +979,7 @@ mod test_encode_types {
     fn vr_mpls_req() {
         let req = vr_mpls_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_mpls_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(49, res.len())
     }
 
@@ -966,6 +987,7 @@ mod test_encode_types {
     fn vr_mirror_req() {
         let req = vr_mirror_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_mirror_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(75, res.len())
     }
 
@@ -973,6 +995,7 @@ mod test_encode_types {
     fn vr_vrf_req() {
         let req = vr_vrf_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_vrf_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(62, res.len())
     }
 
@@ -980,6 +1003,7 @@ mod test_encode_types {
     fn vr_flow_req() {
         let req = vr_flow_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_flow_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(272, res.len())
     }
 
@@ -987,6 +1011,7 @@ mod test_encode_types {
     fn vr_vrf_assign_req() {
         let req = vr_vrf_assign_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_vrf_assign_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(63, res.len())
     }
 
@@ -994,6 +1019,7 @@ mod test_encode_types {
     fn vr_vrf_stats_req() {
         let req = vr_vrf_stats_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_vrf_stats_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(352, res.len())
     }
 
@@ -1001,6 +1027,7 @@ mod test_encode_types {
     fn vr_response() {
         let req = vr_response::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_response", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(30, res.len())
     }
 
@@ -1008,6 +1035,7 @@ mod test_encode_types {
     fn vr_mem_stats_req() {
         let req = vr_mem_stats_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_mem_stats_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(803, res.len())
     }
 
@@ -1015,6 +1043,7 @@ mod test_encode_types {
     fn vr_pkt_drop_log_req() {
         let req = vr_pkt_drop_log_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_pkt_drop_log_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(74, res.len())
     }
 
@@ -1022,6 +1051,7 @@ mod test_encode_types {
     fn vr_drop_stats_req() {
         let req = vr_drop_stats_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_drop_stats_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(593, res.len())
     }
 
@@ -1029,6 +1059,7 @@ mod test_encode_types {
     fn vr_qos_map_req() {
         let req = vr_qos_map_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_qos_map_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(89, res.len())
     }
 
@@ -1036,6 +1067,7 @@ mod test_encode_types {
     fn vr_fc_map_req() {
         let req = vr_fc_map_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_fc_map_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(75, res.len())
     }
 
@@ -1043,6 +1075,7 @@ mod test_encode_types {
     fn vr_flow_response() {
         let req = vr_flow_response::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_flow_response", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(70, res.len())
     }
 
@@ -1050,6 +1083,7 @@ mod test_encode_types {
     fn vr_flow_table_data() {
         let req = vr_flow_table_data::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_flow_table_data", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(163, res.len())
     }
 
@@ -1057,6 +1091,7 @@ mod test_encode_types {
     fn vr_bridge_table_data() {
         let req = vr_bridge_table_data::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_bridge_table_data", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(56, res.len())
     }
 
@@ -1064,6 +1099,7 @@ mod test_encode_types {
     fn vr_hugepage_config() {
         let req = vr_hugepage_config::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
+        assert_eq!("vr_hugepage_config", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(53, res.len())
     }
 }
