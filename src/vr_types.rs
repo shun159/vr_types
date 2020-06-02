@@ -5,7 +5,7 @@ use crate::vr_interface;
 use crate::vr_pkt_droplog;
 use crate::vr_types_binding::*;
 
-use std::mem::{size_of, size_of_val, MaybeUninit};
+use std::mem::{size_of, size_of_val};
 use std::os::raw::{c_void, c_uint, c_int};
 use libc::{time_t, AF_INET6};
 
@@ -473,9 +473,7 @@ struct vr_pkt_drop_log {
 
 impl VrSandesh for vr_pkt_drop_log_req {
     fn new() -> Self {
-        //let mut req = vr_pkt_drop_log_req::default();
-        let req = MaybeUninit::<vr_pkt_drop_log_req>::zeroed();
-        let mut req = unsafe { req.assume_init() };
+        let mut req = vr_pkt_drop_log_req::default();
         req.vdl_pkt_droplog_arr_size = 0;
         req
     }
@@ -729,11 +727,11 @@ impl sandesh_info_t {
             let req_ptr = utils::into_raw_ptr(&req) as *mut c_void;
             let buf     = utils::alloc_buf(req.obj_len());
             let buf_len = req.obj_len();
-            if req.write_binary_fn()(req_ptr, buf, buf_len, &mut error) > 0 {
-                let ret = utils::free_buf(buf, buf_len);
-                Ok(ret)
-            } else {
-                Err(error)
+            match req.write_binary_fn()(req_ptr, buf, buf_len, &mut error) {
+                wxfer if wxfer >= 0 && error == 0 =>
+                    Ok(utils::free_buf(buf, wxfer as usize)),
+                _ =>
+                    Err(error),
             }
         }
     }
@@ -750,139 +748,139 @@ mod test_encode_types {
     fn vr_nexthop_req() {
         let req = vr_nexthop_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(214, res.len())
     }
 
     #[test]
     fn vr_interface_req() {
         let req = vr_interface_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(724, res.len())
     }
 
     #[test]
     fn vr_vxlan_req() {
         let req = vr_vxlan_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(43, res.len())
     }
 
     #[test]
     fn vr_route_req() {
         let req = vr_route_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(114, res.len())
     }
 
     #[test]
     fn vr_mpls_req() {
         let req = vr_mpls_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(49, res.len())
     }
 
     #[test]
     fn vr_mirror_req() {
         let req = vr_mirror_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(75, res.len())
     }
 
     #[test]
     fn vr_vrf_req() {
         let req = vr_vrf_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(62, res.len())
     }
 
     #[test]
     fn vr_flow_req() {
         let req = vr_flow_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(272, res.len())
     }
 
     #[test]
     fn vr_vrf_assign_req() {
         let req = vr_vrf_assign_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(63, res.len())
     }
 
     #[test]
     fn vr_vrf_stats_req() {
         let req = vr_vrf_stats_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(352, res.len())
     }
 
     #[test]
     fn vr_response() {
         let req = vr_response::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(30, res.len())
     }
 
     #[test]
     fn vr_mem_stats_req() {
         let req = vr_mem_stats_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(803, res.len())
     }
 
     #[test]
     fn vr_pkt_drop_log_req() {
         let req = vr_pkt_drop_log_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(74, res.len())
     }
 
     #[test]
     fn vr_drop_stats_req() {
         let req = vr_drop_stats_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(593, res.len())
     }
 
     #[test]
     fn vr_qos_map_req() {
         let req = vr_qos_map_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(89, res.len())
     }
 
     #[test]
     fn vr_fc_map_req() {
         let req = vr_fc_map_req::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(75, res.len())
     }
 
     #[test]
     fn vr_flow_response() {
         let req = vr_flow_response::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(70, res.len())
     }
 
     #[test]
     fn vr_flow_table_data() {
         let req = vr_flow_table_data::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(163, res.len())
     }
 
     #[test]
     fn vr_bridge_table_data() {
         let req = vr_bridge_table_data::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(56, res.len())
     }
 
     #[test]
     fn vr_hugepage_config() {
         let req = vr_hugepage_config::new();
         let res = sandesh_info_t::to_binary(req).unwrap();
-        assert_eq!(req.obj_len(), res.len())
+        assert_eq!(53, res.len())
     }
 }
