@@ -10,9 +10,12 @@ use std::os::raw::{c_void, c_uint, c_int};
 use libc::{time_t, AF_INET6};
 
 pub trait VrSandesh {
-    fn new() -> Self;
-    fn obj_type_string(&self) -> &'static str;
-    fn obj_len(&self) -> usize;
+    type Type;
+
+    fn new() -> Self::Type;
+
+    fn obj_len(&self) -> usize { 4usize * size_of::<Self::Type>() }
+
     fn write_binary_fn(&self) -> unsafe extern "C" fn(
         wsandesh: *mut c_void,
         buf: *mut u8,
@@ -28,13 +31,10 @@ impl Default for vr_nexthop_req {
 }
 
 impl VrSandesh for vr_nexthop_req {
+    type Type = vr_nexthop_req;
+
     fn new() -> Self {
         vr_nexthop_req::default()
-    }
-
-    // From sandesh_md on vr_sandesh.c
-    fn obj_type_string(&self) -> &'static str {
-        "vr_nexthop_req"
     }
 
     // write_binary_to_buffer function
@@ -74,12 +74,10 @@ impl Default for vr_interface_req {
 }
 
 impl VrSandesh for vr_interface_req {
+    type Type = vr_interface_req;
+
     fn new() -> Self {
         vr_interface_req::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_interface_req"
     }
 
     // write_binary_to_buffer function
@@ -112,12 +110,10 @@ impl Default for vr_vxlan_req {
 }
 
 impl VrSandesh for vr_vxlan_req {
+    type Type = vr_vxlan_req;
+
     fn new() -> Self {
         vr_vxlan_req::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_vxlan_req"
     }
 
     // write_binary_to_buffer function
@@ -129,10 +125,6 @@ impl VrSandesh for vr_vxlan_req {
     ) -> i32 {
         vr_vxlan_req_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vr_route_req {
@@ -142,12 +134,10 @@ impl Default for vr_route_req {
 }
 
 impl VrSandesh for vr_route_req {
+    type Type = vr_route_req;
+
     fn new() -> Self {
         vr_route_req::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_route_req"
     }
 
     // write_binary_to_buffer function
@@ -159,10 +149,6 @@ impl VrSandesh for vr_route_req {
     ) -> i32 {
         vr_route_req_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vr_mpls_req {
@@ -172,12 +158,10 @@ impl Default for vr_mpls_req {
 }
 
 impl VrSandesh for vr_mpls_req {
+    type Type = vr_mpls_req;
+
     fn new() -> Self {
         vr_mpls_req::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_mpls_req"
     }
 
     // write_binary_to_buffer function
@@ -189,10 +173,6 @@ impl VrSandesh for vr_mpls_req {
     ) -> i32 {
         vr_mpls_req_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vr_mirror_req {
@@ -202,12 +182,10 @@ impl Default for vr_mirror_req {
 }
 
 impl VrSandesh for vr_mirror_req {
+    type Type = vr_mirror_req;
+
     fn new() -> Self {
         vr_mirror_req::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_mirror_req"
     }
 
     // write_binary_to_buffer function
@@ -219,10 +197,6 @@ impl VrSandesh for vr_mirror_req {
     ) -> i32 {
         vr_mirror_req_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vr_vrf_req {
@@ -232,12 +206,10 @@ impl Default for vr_vrf_req {
 }
 
 impl VrSandesh for vr_vrf_req {
+    type Type = vr_vrf_req;
+
     fn new() -> Self {
         vr_vrf_req::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_vrf_req"
     }
 
     // write_binary_to_buffer function
@@ -249,10 +221,6 @@ impl VrSandesh for vr_vrf_req {
     ) -> i32 {
         vr_vrf_req_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vr_flow_req {
@@ -262,12 +230,10 @@ impl Default for vr_flow_req {
 }
 
 impl VrSandesh for vr_flow_req {
+    type Type = vr_flow_req;
+
     fn new() -> Self {
         vr_flow_req::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_flow_req"
     }
 
     // write_binary_to_buffer function
@@ -279,10 +245,6 @@ impl VrSandesh for vr_flow_req {
     ) -> i32 {
         vr_flow_req_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vr_vrf_assign_req {
@@ -292,12 +254,10 @@ impl Default for vr_vrf_assign_req {
 }
 
 impl VrSandesh for vr_vrf_assign_req {
+    type Type = vr_vrf_assign_req;
+
     fn new() -> Self {
         vr_vrf_assign_req::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_vrf_assign_req"
     }
 
     // write_binary_to_buffer function
@@ -309,10 +269,6 @@ impl VrSandesh for vr_vrf_assign_req {
     ) -> i32 {
         vr_vrf_assign_req_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vr_vrf_stats_req {
@@ -322,12 +278,10 @@ impl Default for vr_vrf_stats_req {
 }
 
 impl VrSandesh for vr_vrf_stats_req {
+    type Type = vr_vrf_stats_req;
+
     fn new() -> Self {
         vr_vrf_stats_req::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_vrf_stats_req"
     }
 
     // write_binary_to_buffer function
@@ -339,10 +293,6 @@ impl VrSandesh for vr_vrf_stats_req {
     ) -> i32 {
         vr_vrf_stats_req_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vr_response {
@@ -352,12 +302,10 @@ impl Default for vr_response {
 }
 
 impl VrSandesh for vr_response {
+    type Type = vr_response;
+
     fn new() -> Self {
         vr_response::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_response"
     }
 
     // write_binary_to_buffer function
@@ -369,10 +317,6 @@ impl VrSandesh for vr_response {
     ) -> i32 {
         vr_response_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vrouter_ops {
@@ -382,12 +326,10 @@ impl Default for vrouter_ops {
 }
 
 impl VrSandesh for vrouter_ops {
+    type Type = vrouter_ops;
+
     fn new() -> Self {
         vrouter_ops::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vrouter_ops"
     }
 
     // write_binary_to_buffer function
@@ -399,10 +341,6 @@ impl VrSandesh for vrouter_ops {
     ) -> i32 {
         vrouter_ops_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vr_mem_stats_req {
@@ -412,15 +350,12 @@ impl Default for vr_mem_stats_req {
 }
 
 impl VrSandesh for vr_mem_stats_req {
+    type Type = vr_mem_stats_req;
+
     fn new() -> Self {
         vr_mem_stats_req::default()
     }
 
-    fn obj_type_string(&self) -> &'static str {
-        "vr_mem_stats_req"
-    }
-
-    // write_binary_to_buffer function
     fn write_binary_fn(&self) -> unsafe extern "C" fn(
         wsandesh: *mut c_void,
         buf: *mut u8,
@@ -428,10 +363,6 @@ impl VrSandesh for vr_mem_stats_req {
         err: *mut c_int
     ) -> i32 {
         vr_mem_stats_req_write_binary_to_buffer
-    }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
     }
 }
 
@@ -472,14 +403,12 @@ struct vr_pkt_drop_log {
 }
 
 impl VrSandesh for vr_pkt_drop_log_req {
+    type Type = vr_pkt_drop_log_req;
+
     fn new() -> Self {
         let mut req = vr_pkt_drop_log_req::default();
         req.vdl_pkt_droplog_arr_size = 0;
         req
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_pkt_drop_log_req"
     }
 
     // write_binary_to_buffer function
@@ -508,12 +437,10 @@ impl Default for vr_drop_stats_req {
 }
 
 impl VrSandesh for vr_drop_stats_req {
+    type Type = vr_drop_stats_req;
+
     fn new() -> Self {
         vr_drop_stats_req::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_drop_stats_req"
     }
 
     // write_binary_to_buffer function
@@ -525,10 +452,6 @@ impl VrSandesh for vr_drop_stats_req {
     ) -> i32 {
         vr_drop_stats_req_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vr_qos_map_req {
@@ -538,12 +461,10 @@ impl Default for vr_qos_map_req {
 }
 
 impl VrSandesh for vr_qos_map_req {
+    type Type = vr_qos_map_req;
+
     fn new() -> Self {
         vr_qos_map_req::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_qos_map_req"
     }
 
     // write_binary_to_buffer function
@@ -575,12 +496,10 @@ impl Default for vr_fc_map_req {
 }
 
 impl VrSandesh for vr_fc_map_req {
+    type Type = vr_fc_map_req;
+
     fn new() -> Self {
         vr_fc_map_req::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_fc_map_req"
     }
 
     // write_binary_to_buffer function
@@ -592,10 +511,6 @@ impl VrSandesh for vr_fc_map_req {
     ) -> i32 {
         vr_fc_map_req_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vr_flow_response {
@@ -605,12 +520,10 @@ impl Default for vr_flow_response {
 }
 
 impl VrSandesh for vr_flow_response {
+    type Type = vr_flow_response;
+
     fn new() -> Self {
         vr_flow_response::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_flow_response"
     }
 
     // write_binary_to_buffer function
@@ -622,10 +535,6 @@ impl VrSandesh for vr_flow_response {
     ) -> i32 {
         vr_flow_response_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vr_flow_table_data {
@@ -635,12 +544,10 @@ impl Default for vr_flow_table_data {
 }
 
 impl VrSandesh for vr_flow_table_data {
+    type Type = vr_flow_table_data;
+
     fn new() -> Self {
         vr_flow_table_data::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_flow_table_data"
     }
 
     // write_binary_to_buffer function
@@ -652,10 +559,6 @@ impl VrSandesh for vr_flow_table_data {
     ) -> i32 {
         vr_flow_table_data_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vr_bridge_table_data {
@@ -665,12 +568,10 @@ impl Default for vr_bridge_table_data {
 }
 
 impl VrSandesh for vr_bridge_table_data {
+    type Type = vr_bridge_table_data;
+
     fn new() -> Self {
         vr_bridge_table_data::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_bridge_table_data"
     }
 
     // write_binary_to_buffer function
@@ -682,10 +583,6 @@ impl VrSandesh for vr_bridge_table_data {
     ) -> i32 {
         vr_bridge_table_data_write_binary_to_buffer
     }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
-    }
 }
 
 impl Default for vr_hugepage_config {
@@ -695,12 +592,10 @@ impl Default for vr_hugepage_config {
 }
 
 impl VrSandesh for vr_hugepage_config {
+    type Type = vr_hugepage_config;
+
     fn new() -> Self {
         vr_hugepage_config::default()
-    }
-
-    fn obj_type_string(&self) -> &'static str {
-        "vr_hugepage_config"
     }
 
     // write_binary_to_buffer function
@@ -711,10 +606,6 @@ impl VrSandesh for vr_hugepage_config {
         err: *mut c_int
     ) -> i32 {
         vr_hugepage_config_write_binary_to_buffer
-    }
-
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>()
     }
 }
 
