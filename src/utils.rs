@@ -1,4 +1,4 @@
-use std::ffi::{CString, CStr};
+use std::ffi::{CStr, CString};
 use std::os::raw::{c_char, c_void};
 
 pub fn str_to_cchar(s: &str) -> *const c_char {

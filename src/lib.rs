@@ -1,5 +1,11 @@
 extern crate libc;
 
+pub mod genetlink;
+pub mod utils;
+pub mod vr_flow;
+pub mod vr_interface;
+pub mod vr_nexthop;
+pub mod vr_pkt_droplog;
 pub mod vr_types;
 #[allow(non_upper_case_globals)]
 #[allow(non_camel_case_types)]
@@ -7,9 +13,3 @@ pub mod vr_types;
 #[allow(unused_variables)]
 #[allow(improper_ctypes)]
 pub mod vr_types_binding;
-pub mod vr_nexthop;
-pub mod vr_flow;
-pub mod vr_pkt_droplog;
-pub mod vr_interface;
-pub mod genetlink;
-pub mod utils;

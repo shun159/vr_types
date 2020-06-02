@@ -1,27 +1,26 @@
 use crate::utils;
-use crate::vr_nexthop;
 use crate::vr_flow;
 use crate::vr_interface;
+use crate::vr_nexthop;
 use crate::vr_pkt_droplog;
 use crate::vr_types_binding::*;
 
-use std::mem::{size_of, size_of_val};
-use std::os::raw::{c_void, c_uint, c_int};
 use libc::{time_t, AF_INET6};
+use std::mem::{size_of, size_of_val};
+use std::os::raw::{c_int, c_uint, c_void};
 
 pub trait VrSandesh {
     type Type;
 
     fn new() -> Self::Type;
 
-    fn obj_len(&self) -> usize { 4usize * size_of::<Self::Type>() }
+    fn obj_len(&self) -> usize {
+        4usize * size_of::<Self::Type>()
+    }
 
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32;
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32;
 }
 
 impl Default for vr_nexthop_req {
@@ -38,12 +37,10 @@ impl VrSandesh for vr_nexthop_req {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_nexthop_req_write_binary_to_buffer
     }
 
@@ -52,18 +49,22 @@ impl VrSandesh for vr_nexthop_req {
         let mut size = 4usize * size_of::<Self>();
         size += self.nhr_encap_size as usize;
 
-        if 0 < self.nhr_nh_list_size    { size += 4 * self.nhr_nh_list_size as usize }
-        if 0 < self.nhr_label_list_size { size += 4 * self.nhr_label_list_size as usize }
+        if 0 < self.nhr_nh_list_size {
+            size += 4 * self.nhr_nh_list_size as usize
+        }
+        if 0 < self.nhr_label_list_size {
+            size += 4 * self.nhr_label_list_size as usize
+        }
         size += self.nhr_pbb_mac_size as usize;
 
+        if (self.nhr_type == vr_nexthop::NH_TUNNEL)
+            && (0 != self.nhr_flags & vr_nexthop::NH_FLAG_TUNNEL_UDP)
+            && (self.nhr_family as i32 == AF_INET6)
+        {
+            size += (vr_flow::VR_IP6_ADDRESS_LEN * 2 * 4) as usize;
+        }
 
-        if (self.nhr_type == vr_nexthop::NH_TUNNEL) &&
-            (0 != self.nhr_flags & vr_nexthop::NH_FLAG_TUNNEL_UDP) &&
-            (self.nhr_family as i32 == AF_INET6) {
-                size += (vr_flow::VR_IP6_ADDRESS_LEN * 2 * 4) as usize;
-           }
-
-        return size
+        return size;
     }
 }
 
@@ -81,12 +82,10 @@ impl VrSandesh for vr_interface_req {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_interface_req_write_binary_to_buffer
     }
 
@@ -98,10 +97,9 @@ impl VrSandesh for vr_interface_req {
             size += 8 * self.vifr_queue_ierrors_to_lcore_size;
         }
 
-        return size as usize
+        return size as usize;
     }
 }
-
 
 impl Default for vr_vxlan_req {
     fn default() -> Self {
@@ -117,12 +115,10 @@ impl VrSandesh for vr_vxlan_req {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_vxlan_req_write_binary_to_buffer
     }
 }
@@ -141,12 +137,10 @@ impl VrSandesh for vr_route_req {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_route_req_write_binary_to_buffer
     }
 }
@@ -165,12 +159,10 @@ impl VrSandesh for vr_mpls_req {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_mpls_req_write_binary_to_buffer
     }
 }
@@ -189,12 +181,10 @@ impl VrSandesh for vr_mirror_req {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_mirror_req_write_binary_to_buffer
     }
 }
@@ -213,12 +203,10 @@ impl VrSandesh for vr_vrf_req {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_vrf_req_write_binary_to_buffer
     }
 }
@@ -237,12 +225,10 @@ impl VrSandesh for vr_flow_req {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_flow_req_write_binary_to_buffer
     }
 }
@@ -261,12 +247,10 @@ impl VrSandesh for vr_vrf_assign_req {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_vrf_assign_req_write_binary_to_buffer
     }
 }
@@ -285,12 +269,10 @@ impl VrSandesh for vr_vrf_stats_req {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_vrf_stats_req_write_binary_to_buffer
     }
 }
@@ -309,12 +291,10 @@ impl VrSandesh for vr_response {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_response_write_binary_to_buffer
     }
 }
@@ -333,12 +313,10 @@ impl VrSandesh for vrouter_ops {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vrouter_ops_write_binary_to_buffer
     }
 }
@@ -356,12 +334,10 @@ impl VrSandesh for vr_mem_stats_req {
         vr_mem_stats_req::default()
     }
 
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_mem_stats_req_write_binary_to_buffer
     }
 }
@@ -375,31 +351,31 @@ impl Default for vr_pkt_drop_log_req {
 #[repr(C)]
 union PktLogAddr {
     ipv4: libc::in_addr,
-    ipv6: libc::in6_addr
+    ipv6: libc::in6_addr,
 }
 
 #[allow(non_camel_case_types)]
 #[repr(C)]
 struct vr_drop_loc {
     file: c_int,
-    line: c_uint
+    line: c_uint,
 }
 
 #[allow(non_camel_case_types)]
 #[repr(C)]
 struct vr_pkt_drop_log {
-    timestamp:   time_t,
-    vp_type:     u8,
+    timestamp: time_t,
+    vp_type: u8,
     drop_reason: u16,
-    vif_idx:     u16,
-    nh_id:       u32,
-    src:         PktLogAddr,
-    dst:         PktLogAddr,
-    sport:       u16,
-    dport:       u16,
-    drop_loc:    vr_drop_loc,
-    pkt_len:     u16,
-    pkt_header:  [u8; 100]
+    vif_idx: u16,
+    nh_id: u32,
+    src: PktLogAddr,
+    dst: PktLogAddr,
+    sport: u16,
+    dport: u16,
+    drop_loc: vr_drop_loc,
+    pkt_len: u16,
+    pkt_header: [u8; 100],
 }
 
 impl VrSandesh for vr_pkt_drop_log_req {
@@ -412,21 +388,16 @@ impl VrSandesh for vr_pkt_drop_log_req {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_pkt_drop_log_req_write_binary_to_buffer
     }
 
     fn obj_len(&self) -> usize {
-        4usize * size_of::<Self>() +
-            (
-                vr_pkt_droplog::VR_PKT_DROP_LOG_MAX as usize +
-                size_of::<vr_pkt_drop_log>()
-            )
+        4usize * size_of::<Self>()
+            + (vr_pkt_droplog::VR_PKT_DROP_LOG_MAX as usize + size_of::<vr_pkt_drop_log>())
     }
 }
 
@@ -444,12 +415,10 @@ impl VrSandesh for vr_drop_stats_req {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_drop_stats_req_write_binary_to_buffer
     }
 }
@@ -468,12 +437,10 @@ impl VrSandesh for vr_qos_map_req {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_qos_map_req_write_binary_to_buffer
     }
 
@@ -503,12 +470,10 @@ impl VrSandesh for vr_fc_map_req {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_fc_map_req_write_binary_to_buffer
     }
 }
@@ -527,12 +492,10 @@ impl VrSandesh for vr_flow_response {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_flow_response_write_binary_to_buffer
     }
 }
@@ -551,12 +514,10 @@ impl VrSandesh for vr_flow_table_data {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_flow_table_data_write_binary_to_buffer
     }
 }
@@ -575,12 +536,10 @@ impl VrSandesh for vr_bridge_table_data {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_bridge_table_data_write_binary_to_buffer
     }
 }
@@ -599,12 +558,10 @@ impl VrSandesh for vr_hugepage_config {
     }
 
     // write_binary_to_buffer function
-    fn write_binary_fn(&self) -> unsafe extern "C" fn(
-        wsandesh: *mut c_void,
-        buf: *mut u8,
-        len: usize,
-        err: *mut c_int
-    ) -> i32 {
+    fn write_binary_fn(
+        &self,
+    ) -> unsafe extern "C" fn(wsandesh: *mut c_void, buf: *mut u8, len: usize, err: *mut c_int) -> i32
+    {
         vr_hugepage_config_write_binary_to_buffer
     }
 }
@@ -616,13 +573,11 @@ impl sandesh_info_t {
         unsafe {
             let mut error = 0;
             let req_ptr = utils::into_raw_ptr(&req) as *mut c_void;
-            let buf     = utils::alloc_buf(req.obj_len());
+            let buf = utils::alloc_buf(req.obj_len());
             let buf_len = req.obj_len();
             match req.write_binary_fn()(req_ptr, buf, buf_len, &mut error) {
-                wxfer if wxfer >= 0 && error == 0 =>
-                    Ok(utils::free_buf(buf, wxfer as usize)),
-                _ =>
-                    Err(error),
+                wxfer if wxfer >= 0 && error == 0 => Ok(utils::free_buf(buf, wxfer as usize)),
+                _ => Err(error),
             }
         }
     }
@@ -632,8 +587,8 @@ impl sandesh_info_t {
 
 #[cfg(test)]
 mod test_encode_types {
-    use crate::vr_types_binding::*;
     use crate::vr_types::VrSandesh;
+    use crate::vr_types_binding::*;
 
     #[test]
     fn vr_nexthop_req() {

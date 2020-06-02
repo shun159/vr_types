@@ -2,7 +2,7 @@ use std::env;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-fn main(){
+fn main() {
     Command::new("./sandesh_idl")
         .args(&["--gen", "c", "priv/vr.sandesh"])
         .output()
@@ -35,8 +35,19 @@ fn main(){
         .compile("vr_types");
 
     println!("cargo:rustc-link-search=native={}", out_dir_str);
-    println!("cargo:rustc-link-search=native={}", Path::new(&dir).join("sandesh/library/c").display());
-    println!("cargo:rustc-link-search=native={}", Path::new(&dir).join("sandesh/library/c/protocol").display());
-    println!("cargo:rustc-link-search=native={}", Path::new(&dir).join("sandesh/library/c/transport").display());
+    println!(
+        "cargo:rustc-link-search=native={}",
+        Path::new(&dir).join("sandesh/library/c").display()
+    );
+    println!(
+        "cargo:rustc-link-search=native={}",
+        Path::new(&dir).join("sandesh/library/c/protocol").display()
+    );
+    println!(
+        "cargo:rustc-link-search=native={}",
+        Path::new(&dir)
+            .join("sandesh/library/c/transport")
+            .display()
+    );
     println!("cargo:rustc-link-lib=vr_types");
 }
