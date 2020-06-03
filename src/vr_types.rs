@@ -20,6 +20,39 @@ pub trait VrSandesh {
         4usize * size_of::<Self::Type>()
     }
 
+    fn write(&self) -> Result<Vec<u8>, i32> {
+        unsafe {
+            let mut error = 0;
+            let wsandesh = self.as_c_void();
+            let buf = utils::alloc_buf(self.obj_len());
+            let buf_len = self.obj_len();
+            match self.write_binary_fn()(wsandesh, buf, buf_len, &mut error) {
+                wxfer if wxfer >= 0 && error == 0 =>
+                    Ok(utils::free_buf(buf, wxfer as usize)),
+                _ =>
+                    Err(error)
+            }
+        }
+    }
+
+    fn read(&self, buf: Vec<u8>) -> Result<i32, i32> {
+        unsafe {
+            let mut error = 0;
+            let buf_ptr = Box::into_raw(buf.into_boxed_slice()) as *mut u8;
+            let buf_len = self.obj_len();
+            let rsandesh = self.as_c_void();
+            match self.read_binary_fn()(rsandesh, buf_ptr, buf_len, &mut error) {
+                rxfer if rxfer >= 0 && error == 0 => {
+                    Ok(rxfer)
+                },
+                _ =>
+                    Err(error)
+            }
+        }
+    }
+
+    fn as_c_void(&self) -> *mut c_void;
+
     fn write_binary_fn(
         &self,
     ) -> unsafe extern "C" fn(
@@ -50,6 +83,10 @@ impl VrSandesh for vr_nexthop_req {
 
     fn new() -> Self {
         vr_nexthop_req::default()
+    }
+
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
     }
 
     // write_binary_to_buffer function
@@ -112,6 +149,10 @@ impl VrSandesh for vr_interface_req {
         vr_interface_req::default()
     }
 
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
+    }
+
     // write_binary_to_buffer function
     fn write_binary_fn(
         &self,
@@ -160,6 +201,10 @@ impl VrSandesh for vr_vxlan_req {
         vr_vxlan_req::default()
     }
 
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
+    }
+
     // write_binary_to_buffer function
     fn write_binary_fn(
         &self,
@@ -195,6 +240,10 @@ impl VrSandesh for vr_route_req {
 
     fn new() -> Self {
         vr_route_req::default()
+    }
+
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
     }
 
     // write_binary_to_buffer function
@@ -234,6 +283,10 @@ impl VrSandesh for vr_mpls_req {
         vr_mpls_req::default()
     }
 
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
+    }
+
     // write_binary_to_buffer function
     fn write_binary_fn(
         &self,
@@ -269,6 +322,10 @@ impl VrSandesh for vr_mirror_req {
 
     fn new() -> Self {
         vr_mirror_req::default()
+    }
+
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
     }
 
     // write_binary_to_buffer function
@@ -308,6 +365,10 @@ impl VrSandesh for vr_vrf_req {
         vr_vrf_req::default()
     }
 
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
+    }
+
     // write_binary_to_buffer function
     fn write_binary_fn(
         &self,
@@ -343,6 +404,10 @@ impl VrSandesh for vr_flow_req {
 
     fn new() -> Self {
         vr_flow_req::default()
+    }
+
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
     }
 
     // write_binary_to_buffer function
@@ -382,6 +447,10 @@ impl VrSandesh for vr_vrf_assign_req {
         vr_vrf_assign_req::default()
     }
 
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
+    }
+
     // write_binary_to_buffer function
     fn write_binary_fn(
         &self,
@@ -417,6 +486,10 @@ impl VrSandesh for vr_vrf_stats_req {
 
     fn new() -> Self {
         vr_vrf_stats_req::default()
+    }
+
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
     }
 
     // write_binary_to_buffer function
@@ -456,6 +529,10 @@ impl VrSandesh for vr_response {
         vr_response::default()
     }
 
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
+    }
+
     // write_binary_to_buffer function
     fn write_binary_fn(
         &self,
@@ -493,6 +570,10 @@ impl VrSandesh for vrouter_ops {
         vrouter_ops::default()
     }
 
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
+    }
+
     // write_binary_to_buffer function
     fn write_binary_fn(
         &self,
@@ -528,6 +609,10 @@ impl VrSandesh for vr_mem_stats_req {
 
     fn new() -> Self {
         vr_mem_stats_req::default()
+    }
+
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
     }
 
     fn write_binary_fn(
@@ -598,6 +683,10 @@ impl VrSandesh for vr_pkt_drop_log_req {
         req
     }
 
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
+    }
+
     // write_binary_to_buffer function
     fn write_binary_fn(
         &self,
@@ -642,6 +731,10 @@ impl VrSandesh for vr_drop_stats_req {
         vr_drop_stats_req::default()
     }
 
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
+    }
+
     // write_binary_to_buffer function
     fn write_binary_fn(
         &self,
@@ -677,6 +770,10 @@ impl VrSandesh for vr_qos_map_req {
 
     fn new() -> Self {
         vr_qos_map_req::default()
+    }
+
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
     }
 
     // write_binary_to_buffer function
@@ -727,6 +824,10 @@ impl VrSandesh for vr_fc_map_req {
         vr_fc_map_req::default()
     }
 
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
+    }
+
     // write_binary_to_buffer function
     fn write_binary_fn(
         &self,
@@ -762,6 +863,10 @@ impl VrSandesh for vr_flow_response {
 
     fn new() -> Self {
         vr_flow_response::default()
+    }
+
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
     }
 
     // write_binary_to_buffer function
@@ -801,6 +906,10 @@ impl VrSandesh for vr_flow_table_data {
         vr_flow_table_data::default()
     }
 
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
+    }
+
     // write_binary_to_buffer function
     fn write_binary_fn(
         &self,
@@ -836,6 +945,10 @@ impl VrSandesh for vr_bridge_table_data {
 
     fn new() -> Self {
         vr_bridge_table_data::default()
+    }
+
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
     }
 
     // write_binary_to_buffer function
@@ -875,6 +988,10 @@ impl VrSandesh for vr_hugepage_config {
         vr_hugepage_config::default()
     }
 
+    fn as_c_void(&self) -> *mut c_void {
+        utils::into_raw_ptr(&*self) as *mut c_void
+    }
+
     // write_binary_to_buffer function
     fn write_binary_fn(
         &self,
@@ -902,22 +1019,6 @@ impl VrSandesh for vr_hugepage_config {
 // sandesh info utils
 
 impl sandesh_info_t {
-    pub fn to_binary<T: VrSandesh>(req: T) -> Result<Vec<u8>, i32> {
-        unsafe {
-            let mut error = 0;
-            let req_ptr = utils::into_raw_ptr(&req) as *mut c_void;
-            let buf = utils::alloc_buf(req.obj_len());
-            let buf_len = req.obj_len();
-            match req.write_binary_fn()(req_ptr, buf, buf_len, &mut error) {
-                wxfer if wxfer >= 0 && error == 0 => {
-                    Ok(utils::free_buf(buf, wxfer as usize))
-                }
-                _ =>
-                    Err(error),
-            }
-        }
-    }
-
     pub fn sname_from_bytes<'a>(buf: &'a Vec<u8>) -> &'a str {
         let buf_len = buf.len();
         let mut c = Cursor::new(&buf);
@@ -929,10 +1030,6 @@ impl sandesh_info_t {
         } else {
             ""
         }
-    }
-
-    pub fn read<T>(_buf: &Vec<u8>) -> Result<impl VrSandesh, i32> {
-        Ok(vr_nexthop_req::new())
     }
 }
 
@@ -946,7 +1043,7 @@ mod test_encode_types {
     #[test]
     fn vr_nexthop_req() {
         let req = vr_nexthop_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_nexthop_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(214, res.len())
     }
@@ -954,7 +1051,7 @@ mod test_encode_types {
     #[test]
     fn vr_interface_req() {
         let req = vr_interface_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_interface_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(724, res.len())
     }
@@ -962,7 +1059,7 @@ mod test_encode_types {
     #[test]
     fn vr_vxlan_req() {
         let req = vr_vxlan_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_vxlan_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(43, res.len())
     }
@@ -970,7 +1067,7 @@ mod test_encode_types {
     #[test]
     fn vr_route_req() {
         let req = vr_route_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_route_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(114, res.len())
     }
@@ -978,7 +1075,7 @@ mod test_encode_types {
     #[test]
     fn vr_mpls_req() {
         let req = vr_mpls_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_mpls_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(49, res.len())
     }
@@ -986,7 +1083,7 @@ mod test_encode_types {
     #[test]
     fn vr_mirror_req() {
         let req = vr_mirror_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_mirror_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(75, res.len())
     }
@@ -994,7 +1091,7 @@ mod test_encode_types {
     #[test]
     fn vr_vrf_req() {
         let req = vr_vrf_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_vrf_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(62, res.len())
     }
@@ -1002,7 +1099,7 @@ mod test_encode_types {
     #[test]
     fn vr_flow_req() {
         let req = vr_flow_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_flow_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(272, res.len())
     }
@@ -1010,7 +1107,7 @@ mod test_encode_types {
     #[test]
     fn vr_vrf_assign_req() {
         let req = vr_vrf_assign_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_vrf_assign_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(63, res.len())
     }
@@ -1018,7 +1115,7 @@ mod test_encode_types {
     #[test]
     fn vr_vrf_stats_req() {
         let req = vr_vrf_stats_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_vrf_stats_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(352, res.len())
     }
@@ -1026,7 +1123,7 @@ mod test_encode_types {
     #[test]
     fn vr_response() {
         let req = vr_response::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_response", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(30, res.len())
     }
@@ -1034,7 +1131,7 @@ mod test_encode_types {
     #[test]
     fn vr_mem_stats_req() {
         let req = vr_mem_stats_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_mem_stats_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(803, res.len())
     }
@@ -1042,7 +1139,7 @@ mod test_encode_types {
     #[test]
     fn vr_pkt_drop_log_req() {
         let req = vr_pkt_drop_log_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_pkt_drop_log_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(74, res.len())
     }
@@ -1050,7 +1147,7 @@ mod test_encode_types {
     #[test]
     fn vr_drop_stats_req() {
         let req = vr_drop_stats_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_drop_stats_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(593, res.len())
     }
@@ -1058,7 +1155,7 @@ mod test_encode_types {
     #[test]
     fn vr_qos_map_req() {
         let req = vr_qos_map_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_qos_map_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(89, res.len())
     }
@@ -1066,7 +1163,7 @@ mod test_encode_types {
     #[test]
     fn vr_fc_map_req() {
         let req = vr_fc_map_req::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_fc_map_req", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(75, res.len())
     }
@@ -1074,7 +1171,7 @@ mod test_encode_types {
     #[test]
     fn vr_flow_response() {
         let req = vr_flow_response::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_flow_response", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(70, res.len())
     }
@@ -1082,7 +1179,7 @@ mod test_encode_types {
     #[test]
     fn vr_flow_table_data() {
         let req = vr_flow_table_data::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_flow_table_data", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(163, res.len())
     }
@@ -1090,7 +1187,7 @@ mod test_encode_types {
     #[test]
     fn vr_bridge_table_data() {
         let req = vr_bridge_table_data::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_bridge_table_data", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(56, res.len())
     }
@@ -1098,8 +1195,194 @@ mod test_encode_types {
     #[test]
     fn vr_hugepage_config() {
         let req = vr_hugepage_config::new();
-        let res = sandesh_info_t::to_binary(req).unwrap();
+        let res = req.write().unwrap();
         assert_eq!("vr_hugepage_config", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(53, res.len())
+    }
+}
+
+#[cfg(test)]
+mod test_decode_types {
+    use crate::vr_types::VrSandesh;
+    use crate::vr_types_binding::*;
+
+    #[test]
+    fn vr_nexthop_req() {
+        let mut req = vr_nexthop_req::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_interface_req() {
+        let mut req = vr_interface_req::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_vxlan_req() {
+        let mut req = vr_vxlan_req::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_route_req() {
+        let mut req = vr_route_req::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_mpls_req() {
+        let mut req = vr_mpls_req::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_mirror_req() {
+        let mut req = vr_mirror_req::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_vrf_req() {
+        let mut req = vr_vrf_req::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_flow_req() {
+        let mut req = vr_flow_req::new();
+        req.fr_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.fr_op)
+    }
+
+    #[test]
+    fn vr_vrf_assign_req() {
+        let mut req = vr_vrf_assign_req::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_vrf_stats_req() {
+        let mut req = vr_vrf_stats_req::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_response() {
+        let mut req = vr_response::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_mem_stats_req() {
+        let mut req = vr_mem_stats_req::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_pkt_drop_log_req() {
+        let mut req = vr_pkt_drop_log_req::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_drop_stats_req() {
+        let mut req = vr_drop_stats_req::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_qos_map_req() {
+        let mut req = vr_qos_map_req::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_fc_map_req() {
+        let mut req = vr_fc_map_req::new();
+        req.h_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.h_op)
+    }
+
+    #[test]
+    fn vr_flow_response() {
+        let mut req = vr_flow_response::new();
+        req.fresp_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.fresp_op)
+    }
+
+    #[test]
+    fn vr_flow_table_data() {
+        let mut req = vr_flow_table_data::new();
+        req.ftable_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.ftable_op)
+    }
+
+    #[test]
+    fn vr_bridge_table_data() {
+        let mut req = vr_bridge_table_data::new();
+        req.btable_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.btable_op)
+    }
+
+    #[test]
+    fn vr_hugepage_config() {
+        let mut req = vr_hugepage_config::new();
+        req.vhp_op = 1;
+        let bytes = req.write().unwrap();
+        let _ = req.read(bytes);
+        assert_eq!(1, req.vhp_op)
     }
 }
