@@ -1,3 +1,6 @@
+// Copyright 2020 Eishun Kondoh
+// SPDX-License-Identifier: Apache-2.0
+
 use std::ffi::{CStr, CString};
 use std::os::raw::{c_char, c_void};
 

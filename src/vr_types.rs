@@ -1,3 +1,6 @@
+// Copyright 2020 Eishun Kondoh
+// SPDX-License-Identifier: Apache-2.0
+
 use crate::utils;
 use crate::vr_flow;
 use crate::vr_interface;
@@ -27,10 +30,10 @@ pub trait VrSandesh {
             let buf = utils::alloc_buf(self.obj_len());
             let buf_len = self.obj_len();
             match self.write_binary_fn()(wsandesh, buf, buf_len, &mut error) {
-                wxfer if wxfer >= 0 && error == 0 =>
-                    Ok(utils::free_buf(buf, wxfer as usize)),
-                _ =>
-                    Err(error)
+                wxfer if wxfer >= 0 && error == 0 => {
+                    Ok(utils::free_buf(buf, wxfer as usize))
+                }
+                _ => Err(error),
             }
         }
     }
@@ -41,12 +44,10 @@ pub trait VrSandesh {
             let buf_ptr = Box::into_raw(buf.into_boxed_slice()) as *mut u8;
             let buf_len = self.obj_len();
             let rsandesh = self.as_c_void();
-            match self.read_binary_fn()(rsandesh, buf_ptr, buf_len, &mut error) {
-                rxfer if rxfer >= 0 && error == 0 => {
-                    Ok(rxfer)
-                },
-                _ =>
-                    Err(error)
+            match self.read_binary_fn()(rsandesh, buf_ptr, buf_len, &mut error)
+            {
+                rxfer if rxfer >= 0 && error == 0 => Ok(rxfer),
+                _ => Err(error),
             }
         }
     }
@@ -125,8 +126,8 @@ impl VrSandesh for vr_nexthop_req {
         }
         size += self.nhr_pbb_mac_size as usize;
 
-        if (self.nhr_type == vr_nexthop::NH_TUNNEL)
-            && (0 != self.nhr_flags & vr_nexthop::NH_FLAG_TUNNEL_UDP)
+        if (self.nhr_type == vr_nexthop::NhType::Tunnel as i8)
+            && (0 != self.nhr_flags & vr_nexthop::Flag::TunnelUdp as u32)
             && (self.nhr_family as i32 == AF_INET6)
         {
             size += (vr_flow::VR_IP6_ADDRESS_LEN * 2 * 4) as usize;
@@ -1140,7 +1141,10 @@ mod test_encode_types {
     fn vr_pkt_drop_log_req() {
         let req = vr_pkt_drop_log_req::new();
         let res = req.write().unwrap();
-        assert_eq!("vr_pkt_drop_log_req", sandesh_info_t::sname_from_bytes(&res));
+        assert_eq!(
+            "vr_pkt_drop_log_req",
+            sandesh_info_t::sname_from_bytes(&res)
+        );
         assert_eq!(74, res.len())
     }
 
@@ -1180,7 +1184,10 @@ mod test_encode_types {
     fn vr_flow_table_data() {
         let req = vr_flow_table_data::new();
         let res = req.write().unwrap();
-        assert_eq!("vr_flow_table_data", sandesh_info_t::sname_from_bytes(&res));
+        assert_eq!(
+            "vr_flow_table_data",
+            sandesh_info_t::sname_from_bytes(&res)
+        );
         assert_eq!(163, res.len())
     }
 
@@ -1188,7 +1195,10 @@ mod test_encode_types {
     fn vr_bridge_table_data() {
         let req = vr_bridge_table_data::new();
         let res = req.write().unwrap();
-        assert_eq!("vr_bridge_table_data", sandesh_info_t::sname_from_bytes(&res));
+        assert_eq!(
+            "vr_bridge_table_data",
+            sandesh_info_t::sname_from_bytes(&res)
+        );
         assert_eq!(56, res.len())
     }
 
@@ -1196,7 +1206,10 @@ mod test_encode_types {
     fn vr_hugepage_config() {
         let req = vr_hugepage_config::new();
         let res = req.write().unwrap();
-        assert_eq!("vr_hugepage_config", sandesh_info_t::sname_from_bytes(&res));
+        assert_eq!(
+            "vr_hugepage_config",
+            sandesh_info_t::sname_from_bytes(&res)
+        );
         assert_eq!(53, res.len())
     }
 }
