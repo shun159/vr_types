@@ -127,7 +127,7 @@ impl VrSandesh for vr_nexthop_req {
         size += self.nhr_pbb_mac_size as usize;
 
         if (self.nhr_type == vr_nexthop::NhType::Tunnel as i8)
-            && (0 != self.nhr_flags & vr_nexthop::Flag::TunnelUdp as u32)
+            && (0 != self.nhr_flags & vr_nexthop::NhFlag::TunnelUdp as u32)
             && (self.nhr_family as i32 == AF_INET6)
         {
             size += (vr_flow::VR_IP6_ADDRESS_LEN * 2 * 4) as usize;
