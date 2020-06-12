@@ -31,7 +31,7 @@ pub trait VrSandesh {
             let buf_len = self.obj_len();
             match self.write_binary_fn()(wsandesh, buf, buf_len, &mut error) {
                 wxfer if wxfer >= 0 && error == 0 => {
-                    Ok(utils::free_buf(buf, wxfer as usize))
+                    Ok(utils::free_buf::<u8>(buf, wxfer as usize))
                 }
                 _ => Err(error),
             }

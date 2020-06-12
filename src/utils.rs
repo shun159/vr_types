@@ -26,7 +26,7 @@ pub fn alloc_buf(len: usize) -> *mut u8 {
     Box::into_raw(vec.into_boxed_slice()) as *mut u8
 }
 
-pub fn free_buf(buf: *mut u8, buf_len: usize) -> Vec<u8> {
+pub fn free_buf<T: Clone>(buf: *mut T, buf_len: usize) -> Vec<T> {
     unsafe {
         let s = std::slice::from_raw_parts_mut(buf, buf_len);
         let r = Box::from_raw(s);

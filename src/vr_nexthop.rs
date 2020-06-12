@@ -1,12 +1,14 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
-use byteorder::{NetworkEndian, ReadBytesExt, WriteBytesExt};
-use crate::sandesh;
+use crate::sandesh::SandeshOp;
+use crate::utils;
+use crate::vr_flow::VR_IP6_ADDRESS_LEN;
+use crate::vr_types::VrSandesh;
+use crate::vr_types_binding::*;
 use eui48::MacAddress;
-use libc;
+use std::convert::{From, TryFrom, TryInto};
 use std::net::{Ipv4Addr, Ipv6Addr};
-use std::io::Cursor;
 
 #[derive(Debug, PartialEq)]
 pub enum NhType {
@@ -22,14 +24,33 @@ pub enum NhType {
     Max,
 }
 
+impl TryFrom<i8> for NhType {
+    type Error = ();
+    fn try_from(v: i8) -> Result<Self, Self::Error> {
+        match v {
+            x if x == NhType::Dead as i8 => Ok(NhType::Dead),
+            x if x == NhType::Rcv as i8 => Ok(NhType::Rcv),
+            x if x == NhType::Encap as i8 => Ok(NhType::Encap),
+            x if x == NhType::Tunnel as i8 => Ok(NhType::Tunnel),
+            x if x == NhType::Resolve as i8 => Ok(NhType::Resolve),
+            x if x == NhType::Discard as i8 => Ok(NhType::Discard),
+            x if x == NhType::Composite as i8 => Ok(NhType::Composite),
+            x if x == NhType::VrfTranslate as i8 => Ok(NhType::VrfTranslate),
+            x if x == NhType::L2Rcv as i8 => Ok(NhType::L2Rcv),
+            x if x == NhType::Max as i8 => Ok(NhType::Max),
+            _ => Err(()),
+        }
+    }
+}
+
 // Defined in vr_nexthop.h
 #[derive(Debug, PartialEq)]
 pub enum NhEcmpConfigHash {
-    Proto = 0b0000_0001,
-    SrcIP = 0b0000_0010,
-    SrcPort = 0b0000_0100,
-    DstIP = 0b0000_1000,
-    DstPort = 0b0001_0000,
+    Proto = 0x01,
+    SrcIP = 0x02,
+    SrcPort = 0x04,
+    DstIP = 0x08,
+    DstPort = 0x10,
 }
 
 #[derive(Debug, PartialEq)]
@@ -64,71 +85,14 @@ pub enum NhFlag {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct VlanHeader {
-    pub tpid: u16,
-    pub pcp:  u8,
-    pub vlan_id: u16
-}
-
-impl VlanHeader {
-    pub fn new() -> VlanHeader {
-        VlanHeader { tpid: 0, pcp: 0, vlan_id: 0 }
-    }
-
-    pub fn write(&self) -> Vec<u8> {
-        let buf: Vec<u8> = Vec::new();
-        let mut c = Cursor::new(buf);
-        c.write_u16::<NetworkEndian>(self.tpid).unwrap();
-        c.write_u16::<NetworkEndian>(
-            (self.pcp as u16) << 13 |
-            self.vlan_id & 0x1fff
-        ).unwrap();
-        c.into_inner()
-    }
-
-    pub fn read<'a>(buf: &'a Vec<u8>) -> Result<VlanHeader, &str> {
-        if buf.len() < 4 { return Err("Byte too short(< 32bit)") }
-        let mut c = Cursor::new(&buf);
-        let tpid = c.read_u16::<NetworkEndian>().unwrap();
-        let tci = c.read_u16::<NetworkEndian>().unwrap();
-        let vlan_h = VlanHeader {
-            tpid: tpid,
-            pcp: (tci >> 13) as u8,
-            vlan_id: tci & 0x1fff
-        };
-
-        Ok(vlan_h)
-    }
-}
-
-#[derive(Debug, PartialEq)]
-pub struct NhEncap {
-    pub dst_mac: MacAddress,
-    pub src_mac: MacAddress,
-    pub vlan_h: VlanHeader,
-    pub eth_type: i32,
-}
-
-impl NhEncap {
-    pub fn new() -> NhEncap {
-        NhEncap {
-            dst_mac: MacAddress::nil(),
-            src_mac: MacAddress::nil(),
-            vlan_h: VlanHeader::new(),
-            eth_type: libc::ETH_P_IP
-        }
-    }
-}
-
-#[derive(Debug, PartialEq)]
 pub struct NhRequest {
-    pub op: sandesh::Op,
+    pub op: SandeshOp,
     pub _type: NhType,
     pub family: i8, // One of AF_*
     pub id: i32,
     pub rid: i32,
     pub encap_oif_id: i32,
-    pub encap_len: i32,
+    pub encap_len: usize,
     pub encap_family: i32,
     pub vrf: i32,
     pub tun_sip: Ipv4Addr,
@@ -137,18 +101,148 @@ pub struct NhRequest {
     pub tun_dport: i16,
     pub ref_cnt: i32,
     pub marker: i32,
-    pub flags: Vec<NhFlag>,
-    pub encap: Option<NhEncap>,
+    pub flags: u32,
+    pub encap: Vec<u8>,
     pub nh_list: Vec<i32>,
     pub label_list: Vec<i32>,
     pub nh_count: i16,
     pub tun_sip6: Ipv6Addr,
     pub tun_dip6: Ipv6Addr,
-    pub ecmp_config_hash: Vec<NhEcmpConfigHash>,
+    pub ecmp_config_hash: i8,
     pub pbb_mac: MacAddress,
     pub encap_crypt_oif_id: i32,
     pub crypt_traffic: i32,
     pub crypt_path_available: i32,
     pub rw_dst_mac: MacAddress,
     pub transport_label: u32,
+}
+
+impl Default for NhRequest {
+    fn default() -> NhRequest {
+        NhRequest {
+            op: SandeshOp::Add,
+            _type: NhType::Dead,
+            family: 0,
+            id: 0,
+            rid: 0,
+            encap_oif_id: 0,
+            encap_len: 0,
+            encap_family: 0,
+            vrf: 0,
+            tun_sip: Ipv4Addr::new(0, 0, 0, 0),
+            tun_dip: Ipv4Addr::new(0, 0, 0, 0),
+            tun_sport: 0,
+            tun_dport: 0,
+            ref_cnt: 0,
+            marker: 0,
+            flags: 0,
+            encap: vec![],
+            nh_list: vec![],
+            label_list: vec![],
+            nh_count: 0,
+            tun_sip6: Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0),
+            tun_dip6: Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0),
+            ecmp_config_hash: 0,
+            pbb_mac: MacAddress::nil(),
+            encap_crypt_oif_id: 0,
+            crypt_traffic: 0,
+            crypt_path_available: 0,
+            rw_dst_mac: MacAddress::nil(),
+            transport_label: 0,
+        }
+    }
+}
+
+impl NhRequest {
+    pub fn read<'a>(buf: Vec<u8>) -> Result<NhRequest, &'a str> {
+        let decoder = vr_nexthop_req::new();
+        match decoder.read(buf) {
+            Err(_) => Err("Failed to read binary"),
+            Ok(_) => {
+                let mut nhr = NhRequest::default();
+                nhr.op = decoder.h_op.try_into().unwrap();
+                nhr._type = decoder.nhr_type.try_into().unwrap();
+                nhr.family = decoder.nhr_family;
+                nhr.id = decoder.nhr_id;
+                nhr.rid = decoder.nhr_rid;
+                nhr.encap_oif_id = decoder.nhr_encap_oif_id;
+                nhr.encap_len = decoder.nhr_encap_len as usize;
+                nhr.encap_family = decoder.nhr_encap_family;
+                nhr.vrf = decoder.nhr_vrf;
+                nhr.tun_sip = Ipv4Addr::from(decoder.nhr_tun_sip);
+                nhr.tun_dip = Ipv4Addr::from(decoder.nhr_tun_dip);
+                nhr.tun_sport = decoder.nhr_tun_sport;
+                nhr.tun_dport = decoder.nhr_tun_dport;
+                nhr.ref_cnt = decoder.nhr_ref_cnt;
+                nhr.marker = decoder.nhr_marker;
+                nhr.flags = decoder.nhr_flags;
+                nhr.encap = utils::free_buf::<u8>(
+                    decoder.nhr_encap as *mut u8,
+                    nhr.encap_len,
+                );
+                nhr.nh_list = utils::free_buf::<i32>(
+                    decoder.nhr_nh_list as *mut i32,
+                    decoder.nhr_nh_list_size as usize,
+                );
+                nhr.nh_count = decoder.nhr_nh_count;
+                nhr.label_list = utils::free_buf::<i32>(
+                    decoder.nhr_label_list as *mut i32,
+                    decoder.nhr_label_list_size as usize,
+                );
+
+                // Decode tunnel in6addr
+                let tun_sip6 = utils::free_buf::<u16>(
+                    decoder.nhr_tun_sip6 as *mut u16,
+                    (VR_IP6_ADDRESS_LEN / 2) as usize,
+                );
+                nhr.tun_sip6 = Ipv6Addr::new(
+                    tun_sip6[0],
+                    tun_sip6[1],
+                    tun_sip6[2],
+                    tun_sip6[3],
+                    tun_sip6[4],
+                    tun_sip6[5],
+                    tun_sip6[6],
+                    tun_sip6[7],
+                );
+
+                let tun_dip6 = utils::free_buf::<u16>(
+                    decoder.nhr_tun_dip6 as *mut u16,
+                    (VR_IP6_ADDRESS_LEN / 2) as usize,
+                );
+                nhr.tun_dip6 = Ipv6Addr::new(
+                    tun_dip6[0],
+                    tun_dip6[1],
+                    tun_dip6[2],
+                    tun_dip6[3],
+                    tun_dip6[4],
+                    tun_dip6[5],
+                    tun_dip6[6],
+                    tun_dip6[7],
+                );
+
+                nhr.ecmp_config_hash = decoder.nhr_ecmp_config_hash;
+
+                // MAC Address
+                nhr.pbb_mac = MacAddress::from_bytes(&*utils::free_buf::<u8>(
+                    decoder.nhr_pbb_mac as *mut u8,
+                    libc::ETH_ALEN as usize,
+                ))
+                .unwrap();
+
+                nhr.encap_crypt_oif_id = decoder.nhr_encap_crypt_oif_id;
+                nhr.crypt_traffic = decoder.nhr_crypt_traffic;
+                nhr.crypt_path_available = decoder.nhr_crypt_path_available;
+                nhr.rw_dst_mac =
+                    MacAddress::from_bytes(&*utils::free_buf::<u8>(
+                        decoder.nhr_rw_dst_mac as *mut u8,
+                        libc::ETH_ALEN as usize,
+                    ))
+                    .unwrap();
+                nhr.transport_label = decoder.nhr_transport_label;
+
+                Ok(nhr)
+            }
+        }
+    }
 }
