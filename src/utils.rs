@@ -33,3 +33,8 @@ pub fn free_buf<T: Clone>(buf: *mut T, buf_len: usize) -> Vec<T> {
         r.to_vec()
     }
 }
+
+pub fn into_mut_ptr<T: Clone>(vec: &Vec<T>) -> *mut T {
+    let mut b: Box<[T]> = vec.clone().into_boxed_slice();
+    b.as_mut_ptr()
+}

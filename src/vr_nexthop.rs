@@ -10,7 +10,7 @@ use eui48::MacAddress;
 use std::convert::{From, TryFrom, TryInto};
 use std::net::{Ipv4Addr, Ipv6Addr};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum NhType {
     Dead,
     Rcv,
@@ -102,7 +102,7 @@ pub struct NhRequest {
     pub ref_cnt: i32,
     pub marker: i32,
     pub flags: u32,
-    pub encap: Vec<u8>,
+    pub encap: Vec<i8>,
     pub nh_list: Vec<i32>,
     pub label_list: Vec<i32>,
     pub nh_count: i16,
@@ -154,6 +154,71 @@ impl Default for NhRequest {
 }
 
 impl NhRequest {
+    pub fn write(&self) -> Result<Vec<u8>, &str> {
+        let mut encoder: vr_nexthop_req = vr_nexthop_req::new();
+        encoder.h_op = self.op as u32;
+        encoder.nhr_type = self._type as i8;
+        encoder.nhr_family = self.family;
+        encoder.nhr_id = self.id;
+        encoder.nhr_rid = self.rid;
+        encoder.nhr_encap_oif_id = self.encap_crypt_oif_id;
+        encoder.nhr_encap_len = self.encap.len() as i32;
+        encoder.nhr_encap = utils::into_mut_ptr::<i8>(&self.encap);
+        encoder.nhr_encap_size = self.encap.len() as u32;
+        encoder.nhr_encap_family = self.encap_family;
+        encoder.nhr_vrf = self.vrf;
+        encoder.nhr_tun_sip = Self::in_addr_to_u32(self.tun_sip);
+        encoder.nhr_tun_dip = Self::in_addr_to_u32(self.tun_dip);
+        encoder.nhr_tun_sport = self.tun_sport;
+        encoder.nhr_tun_dport = self.tun_dport;
+        encoder.nhr_ref_cnt = self.ref_cnt;
+        encoder.nhr_marker = self.marker;
+        encoder.nhr_flags = self.flags;
+        encoder.nhr_nh_list = utils::into_mut_ptr::<i32>(&self.nh_list);
+        encoder.nhr_nh_list_size = self.nh_list.len() as u32;
+        encoder.nhr_label_list = utils::into_mut_ptr::<i32>(&self.label_list);
+        encoder.nhr_label_list_size = self.label_list.len() as u32;
+        encoder.nhr_nh_count = self.nh_count;
+        encoder.nhr_tun_sip6 =
+            utils::into_mut_ptr::<i8>(&Self::in6_addr_to_vec(self.tun_sip6));
+        encoder.nhr_tun_sip6_size = if self.tun_sip6.is_unspecified() {
+            0u32
+        } else {
+            VR_IP6_ADDRESS_LEN
+        };
+        encoder.nhr_tun_dip6 =
+            utils::into_mut_ptr::<i8>(&Self::in6_addr_to_vec(self.tun_dip6));
+        encoder.nhr_tun_dip6_size = if self.tun_dip6.is_unspecified() {
+            0u32
+        } else {
+            VR_IP6_ADDRESS_LEN
+        };
+        encoder.nhr_ecmp_config_hash = self.ecmp_config_hash;
+        encoder.nhr_pbb_mac =
+            utils::into_mut_ptr(&Self::mac_to_vec(self.pbb_mac));
+        encoder.nhr_pbb_mac_size = if self.pbb_mac.is_nil() {
+            0u32
+        } else {
+            libc::ETH_ALEN as u32
+        };
+        encoder.nhr_encap_crypt_oif_id = self.encap_crypt_oif_id;
+        encoder.nhr_crypt_traffic = self.crypt_traffic;
+        encoder.nhr_crypt_path_available = self.crypt_path_available;
+        encoder.nhr_rw_dst_mac =
+            utils::into_mut_ptr(&Self::mac_to_vec(self.rw_dst_mac));
+        encoder.nhr_rw_dst_mac_size = if self.rw_dst_mac.is_nil() {
+            0u32
+        } else {
+            libc::ETH_ALEN as u32
+        };
+        encoder.nhr_transport_label = self.transport_label;
+
+        match encoder.write() {
+            Err(_) => Err("Failed to write binary"),
+            Ok(v) => Ok(v),
+        }
+    }
+
     pub fn read<'a>(buf: Vec<u8>) -> Result<NhRequest, &'a str> {
         let decoder = vr_nexthop_req::new();
         match decoder.read(buf) {
@@ -176,8 +241,8 @@ impl NhRequest {
                 nhr.ref_cnt = decoder.nhr_ref_cnt;
                 nhr.marker = decoder.nhr_marker;
                 nhr.flags = decoder.nhr_flags;
-                nhr.encap = utils::free_buf::<u8>(
-                    decoder.nhr_encap as *mut u8,
+                nhr.encap = utils::free_buf::<i8>(
+                    decoder.nhr_encap as *mut i8,
                     nhr.encap_len,
                 );
                 nhr.nh_list = utils::free_buf::<i32>(
@@ -191,58 +256,95 @@ impl NhRequest {
                 );
 
                 // Decode tunnel in6addr
-                let tun_sip6 = utils::free_buf::<u16>(
-                    decoder.nhr_tun_sip6 as *mut u16,
-                    (VR_IP6_ADDRESS_LEN / 2) as usize,
-                );
-                nhr.tun_sip6 = Ipv6Addr::new(
-                    tun_sip6[0],
-                    tun_sip6[1],
-                    tun_sip6[2],
-                    tun_sip6[3],
-                    tun_sip6[4],
-                    tun_sip6[5],
-                    tun_sip6[6],
-                    tun_sip6[7],
+                nhr.tun_sip6 = Self::read_tun_ip6(
+                    decoder.nhr_tun_sip6,
+                    decoder.nhr_tun_sip6_size,
                 );
 
-                let tun_dip6 = utils::free_buf::<u16>(
-                    decoder.nhr_tun_dip6 as *mut u16,
-                    (VR_IP6_ADDRESS_LEN / 2) as usize,
-                );
-                nhr.tun_dip6 = Ipv6Addr::new(
-                    tun_dip6[0],
-                    tun_dip6[1],
-                    tun_dip6[2],
-                    tun_dip6[3],
-                    tun_dip6[4],
-                    tun_dip6[5],
-                    tun_dip6[6],
-                    tun_dip6[7],
+                nhr.tun_dip6 = Self::read_tun_ip6(
+                    decoder.nhr_tun_dip6,
+                    decoder.nhr_tun_dip6_size,
                 );
 
                 nhr.ecmp_config_hash = decoder.nhr_ecmp_config_hash;
 
                 // MAC Address
-                nhr.pbb_mac = MacAddress::from_bytes(&*utils::free_buf::<u8>(
-                    decoder.nhr_pbb_mac as *mut u8,
-                    libc::ETH_ALEN as usize,
-                ))
-                .unwrap();
+                nhr.pbb_mac = Self::read_mac_addr(
+                    decoder.nhr_pbb_mac,
+                    decoder.nhr_pbb_mac_size,
+                );
 
                 nhr.encap_crypt_oif_id = decoder.nhr_encap_crypt_oif_id;
                 nhr.crypt_traffic = decoder.nhr_crypt_traffic;
                 nhr.crypt_path_available = decoder.nhr_crypt_path_available;
-                nhr.rw_dst_mac =
-                    MacAddress::from_bytes(&*utils::free_buf::<u8>(
-                        decoder.nhr_rw_dst_mac as *mut u8,
-                        libc::ETH_ALEN as usize,
-                    ))
-                    .unwrap();
+                nhr.rw_dst_mac = Self::read_mac_addr(
+                    decoder.nhr_rw_dst_mac,
+                    decoder.nhr_rw_dst_mac_size,
+                );
                 nhr.transport_label = decoder.nhr_transport_label;
 
                 Ok(nhr)
             }
+        }
+    }
+
+    fn mac_to_vec(addr: MacAddress) -> Vec<i8> {
+        let mut v: Vec<i8> = Vec::new();
+        let octets = if addr.is_nil() {
+            vec![]
+        } else {
+            addr.as_bytes().to_vec()
+        };
+        for (i, o) in octets.into_iter().enumerate() {
+            v[i] = o as i8
+        }
+
+        return v;
+    }
+
+    fn in_addr_to_u32(addr: Ipv4Addr) -> u32 {
+        let v = addr.octets().to_vec();
+        ((v[3] as u32) << 24)
+            | ((v[2] as u32) << 16)
+            | ((v[1] as u32) << 8)
+            | (v[0] as u32)
+    }
+
+    fn in6_addr_to_vec(addr: Ipv6Addr) -> Vec<i8> {
+        let mut v: Vec<i8> = Vec::new();
+        let octets = if addr.is_unspecified() {
+            vec![]
+        } else {
+            addr.octets().to_vec()
+        };
+        for (i, o) in octets.into_iter().enumerate() {
+            v[i] = o as i8;
+        }
+        return v;
+    }
+
+    fn read_mac_addr(mac_addr: *mut i8, mac_addr_size: u32) -> MacAddress {
+        if mac_addr_size == libc::ETH_ALEN as u32 {
+            MacAddress::from_bytes(&*utils::free_buf::<u8>(
+                mac_addr as *mut u8,
+                libc::ETH_ALEN as usize,
+            ))
+            .unwrap()
+        } else {
+            MacAddress::nil()
+        }
+    }
+
+    fn read_tun_ip6(tun_ip6: *mut i8, ip6_size: u32) -> Ipv6Addr {
+        if ip6_size == VR_IP6_ADDRESS_LEN / 2 {
+            let v: Vec<u16> = utils::free_buf::<u16>(
+                tun_ip6 as *mut u16,
+                (VR_IP6_ADDRESS_LEN / 2) as usize,
+            );
+
+            Ipv6Addr::new(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7])
+        } else {
+            Ipv6Addr::UNSPECIFIED
         }
     }
 }
