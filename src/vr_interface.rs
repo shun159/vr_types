@@ -4,22 +4,55 @@
 use crate::sandesh::SandeshOp;
 use eui48::MacAddress;
 use std::net::{Ipv4Addr, Ipv6Addr};
+use std::convert::{TryFrom, TryInto};
 
 pub const VIF_MAX_MIRROR_MD_SIZE: u32 = 0xFF;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum IfType {
-    Host       = 0,
-    Agent      = 1,
-    Physical   = 2,
-    Virtual    = 3,
-    XenLlHost  = 4,
-    Gateway    = 5,
-    VirualVlan = 6,
-    Stats      = 7,
-    Vlan       = 8,
-    Monitoring = 9,
-    Max        = 10
+    Host        = 0,
+    Agent       = 1,
+    Physical    = 2,
+    Virtual     = 3,
+    XenLlHost   = 4,
+    Gateway     = 5,
+    VirtualVlan = 6,
+    Stats       = 7,
+    Vlan        = 8,
+    Monitoring  = 9,
+    Max         = 10
+}
+
+impl TryFrom<i8> for IfType {
+    type Error = ();
+    fn try_from(v: i8) -> Result<Self, Self::Error> {
+        match v {
+            x if x == IfType::Host as i8 =>
+                Ok(IfType::Host),
+            x if x == IfType::Agent as i8 =>
+                Ok(IfType::Agent),
+            x if x == IfType::Physical as i8 =>
+                Ok(IfType::Physical),
+            x if x == IfType::Virtual as i8 =>
+                Ok(IfType::Virtual),
+            x if x == IfType::XenLlHost as i8 =>
+                Ok(IfType::XenLlHost),
+            x if x == IfType::Gateway as i8 =>
+                Ok(IfType::Gateway),
+            x if x == IfType::VirtualVlan as i8 =>
+                Ok(IfType::VirtualVlan),
+            x if x == IfType::Stats as i8 =>
+                Ok(IfType::Stats),
+            x if x == IfType::Vlan as i8 =>
+                Ok(IfType::Vlan),
+            x if x == IfType::Monitoring as i8 =>
+                Ok(IfType::Monitoring),
+            x if x == IfType::Max as i8 =>
+                Ok(IfType::Max),
+            _ =>
+                Err(())
+        }
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -139,11 +172,98 @@ pub struct IfRequest {
     pub fat_flow_dst_prefix_mask: Vec<i8>,
     pub fat_flow_dst_aggregate_plen: Vec<i8>,
     pub intf_status: i8,
-    pub fab_name: Vec<i8>,
-    pub fab_drv_name: Vec<i8>,
+    pub fab_name: String,
+    pub fab_drv_name: String,
     pub num_bond_slave: i8,
-    pub bond_slave_name: Vec<i8>,
-    pub bond_slave_drv_name: Vec<i8>,
+    pub bond_slave_name: String,
+    pub bond_slave_drv_name: String,
     pub vlan_tag: u32,
-    pub vifr_vlan_name: Vec<i8>,
+    pub vlan_name: String,
+}
+
+impl Default for IfRequest {
+    fn default() -> IfRequest {
+        IfRequest {
+            op: SandeshOp::Add,
+            core: 0,
+            _type: IfType::Host,
+            flags: 0,
+            vrf: 0,
+            idx: 0,
+            rid: 0,
+            os_idx: 0,
+            mtu: 0,
+            name: String::default(),
+            ibytes: 0,
+            ipackets: 0,
+            ierrors: 0,
+            obytes: 0,
+            opackets: 0,
+            oerrors: 0,
+            queue_ipackets: 0,
+            queue_ierrors: 0,
+            queue_ierrors_to_lcore: vec![],
+            queue_opackets: 0,
+            queue_oerrors: 0,
+            port_ipackets: 0,
+            port_ierrors: 0,
+            port_isyscalls: 0,
+            port_inombufs: 0,
+            port_opackets: 0,
+            port_oerrors: 0,
+            port_osyscalls: 0,
+            dev_ibytes: 0,
+            dev_ipackets: 0,
+            dev_ierrors: 0,
+            dev_inombufs: 0,
+            dev_obytes: 0,
+            dev_opackets: 0,
+            dev_oerrors: 0,
+            ref_cnt: 0,
+            marker: 0,
+            mac: MacAddress::nil(),
+            ip: Ipv4Addr::UNSPECIFIED,
+            ip6: Ipv6Addr::UNSPECIFIED,
+            context: 0,
+            mir_id: 0,
+            speed: 0,
+            duplex: 0,
+            vlan_id: 0,
+            parent_vif_idx: 0,
+            nh_id: 0,
+            cross_connect_idx: 0,
+            src_mac: MacAddress::nil(),
+            bridge_idx: vec![],
+            ovlan_id: 0,
+            transport: vec![],
+            fat_flow_protocol_port: vec![],
+            qos_map_index: 0,
+            in_mirror_md: vec![],
+            out_mirror_md: vec![],
+            dpackets: 0,
+            hw_queues: vec![],
+            isid: 0,
+            pbb_mac: MacAddress::nil(),
+            vhostuser_mode: vec![],
+            mcast_vrf: 0,
+            if_guid: vec![],
+            fat_flow_exclude_ip_list: vec![],
+            fat_flow_exclude_ip6_list: vec![],
+            fat_flow_exclude_ip6_plen_list: vec![],
+            fat_flow_src_prefix: vec![],
+            fat_flow_src_prefix_mask: vec![],
+            fat_flow_src_aggregate_plen: vec![],
+            fat_flow_dst_prefix: vec![],
+            fat_flow_dst_prefix_mask: vec![],
+            fat_flow_dst_aggregate_plen: vec![],
+            intf_status: 0,
+            fab_name: String::default(),
+            fab_drv_name: String::default(),
+            num_bond_slave: 0,
+            bond_slave_name: String::default(),
+            bond_slave_drv_name: String::default(),
+            vlan_tag: 0,
+            vlan_name: String::default()
+        }
+    }
 }
