@@ -1043,14 +1043,10 @@ mod test_encode_types {
 
     #[test]
     fn vr_nexthop_req() {
-        use crate::vr_nexthop;
-
         let req = vr_nexthop_req::new();
         let res = req.write().unwrap();
-        let r = vr_nexthop::NhRequest::read(res).unwrap();
-        println!("{:?}", vr_nexthop::NhRequest::read(r.write().unwrap()));
-        //assert_eq!("vr_nexthop_req", sandesh_info_t::sname_from_bytes(&res));
-        //assert_eq!(214, res.len())
+        assert_eq!("vr_nexthop_req", sandesh_info_t::sname_from_bytes(&res));
+        assert_eq!(214, res.len())
     }
 
     #[test]

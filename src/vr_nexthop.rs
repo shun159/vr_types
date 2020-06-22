@@ -269,7 +269,7 @@ impl NhRequest {
                 nhr.ecmp_config_hash = decoder.nhr_ecmp_config_hash;
 
                 // MAC Address
-                nhr.pbb_mac = Self::read_mac_addr(
+                nhr.pbb_mac = utils::read_mac_addr(
                     decoder.nhr_pbb_mac,
                     decoder.nhr_pbb_mac_size,
                 );
@@ -277,7 +277,7 @@ impl NhRequest {
                 nhr.encap_crypt_oif_id = decoder.nhr_encap_crypt_oif_id;
                 nhr.crypt_traffic = decoder.nhr_crypt_traffic;
                 nhr.crypt_path_available = decoder.nhr_crypt_path_available;
-                nhr.rw_dst_mac = Self::read_mac_addr(
+                nhr.rw_dst_mac = utils::read_mac_addr(
                     decoder.nhr_rw_dst_mac,
                     decoder.nhr_rw_dst_mac_size,
                 );
@@ -323,18 +323,6 @@ impl NhRequest {
         return v;
     }
 
-    fn read_mac_addr(mac_addr: *mut i8, mac_addr_size: u32) -> MacAddress {
-        if mac_addr_size == libc::ETH_ALEN as u32 {
-            MacAddress::from_bytes(&*utils::free_buf::<u8>(
-                mac_addr as *mut u8,
-                libc::ETH_ALEN as usize,
-            ))
-            .unwrap()
-        } else {
-            MacAddress::nil()
-        }
-    }
-
     fn read_tun_ip6(tun_ip6: *mut i8, ip6_size: u32) -> Ipv6Addr {
         if ip6_size == VR_IP6_ADDRESS_LEN / 2 {
             let v: Vec<u16> = utils::free_buf::<u16>(
@@ -346,5 +334,48 @@ impl NhRequest {
         } else {
             Ipv6Addr::UNSPECIFIED
         }
+    }
+}
+
+#[cfg(test)]
+mod test_vr_nexthop {
+    use eui48::MacAddress;
+    use std::net::{Ipv4Addr, Ipv6Addr};
+    use crate::sandesh::SandeshOp;
+    use crate::vr_nexthop::{NhRequest, NhType};
+
+    #[test]
+    fn empty_request() {
+        let nhreq: NhRequest = NhRequest::default();
+        let bytes = nhreq.write().unwrap();
+        let nhreq: NhRequest = NhRequest::read(bytes).unwrap();
+        assert_eq!(nhreq.op, SandeshOp::Add);
+        assert_eq!(nhreq._type, NhType::Dead);
+        assert_eq!(nhreq.family, 0);
+        assert_eq!(nhreq.id, 0);
+        assert_eq!(nhreq.rid, 0);
+        assert_eq!(nhreq.encap_oif_id, 0);
+        assert_eq!(nhreq.encap_len, 0);
+        assert_eq!(nhreq.encap_family, 0);
+        assert_eq!(nhreq.vrf, 0);
+        assert_eq!(nhreq.tun_sip, Ipv4Addr::UNSPECIFIED);
+        assert_eq!(nhreq.tun_dip, Ipv4Addr::UNSPECIFIED);
+        assert_eq!(nhreq.tun_sport, 0);
+        assert_eq!(nhreq.tun_dport, 0);
+        assert_eq!(nhreq.ref_cnt, 0);
+        assert_eq!(nhreq.marker, 0);
+        assert_eq!(nhreq.flags, 0);
+        assert_eq!(nhreq.encap, vec![]);
+        assert_eq!(nhreq.nh_list, vec![]);
+        assert_eq!(nhreq.label_list, vec![]);
+        assert_eq!(nhreq.tun_sip6, Ipv6Addr::UNSPECIFIED);
+        assert_eq!(nhreq.tun_dip6, Ipv6Addr::UNSPECIFIED);
+        assert_eq!(nhreq.ecmp_config_hash, 0);
+        assert_eq!(nhreq.pbb_mac, MacAddress::nil());
+        assert_eq!(nhreq.encap_crypt_oif_id, 0);
+        assert_eq!(nhreq.crypt_path_available, 0);
+        assert_eq!(nhreq.crypt_traffic, 0);
+        assert_eq!(nhreq.rw_dst_mac, MacAddress::nil());
+        assert_eq!(nhreq.transport_label, 0);
     }
 }

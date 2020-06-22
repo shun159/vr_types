@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use eui48::MacAddress;
 use std::ffi::{CStr, CString};
 use std::os::raw::{c_char, c_void};
 
@@ -37,4 +38,16 @@ pub fn free_buf<T: Clone>(buf: *mut T, buf_len: usize) -> Vec<T> {
 pub fn into_mut_ptr<T: Clone>(vec: &Vec<T>) -> *mut T {
     let mut b: Box<[T]> = vec.clone().into_boxed_slice();
     b.as_mut_ptr()
+}
+
+pub fn read_mac_addr(mac_addr: *mut i8, mac_addr_size: u32) -> MacAddress {
+    if mac_addr_size == libc::ETH_ALEN as u32 {
+        MacAddress::from_bytes(&*free_buf::<u8>(
+            mac_addr as *mut u8,
+            libc::ETH_ALEN as usize,
+        ))
+        .unwrap()
+    } else {
+        MacAddress::nil()
+    }
 }
