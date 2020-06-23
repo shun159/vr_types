@@ -3,6 +3,7 @@
 
 use eui48::MacAddress;
 use std::ffi::{CStr, CString};
+use std::net::{Ipv4Addr, Ipv6Addr};
 use std::os::raw::{c_char, c_void};
 
 pub fn str_to_cchar(s: &str) -> *const c_char {
@@ -38,6 +39,50 @@ pub fn free_buf<T: Clone>(buf: *mut T, buf_len: usize) -> Vec<T> {
 pub fn into_mut_ptr<T: Clone>(vec: &Vec<T>) -> *mut T {
     let mut b: Box<[T]> = vec.clone().into_boxed_slice();
     b.as_mut_ptr()
+}
+
+pub fn write_mac(mac_addr: MacAddress) -> *mut i8 {
+    let v: Vec<i8> = Vec::new();
+    let octets = if mac_addr.is_nil() {
+        vec![]
+    } else {
+        mac_addr.as_bytes().to_vec()
+    };
+
+    let mac = octets.iter().fold(v, |mut acc, &o| {
+        acc.push(o as i8);
+        acc
+    });
+
+    into_mut_ptr(&mac)
+}
+
+pub fn write_ip4(ip: Ipv4Addr) -> u32 {
+    let v = ip.octets().to_vec();
+    ((v[3] as u32) << 24)
+        | ((v[2] as u32) << 16)
+        | ((v[1] as u32) << 8)
+        | (v[0] as u32)
+}
+
+pub fn write_ip6(ip: Ipv6Addr) -> u128 {
+    let v: Vec<u8> = ip.octets().to_vec();
+    ((v[15] as u128) << 120)
+        | ((v[14] as u128) << 112)
+        | ((v[13] as u128) << 104)
+        | ((v[12] as u128) << 96)
+        | ((v[11] as u128) << 88)
+        | ((v[10] as u128) << 80)
+        | ((v[9] as u128) << 72)
+        | ((v[8] as u128) << 64)
+        | ((v[7] as u128) << 56)
+        | ((v[6] as u128) << 48)
+        | ((v[5] as u128) << 40)
+        | ((v[4] as u128) << 32)
+        | ((v[3] as u128) << 24)
+        | ((v[2] as u128) << 16)
+        | ((v[1] as u128) << 8)
+        | (v[0] as u128)
 }
 
 pub fn read_mac_addr(mac_addr: *mut i8, mac_addr_size: u32) -> MacAddress {

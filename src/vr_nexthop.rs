@@ -339,10 +339,10 @@ impl NhRequest {
 
 #[cfg(test)]
 mod test_vr_nexthop {
-    use eui48::MacAddress;
-    use std::net::{Ipv4Addr, Ipv6Addr};
     use crate::sandesh::SandeshOp;
     use crate::vr_nexthop::{NhRequest, NhType};
+    use eui48::MacAddress;
+    use std::net::{Ipv4Addr, Ipv6Addr};
 
     #[test]
     fn empty_request() {

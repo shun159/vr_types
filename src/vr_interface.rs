@@ -7,11 +7,13 @@ use crate::vr_types::VrSandesh;
 use crate::vr_types_binding::*;
 use eui48::MacAddress;
 use std::convert::{TryFrom, TryInto};
-use std::ffi::CStr;
+use std::ffi::{CStr, CString};
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::os::raw::c_char;
 
 pub const VIF_MAX_MIRROR_MD_SIZE: u32 = 0xFF;
+pub const IPV6_UPPER_MASK: u128 = 0xffffffffffffffff_0000000000000000;
+pub const IPV6_LOWER_MASK: u128 = 0x0000000000000000_ffffffffffffffff;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum IfType {
@@ -262,6 +264,164 @@ impl Default for IfRequest {
 }
 
 impl IfRequest {
+    pub fn write(&self) -> Result<Vec<u8>, &str> {
+        let mut encoder: vr_interface_req = vr_interface_req::new();
+        encoder.h_op = self.op as u32;
+        encoder.vifr_core = self.core;
+        encoder.vifr_type = self._type as i32;
+        encoder.vifr_flags = self.flags;
+        encoder.vifr_vrf = self.vrf;
+        encoder.vifr_idx = self.idx;
+        encoder.vifr_rid = self.rid;
+        encoder.vifr_os_idx = self.os_idx;
+        encoder.vifr_mtu = self.mtu;
+        encoder.vifr_name = Self::write_cstring(&self.name);
+        encoder.vifr_ibytes = self.ibytes;
+        encoder.vifr_ipackets = self.ipackets;
+        encoder.vifr_ierrors = self.ierrors;
+        encoder.vifr_obytes = self.obytes;
+        encoder.vifr_opackets = self.opackets;
+        encoder.vifr_oerrors = self.oerrors;
+        encoder.vifr_queue_ipackets = self.queue_ipackets;
+        encoder.vifr_queue_ierrors = self.queue_ierrors;
+        encoder.vifr_queue_ierrors_to_lcore =
+            utils::into_mut_ptr(&self.queue_ierrors_to_lcore);
+        encoder.vifr_queue_ierrors_to_lcore_size =
+            self.queue_ierrors_to_lcore.len() as u32;
+        encoder.vifr_queue_opackets = self.queue_opackets;
+        encoder.vifr_queue_oerrors = self.queue_oerrors;
+        encoder.vifr_port_ipackets = self.port_ipackets;
+        encoder.vifr_port_ierrors = self.port_ierrors;
+        encoder.vifr_port_isyscalls = self.port_isyscalls;
+        encoder.vifr_port_inombufs = self.port_inombufs;
+        encoder.vifr_port_opackets = self.port_opackets;
+        encoder.vifr_port_oerrors = self.port_oerrors;
+        encoder.vifr_port_osyscalls = self.port_osyscalls;
+        encoder.vifr_dev_ibytes = self.dev_ibytes;
+        encoder.vifr_dev_ipackets = self.dev_ipackets;
+        encoder.vifr_dev_ierrors = self.dev_ierrors;
+        encoder.vifr_dev_inombufs = self.dev_inombufs;
+        encoder.vifr_dev_obytes = self.dev_obytes;
+        encoder.vifr_dev_opackets = self.dev_opackets;
+        encoder.vifr_dev_oerrors = self.dev_oerrors;
+        encoder.vifr_ref_cnt = self.ref_cnt;
+        encoder.vifr_marker = self.marker;
+        encoder.vifr_mac = utils::write_mac(self.mac);
+        encoder.vifr_mac_size = if self.mac.is_nil() {
+            0u32
+        } else {
+            libc::ETH_ALEN as u32
+        };
+        encoder.vifr_ip = utils::write_ip4(self.ip);
+        let vifr_ip6 = utils::write_ip6(self.ip6);
+        encoder.vifr_ip6_u = ((vifr_ip6 & IPV6_UPPER_MASK) >> 64) as u64;
+        encoder.vifr_ip6_l = (vifr_ip6 & IPV6_LOWER_MASK) as u64;
+        encoder.vifr_context = self.context;
+        encoder.vifr_mir_id = self.mir_id;
+        encoder.vifr_speed = self.speed;
+        encoder.vifr_duplex = self.duplex;
+        encoder.vifr_vlan_id = self.vlan_id;
+        encoder.vifr_parent_vif_idx = self.parent_vif_idx;
+        encoder.vifr_nh_id = self.nh_id;
+        encoder.vifr_cross_connect_idx = self.cross_connect_idx;
+        encoder.vifr_src_mac = utils::write_mac(self.src_mac);
+        encoder.vifr_src_mac_size = if self.src_mac.is_nil() {
+            0u32
+        } else {
+            libc::ETH_ALEN as u32
+        };
+        encoder.vifr_bridge_idx = utils::into_mut_ptr(&self.bridge_idx);
+        encoder.vifr_bridge_idx_size = self.bridge_idx.len() as u32;
+        encoder.vifr_ovlan_id = self.ovlan_id;
+        encoder.vifr_transport = self.transport;
+        encoder.vifr_fat_flow_protocol_port =
+            utils::into_mut_ptr(&self.fat_flow_protocol_port);
+        encoder.vifr_fat_flow_protocol_port_size =
+            self.fat_flow_protocol_port.len() as u32;
+        encoder.vifr_qos_map_index = self.qos_map_index;
+        encoder.vifr_in_mirror_md = utils::into_mut_ptr(&self.in_mirror_md);
+        encoder.vifr_in_mirror_md_size = self.in_mirror_md.len() as u32;
+        encoder.vifr_out_mirror_md = utils::into_mut_ptr(&self.out_mirror_md);
+        encoder.vifr_out_mirror_md_size = self.out_mirror_md.len() as u32;
+        encoder.vifr_dpackets = self.dpackets;
+        encoder.vifr_hw_queues = utils::into_mut_ptr(&self.hw_queues);
+        encoder.vifr_hw_queues_size = self.hw_queues.len() as u32;
+        encoder.vifr_isid = self.isid;
+        encoder.vifr_pbb_mac = utils::write_mac(self.pbb_mac);
+        encoder.vifr_pbb_mac_size = if self.pbb_mac.is_nil() {
+            0u32
+        } else {
+            libc::ETH_ALEN as u32
+        };
+        encoder.vifr_vhostuser_mode = self.vhostuser_mode;
+        encoder.vifr_mcast_vrf = self.mcast_vrf;
+        encoder.vifr_if_guid = utils::into_mut_ptr(&self.if_guid);
+        encoder.vifr_if_guid_size = self.if_guid.len() as u32;
+        encoder.vifr_fat_flow_exclude_ip_list =
+            Self::write_ip_list(&self.fat_flow_exclude_ip_list);
+        encoder.vifr_fat_flow_exclude_ip_list_size =
+            self.fat_flow_exclude_ip_list.len() as u32;
+        let ip6_mut_ptrs =
+            Self::write_ip6_list(&self.fat_flow_exclude_ip6_list);
+        encoder.vifr_fat_flow_exclude_ip6_l_list = ip6_mut_ptrs.0;
+        encoder.vifr_fat_flow_exclude_ip6_l_list_size =
+            self.fat_flow_exclude_ip6_list.len() as u32;
+        encoder.vifr_fat_flow_exclude_ip6_u_list = ip6_mut_ptrs.1;
+        encoder.vifr_fat_flow_exclude_ip6_u_list_size =
+            self.fat_flow_exclude_ip6_list.len() as u32;
+        encoder.vifr_fat_flow_exclude_ip6_plen_list =
+            utils::into_mut_ptr(&self.fat_flow_exclude_ip6_plen_list);
+        encoder.vifr_fat_flow_exclude_ip6_plen_list_size =
+            self.fat_flow_exclude_ip6_plen_list.len() as u32;
+        let src_prefixes =
+            Self::write_u128_into_u64_ptr(&self.fat_flow_src_prefix);
+        encoder.vifr_fat_flow_src_prefix_l = src_prefixes.0;
+        encoder.vifr_fat_flow_src_prefix_l_size =
+            self.fat_flow_src_prefix.len() as u32;
+        encoder.vifr_fat_flow_src_prefix_h = src_prefixes.1;
+        encoder.vifr_fat_flow_src_prefix_h_size =
+            self.fat_flow_src_prefix.len() as u32;
+        encoder.vifr_fat_flow_src_prefix_mask =
+            utils::into_mut_ptr(&self.fat_flow_src_prefix_mask);
+        encoder.vifr_fat_flow_src_prefix_mask_size =
+            self.fat_flow_src_prefix_mask.len() as u32;
+        encoder.vifr_fat_flow_src_aggregate_plen =
+            utils::into_mut_ptr(&self.fat_flow_src_aggregate_plen);
+        encoder.vifr_fat_flow_src_aggregate_plen_size =
+            self.fat_flow_src_aggregate_plen.len() as u32;
+        let dst_prefixes =
+            Self::write_u128_into_u64_ptr(&self.fat_flow_dst_prefix);
+        encoder.vifr_fat_flow_dst_prefix_l = dst_prefixes.0;
+        encoder.vifr_fat_flow_dst_prefix_l_size =
+            self.fat_flow_dst_prefix.len() as u32;
+        encoder.vifr_fat_flow_dst_prefix_h = dst_prefixes.1;
+        encoder.vifr_fat_flow_dst_prefix_h_size =
+            self.fat_flow_dst_prefix.len() as u32;
+        encoder.vifr_fat_flow_dst_prefix_mask =
+            utils::into_mut_ptr(&self.fat_flow_dst_prefix_mask);
+        encoder.vifr_fat_flow_dst_prefix_mask_size =
+            self.fat_flow_dst_prefix_mask.len() as u32;
+        encoder.vifr_fat_flow_dst_aggregate_plen =
+            utils::into_mut_ptr(&self.fat_flow_dst_aggregate_plen);
+        encoder.vifr_fat_flow_dst_aggregate_plen_size =
+            self.fat_flow_dst_aggregate_plen.len() as u32;
+        encoder.vifr_intf_status = self.intf_status;
+        encoder.vifr_fab_name = Self::write_string(&self.fab_name);
+        encoder.vifr_fab_drv_name = Self::write_string(&self.fab_drv_name);
+        encoder.vifr_num_bond_slave = self.num_bond_slave;
+        encoder.vifr_bond_slave_name =
+            Self::write_string(&self.bond_slave_name);
+        encoder.vifr_bond_slave_drv_name =
+            Self::write_string(&self.bond_slave_drv_name);
+        encoder.vifr_vlan_tag = self.vlan_tag;
+        encoder.vifr_vlan_name = Self::write_string(&self.vlan_name);
+
+        match encoder.write() {
+            Err(_) => Err("Failed to write binary"),
+            Ok(v) => Ok(v),
+        }
+    }
+
     pub fn read<'a>(buf: Vec<u8>) -> Result<IfRequest, &'a str> {
         let decoder: vr_interface_req = vr_interface_req::new();
         match decoder.read(buf) {
@@ -385,11 +545,11 @@ impl IfRequest {
                 );
                 vifr.fat_flow_src_prefix_mask = utils::free_buf(
                     decoder.vifr_fat_flow_src_prefix_mask,
-                    decoder.vifr_fat_flow_src_prefix_mask_size as usize
+                    decoder.vifr_fat_flow_src_prefix_mask_size as usize,
                 );
                 vifr.fat_flow_src_aggregate_plen = utils::free_buf(
                     decoder.vifr_fat_flow_src_aggregate_plen,
-                    decoder.vifr_fat_flow_src_aggregate_plen_size as usize
+                    decoder.vifr_fat_flow_src_aggregate_plen_size as usize,
                 );
                 vifr.fat_flow_dst_prefix = Self::read_splitted_u128_vec(
                     decoder.vifr_fat_flow_dst_prefix_h,
@@ -399,34 +559,34 @@ impl IfRequest {
                 );
                 vifr.fat_flow_dst_prefix_mask = utils::free_buf(
                     decoder.vifr_fat_flow_dst_prefix_mask,
-                    decoder.vifr_fat_flow_dst_prefix_mask_size as usize
+                    decoder.vifr_fat_flow_dst_prefix_mask_size as usize,
                 );
                 vifr.fat_flow_dst_aggregate_plen = utils::free_buf(
                     decoder.vifr_fat_flow_dst_aggregate_plen,
-                    decoder.vifr_fat_flow_dst_aggregate_plen_size as usize
+                    decoder.vifr_fat_flow_dst_aggregate_plen_size as usize,
                 );
                 vifr.intf_status = decoder.vifr_intf_status;
                 vifr.fab_name = Self::bytes_to_string(
                     decoder.vifr_fab_name,
-                    decoder.vifr_fab_name_size
+                    decoder.vifr_fab_name_size,
                 );
                 vifr.fab_drv_name = Self::bytes_to_string(
                     decoder.vifr_fab_drv_name,
-                    decoder.vifr_fab_drv_name_size
+                    decoder.vifr_fab_drv_name_size,
                 );
                 vifr.num_bond_slave = decoder.vifr_num_bond_slave;
                 vifr.bond_slave_name = Self::bytes_to_string(
                     decoder.vifr_bond_slave_name,
-                    decoder.vifr_bond_slave_name_size
+                    decoder.vifr_bond_slave_name_size,
                 );
                 vifr.bond_slave_drv_name = Self::bytes_to_string(
                     decoder.vifr_bond_slave_drv_name,
-                    decoder.vifr_bond_slave_drv_name_size
+                    decoder.vifr_bond_slave_drv_name_size,
                 );
                 vifr.vlan_tag = decoder.vifr_vlan_tag;
                 vifr.vlan_name = Self::bytes_to_string(
                     decoder.vifr_vlan_name,
-                    decoder.vifr_vlan_name_size
+                    decoder.vifr_vlan_name_size,
                 );
                 Ok(vifr)
             }
@@ -436,11 +596,20 @@ impl IfRequest {
     // private functions
 
     fn bytes_to_string(ptr: *mut i8, size: u32) -> String {
-        let bytes: Vec<u8> = utils::free_buf(
-            ptr as *mut u8,
-            size as usize
-        );
+        let bytes: Vec<u8> = utils::free_buf(ptr as *mut u8, size as usize);
         String::from_utf8(bytes).unwrap()
+    }
+
+    fn write_ip6_list(ip6_list: &Vec<Ipv6Addr>) -> (*mut u64, *mut u64) {
+        let mut ip6_u: Vec<u64> = Vec::new();
+        let mut ip6_l: Vec<u64> = Vec::new();
+        ip6_list.iter().for_each(|&ip6| {
+            let ip6 = utils::write_ip6(ip6);
+            ip6_l.push((ip6 & IPV6_LOWER_MASK) as u64);
+            ip6_u.push(((ip6 & IPV6_UPPER_MASK) >> 64) as u64);
+        });
+
+        (utils::into_mut_ptr(&ip6_l), utils::into_mut_ptr(&ip6_u))
     }
 
     fn read_ip6_list(
@@ -450,20 +619,24 @@ impl IfRequest {
         size_l: u32,
     ) -> Vec<Ipv6Addr> {
         let ip6_list: Vec<Ipv6Addr> = Vec::new();
-        let ip6_i_v = Self::read_splitted_u128_vec(
-            ptr_u,
-            ptr_l,
-            size_u,
-            size_l
-        );
+        let ip6_i_v =
+            Self::read_splitted_u128_vec(ptr_u, ptr_l, size_u, size_l);
 
-        ip6_i_v
-            .iter()
-            .fold(ip6_list, |mut acc, &ip6_i| {
-                let ip6 = Ipv6Addr::from(ip6_i);
-                acc.push(ip6);
-                acc
-            })
+        ip6_i_v.iter().fold(ip6_list, |mut acc, &ip6_i| {
+            let ip6 = Ipv6Addr::from(ip6_i);
+            acc.push(ip6);
+            acc
+        })
+    }
+
+    fn write_u128_into_u64_ptr(v: &Vec<u128>) -> (*mut u64, *mut u64) {
+        let mut upper: Vec<u64> = Vec::new();
+        let mut lower: Vec<u64> = Vec::new();
+        v.iter().for_each(|x| {
+            lower.push((x & IPV6_LOWER_MASK) as u64);
+            upper.push((x & IPV6_UPPER_MASK) as u64);
+        });
+        (utils::into_mut_ptr(&lower), utils::into_mut_ptr(&upper))
     }
 
     fn read_splitted_u128_vec(
@@ -475,14 +648,24 @@ impl IfRequest {
         let u128_list: Vec<u128> = Vec::new();
         let u128_u_v: Vec<u64> = utils::free_buf(ptr_u, size_u as usize);
         let u128_l_v: Vec<u64> = utils::free_buf(ptr_l, size_l as usize);
-        u128_l_v
-            .iter()
-            .enumerate()
-            .fold(u128_list, |mut acc, (idx, &u128_l)| {
+        u128_l_v.iter().enumerate().fold(
+            u128_list,
+            |mut acc, (idx, &u128_l)| {
                 let u128_i = ((u128_u_v[idx] as u128) << 64) | u128_l as u128;
                 acc.push(u128_i);
                 acc
-            })
+            },
+        )
+    }
+
+    fn write_ip_list(ip_list: &Vec<Ipv4Addr>) -> *mut u64 {
+        let mut v: Vec<u64> = Vec::new();
+        ip_list.iter().fold(&mut v, |acc, &ip4| {
+            let ip4_int = utils::write_ip4(ip4) as u64;
+            acc.push(ip4_int);
+            acc
+        });
+        utils::into_mut_ptr(&v)
     }
 
     fn read_ip_list(ptr: *mut u64, size: u32) -> Vec<Ipv4Addr> {
@@ -494,6 +677,17 @@ impl IfRequest {
             acc
         });
         return ip_list;
+    }
+
+    fn write_string(s: &String) -> *mut i8 {
+        let mut v: Vec<i8> = Vec::new();
+        s.clone().into_bytes().iter().for_each(|&c| v.push(c as i8));
+        utils::into_mut_ptr(&v)
+    }
+
+    fn write_cstring(s: &String) -> *mut c_char {
+        let c_str: CString = CString::new(s.as_str()).unwrap();
+        c_str.as_ptr() as *mut _
     }
 
     fn read_cstring(ptr: *mut c_char) -> String {
