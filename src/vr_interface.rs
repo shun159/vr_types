@@ -7,9 +7,10 @@ use crate::vr_types::VrSandesh;
 use crate::vr_types_binding::*;
 use eui48::MacAddress;
 use std::convert::{TryFrom, TryInto};
-use std::ffi::{CStr, CString};
+use std::ffi::CString;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::os::raw::c_char;
+use std::{slice, str};
 
 pub const VIF_MAX_MIRROR_MD_SIZE: u32 = 0xFF;
 pub const IPV6_UPPER_MASK: u128 = 0xffffffffffffffff_0000000000000000;
@@ -407,14 +408,20 @@ impl IfRequest {
             self.fat_flow_dst_aggregate_plen.len() as u32;
         encoder.vifr_intf_status = self.intf_status;
         encoder.vifr_fab_name = Self::write_string(&self.fab_name);
+        encoder.vifr_fab_name_size = self.fab_name.len() as u32;
         encoder.vifr_fab_drv_name = Self::write_string(&self.fab_drv_name);
+        encoder.vifr_fab_drv_name_size = self.fab_drv_name.len() as u32;
         encoder.vifr_num_bond_slave = self.num_bond_slave;
         encoder.vifr_bond_slave_name =
             Self::write_string(&self.bond_slave_name);
+        encoder.vifr_bond_slave_name_size = self.bond_slave_name.len() as u32;
         encoder.vifr_bond_slave_drv_name =
             Self::write_string(&self.bond_slave_drv_name);
+        encoder.vifr_bond_slave_drv_name_size =
+            self.bond_slave_drv_name.len() as u32;
         encoder.vifr_vlan_tag = self.vlan_tag;
         encoder.vifr_vlan_name = Self::write_string(&self.vlan_name);
+        encoder.vifr_vlan_name_size = self.vlan_name.len() as u32;
 
         match encoder.write() {
             Err(_) => Err("Failed to write binary"),
@@ -444,6 +451,7 @@ impl IfRequest {
                 vifr.obytes = decoder.vifr_obytes;
                 vifr.opackets = decoder.vifr_opackets;
                 vifr.oerrors = decoder.vifr_oerrors;
+                vifr.queue_ipackets = decoder.vifr_queue_ipackets;
                 vifr.queue_ierrors = decoder.vifr_queue_ierrors;
                 vifr.queue_ierrors_to_lcore = utils::free_buf::<i64>(
                     decoder.vifr_queue_ierrors_to_lcore as *mut i64,
@@ -566,25 +574,25 @@ impl IfRequest {
                     decoder.vifr_fat_flow_dst_aggregate_plen_size as usize,
                 );
                 vifr.intf_status = decoder.vifr_intf_status;
-                vifr.fab_name = Self::bytes_to_string(
+                vifr.fab_name = Self::read_bytes_as_string(
                     decoder.vifr_fab_name,
                     decoder.vifr_fab_name_size,
                 );
-                vifr.fab_drv_name = Self::bytes_to_string(
+                vifr.fab_drv_name = Self::read_bytes_as_string(
                     decoder.vifr_fab_drv_name,
                     decoder.vifr_fab_drv_name_size,
                 );
                 vifr.num_bond_slave = decoder.vifr_num_bond_slave;
-                vifr.bond_slave_name = Self::bytes_to_string(
+                vifr.bond_slave_name = Self::read_bytes_as_string(
                     decoder.vifr_bond_slave_name,
                     decoder.vifr_bond_slave_name_size,
                 );
-                vifr.bond_slave_drv_name = Self::bytes_to_string(
+                vifr.bond_slave_drv_name = Self::read_bytes_as_string(
                     decoder.vifr_bond_slave_drv_name,
                     decoder.vifr_bond_slave_drv_name_size,
                 );
                 vifr.vlan_tag = decoder.vifr_vlan_tag;
-                vifr.vlan_name = Self::bytes_to_string(
+                vifr.vlan_name = Self::read_bytes_as_string(
                     decoder.vifr_vlan_name,
                     decoder.vifr_vlan_name_size,
                 );
@@ -595,9 +603,16 @@ impl IfRequest {
 
     // private functions
 
-    fn bytes_to_string(ptr: *mut i8, size: u32) -> String {
-        let bytes: Vec<u8> = utils::free_buf(ptr as *mut u8, size as usize);
-        String::from_utf8(bytes).unwrap()
+    fn read_bytes_as_string(ptr: *mut i8, size: u32) -> String {
+        unsafe {
+            String::from(
+                std::str::from_utf8(slice::from_raw_parts(
+                    ptr as *const u8,
+                    size as usize,
+                ))
+                .unwrap(),
+            )
+        }
     }
 
     fn write_ip6_list(ip6_list: &Vec<Ipv6Addr>) -> (*mut u64, *mut u64) {
@@ -680,21 +695,291 @@ impl IfRequest {
     }
 
     fn write_string(s: &String) -> *mut i8 {
-        let mut v: Vec<i8> = Vec::new();
-        s.clone().into_bytes().iter().for_each(|&c| v.push(c as i8));
-        utils::into_mut_ptr(&v)
+        Self::write_cstring(s) as *mut i8
     }
 
     fn write_cstring(s: &String) -> *mut c_char {
-        let c_str: CString = CString::new(s.as_str()).unwrap();
-        c_str.as_ptr() as *mut _
+        let cs = CString::new(s.as_str()).unwrap();
+        cs.into_raw()
     }
 
     fn read_cstring(ptr: *mut c_char) -> String {
         unsafe {
-            let c = CStr::from_ptr(ptr as *const _);
-            let s = c.to_str().unwrap();
-            String::from(s)
+            if ptr.is_null() {
+                return String::from("");
+            }
+            let cs = CString::from_raw(ptr);
+            cs.to_string_lossy().into_owned()
         }
+    }
+}
+
+#[cfg(test)]
+mod test_vr_interface {
+    use crate::sandesh::SandeshOp;
+    use crate::vr_interface::{IfRequest, IfType};
+    use eui48::MacAddress;
+    use std::net::{Ipv4Addr, Ipv6Addr};
+
+    #[test]
+    fn empty_request() {
+        let ifreq: IfRequest = IfRequest::default();
+        let bytes = ifreq.write().unwrap();
+        let ifreq: IfRequest = IfRequest::read(bytes).unwrap();
+        assert_eq!(ifreq.op, SandeshOp::Add);
+        assert_eq!(ifreq.core, 0);
+        assert_eq!(ifreq._type, IfType::Host);
+        assert_eq!(ifreq.flags, 0);
+        assert_eq!(ifreq.vrf, 0);
+        assert_eq!(ifreq.idx, 0);
+        assert_eq!(ifreq.rid, 0);
+        assert_eq!(ifreq.os_idx, 0);
+        assert_eq!(ifreq.mtu, 0);
+        assert_eq!(ifreq.name, "".to_string());
+        assert_eq!(ifreq.ibytes, 0);
+        assert_eq!(ifreq.ipackets, 0);
+        assert_eq!(ifreq.ierrors, 0);
+        assert_eq!(ifreq.obytes, 0);
+        assert_eq!(ifreq.opackets, 0);
+        assert_eq!(ifreq.oerrors, 0);
+        assert_eq!(ifreq.queue_ipackets, 0);
+        assert_eq!(ifreq.queue_ierrors, 0);
+        assert_eq!(ifreq.queue_ierrors_to_lcore, vec![]);
+        assert_eq!(ifreq.queue_opackets, 0);
+        assert_eq!(ifreq.queue_oerrors, 0);
+        assert_eq!(ifreq.port_ipackets, 0);
+        assert_eq!(ifreq.port_ierrors, 0);
+        assert_eq!(ifreq.port_isyscalls, 0);
+        assert_eq!(ifreq.port_inombufs, 0);
+        assert_eq!(ifreq.port_opackets, 0);
+        assert_eq!(ifreq.port_oerrors, 0);
+        assert_eq!(ifreq.port_osyscalls, 0);
+        assert_eq!(ifreq.dev_ibytes, 0);
+        assert_eq!(ifreq.dev_ipackets, 0);
+        assert_eq!(ifreq.dev_ierrors, 0);
+        assert_eq!(ifreq.dev_inombufs, 0);
+        assert_eq!(ifreq.dev_obytes, 0);
+        assert_eq!(ifreq.dev_opackets, 0);
+        assert_eq!(ifreq.dev_oerrors, 0);
+        assert_eq!(ifreq.ref_cnt, 0);
+        assert_eq!(ifreq.marker, 0);
+        assert_eq!(ifreq.mac, MacAddress::nil());
+        assert_eq!(ifreq.ip, Ipv4Addr::UNSPECIFIED);
+        assert_eq!(ifreq.ip6, Ipv6Addr::UNSPECIFIED);
+        assert_eq!(ifreq.context, 0);
+        assert_eq!(ifreq.mir_id, 0);
+        assert_eq!(ifreq.speed, 0);
+        assert_eq!(ifreq.duplex, 0);
+        assert_eq!(ifreq.vlan_id, 0);
+        assert_eq!(ifreq.parent_vif_idx, 0);
+        assert_eq!(ifreq.nh_id, 0);
+        assert_eq!(ifreq.cross_connect_idx, 0);
+        assert_eq!(ifreq.src_mac, MacAddress::nil());
+        assert_eq!(ifreq.bridge_idx, vec![]);
+        assert_eq!(ifreq.ovlan_id, 0);
+        assert_eq!(ifreq.transport, 0);
+        assert_eq!(ifreq.fat_flow_protocol_port, vec![]);
+        assert_eq!(ifreq.qos_map_index, 0);
+        assert_eq!(ifreq.in_mirror_md, vec![]);
+        assert_eq!(ifreq.out_mirror_md, vec![]);
+        assert_eq!(ifreq.dpackets, 0);
+        assert_eq!(ifreq.hw_queues, vec![]);
+        assert_eq!(ifreq.isid, 0);
+        assert_eq!(ifreq.pbb_mac, MacAddress::nil());
+        assert_eq!(ifreq.vhostuser_mode, 0);
+        assert_eq!(ifreq.mcast_vrf, 0);
+        assert_eq!(ifreq.if_guid, vec![]);
+        let v: Vec<Ipv4Addr> = Vec::new();
+        assert_eq!(ifreq.fat_flow_exclude_ip_list, v);
+        let v: Vec<Ipv6Addr> = Vec::new();
+        assert_eq!(ifreq.fat_flow_exclude_ip6_list, v);
+        assert_eq!(ifreq.fat_flow_exclude_ip6_plen_list, vec![]);
+        assert_eq!(ifreq.fat_flow_src_prefix, vec![]);
+        assert_eq!(ifreq.fat_flow_src_prefix_mask, vec![]);
+        assert_eq!(ifreq.fat_flow_src_aggregate_plen, vec![]);
+        assert_eq!(ifreq.fat_flow_dst_prefix, vec![]);
+        assert_eq!(ifreq.fat_flow_dst_prefix_mask, vec![]);
+        assert_eq!(ifreq.fat_flow_dst_aggregate_plen, vec![]);
+        assert_eq!(ifreq.intf_status, 0);
+        assert_eq!(ifreq.fab_name, "".to_string());
+        assert_eq!(ifreq.fab_drv_name, "".to_string());
+        assert_eq!(ifreq.num_bond_slave, 0);
+        assert_eq!(ifreq.bond_slave_name, "".to_string());
+        assert_eq!(ifreq.bond_slave_drv_name, "".to_string());
+        assert_eq!(ifreq.vlan_tag, 0);
+        assert_eq!(ifreq.vlan_name, "".to_string());
+    }
+
+    #[test]
+    fn complex_request() {
+        let mut ifreq: IfRequest = IfRequest::default();
+
+        ifreq.op = SandeshOp::Dump;
+        ifreq.core = 1;
+        ifreq._type = IfType::Agent;
+        ifreq.flags = 1;
+        ifreq.vrf = 1;
+        ifreq.idx = 1;
+        ifreq.rid = 1;
+        ifreq.os_idx = 1;
+        ifreq.mtu = 1;
+        ifreq.name = "test".to_string();
+        ifreq.ibytes = 1;
+        ifreq.ipackets = 1;
+        ifreq.ierrors = 1;
+        ifreq.obytes = 1;
+        ifreq.opackets = 1;
+        ifreq.oerrors = 1;
+        ifreq.queue_ipackets = 1;
+        ifreq.queue_ierrors = 1;
+        ifreq.queue_ierrors_to_lcore = vec![1, 2, 3, 4, 5];
+        ifreq.queue_opackets = 1;
+        ifreq.queue_oerrors = 1;
+        ifreq.port_ipackets = 1;
+        ifreq.port_ierrors = 1;
+        ifreq.port_isyscalls = 1;
+        ifreq.port_inombufs = 1;
+        ifreq.port_opackets = 1;
+        ifreq.port_oerrors = 1;
+        ifreq.port_osyscalls = 1;
+        ifreq.dev_ibytes = 1;
+        ifreq.dev_ipackets = 1;
+        ifreq.dev_ierrors = 1;
+        ifreq.dev_inombufs = 1;
+        ifreq.dev_obytes = 1;
+        ifreq.dev_opackets = 1;
+        ifreq.dev_oerrors = 1;
+        ifreq.ref_cnt = 1;
+        ifreq.marker = 1;
+        ifreq.mac = MacAddress::broadcast();
+        ifreq.ip = Ipv4Addr::LOCALHOST;
+        ifreq.ip6 = Ipv6Addr::LOCALHOST;
+        ifreq.context = 1;
+        ifreq.mir_id = 1;
+        ifreq.speed = 1;
+        ifreq.duplex = 1;
+        ifreq.vlan_id = 1;
+        ifreq.parent_vif_idx = 1;
+        ifreq.nh_id = 1;
+        ifreq.cross_connect_idx = 1;
+        ifreq.src_mac = MacAddress::broadcast();
+        ifreq.bridge_idx = vec![];
+        ifreq.ovlan_id = 1;
+        ifreq.transport = 1;
+        ifreq.fat_flow_protocol_port = vec![1, 2, 3, 4, 5];
+        ifreq.qos_map_index = 1;
+        ifreq.in_mirror_md = vec![1, 2, 3, 4, 5];
+        ifreq.out_mirror_md = vec![1, 2, 3, 4, 5];
+        ifreq.dpackets = 1;
+        ifreq.hw_queues = vec![1, 2, 3, 4, 5];
+        ifreq.isid = 1;
+        ifreq.pbb_mac = MacAddress::broadcast();
+        ifreq.vhostuser_mode = 1;
+        ifreq.mcast_vrf = 1;
+        ifreq.if_guid = vec![1, 2, 3, 4, 5];
+        ifreq.fat_flow_exclude_ip_list = vec![Ipv4Addr::from(1)];
+        ifreq.fat_flow_exclude_ip6_list = vec![Ipv6Addr::from(1)];
+        ifreq.fat_flow_exclude_ip6_plen_list = vec![1];
+        ifreq.fat_flow_src_prefix = vec![1];
+        ifreq.fat_flow_src_prefix_mask = vec![1];
+        ifreq.fat_flow_src_aggregate_plen = vec![1];
+        ifreq.fat_flow_dst_prefix = vec![1];
+        ifreq.fat_flow_dst_prefix_mask = vec![1];
+        ifreq.fat_flow_dst_aggregate_plen = vec![1];
+        ifreq.intf_status = 1;
+        ifreq.fab_name = "test_fab name".to_string();
+        ifreq.fab_drv_name = "test_fab_drv name".to_string();
+        ifreq.num_bond_slave = 1;
+        ifreq.bond_slave_name = "test_bond_slave name".to_string();
+        ifreq.bond_slave_drv_name = "test_bond_slave_drv name".to_string();
+        ifreq.vlan_tag = 1;
+        ifreq.vlan_name = "test vlan".to_string();
+
+        let bytes = ifreq.write().unwrap();
+        let ifreq: IfRequest = IfRequest::read(bytes).unwrap();
+
+        assert_eq!(ifreq.op, SandeshOp::Dump);
+        assert_eq!(ifreq.core, 1);
+        assert_eq!(ifreq._type, IfType::Agent);
+        assert_eq!(ifreq.flags, 1);
+        assert_eq!(ifreq.vrf, 1);
+        assert_eq!(ifreq.idx, 1);
+        assert_eq!(ifreq.rid, 1);
+        assert_eq!(ifreq.os_idx, 1);
+        assert_eq!(ifreq.mtu, 1);
+        assert_eq!(ifreq.name, "test".to_string());
+        assert_eq!(ifreq.ibytes, 1);
+        assert_eq!(ifreq.ipackets, 1);
+        assert_eq!(ifreq.ierrors, 1);
+        assert_eq!(ifreq.obytes, 1);
+        assert_eq!(ifreq.opackets, 1);
+        assert_eq!(ifreq.oerrors, 1);
+        assert_eq!(ifreq.queue_ipackets, 1);
+        assert_eq!(ifreq.queue_ierrors, 1);
+        assert_eq!(ifreq.queue_ierrors_to_lcore, vec![1, 2, 3, 4, 5]);
+        assert_eq!(ifreq.queue_opackets, 1);
+        assert_eq!(ifreq.queue_oerrors, 1);
+        assert_eq!(ifreq.port_ipackets, 1);
+        assert_eq!(ifreq.port_ierrors, 1);
+        assert_eq!(ifreq.port_isyscalls, 1);
+        assert_eq!(ifreq.port_inombufs, 1);
+        assert_eq!(ifreq.port_opackets, 1);
+        assert_eq!(ifreq.port_oerrors, 1);
+        assert_eq!(ifreq.port_osyscalls, 1);
+        assert_eq!(ifreq.dev_ibytes, 1);
+        assert_eq!(ifreq.dev_ipackets, 1);
+        assert_eq!(ifreq.dev_ierrors, 1);
+        assert_eq!(ifreq.dev_inombufs, 1);
+        assert_eq!(ifreq.dev_obytes, 1);
+        assert_eq!(ifreq.dev_opackets, 1);
+        assert_eq!(ifreq.dev_oerrors, 1);
+        assert_eq!(ifreq.ref_cnt, 1);
+        assert_eq!(ifreq.marker, 1);
+        assert_eq!(ifreq.mac, MacAddress::broadcast());
+        assert_eq!(ifreq.ip, Ipv4Addr::LOCALHOST);
+        assert_eq!(ifreq.ip6, Ipv6Addr::LOCALHOST);
+        assert_eq!(ifreq.context, 1);
+        assert_eq!(ifreq.mir_id, 1);
+        assert_eq!(ifreq.speed, 1);
+        assert_eq!(ifreq.duplex, 1);
+        assert_eq!(ifreq.vlan_id, 1);
+        assert_eq!(ifreq.parent_vif_idx, 1);
+        assert_eq!(ifreq.nh_id, 1);
+        assert_eq!(ifreq.cross_connect_idx, 1);
+        assert_eq!(ifreq.src_mac, MacAddress::broadcast());
+        assert_eq!(ifreq.bridge_idx, vec![]);
+        assert_eq!(ifreq.ovlan_id, 1);
+        assert_eq!(ifreq.transport, 1);
+        assert_eq!(ifreq.fat_flow_protocol_port, vec![1, 2, 3, 4, 5]);
+        assert_eq!(ifreq.qos_map_index, 1);
+        assert_eq!(ifreq.in_mirror_md, vec![1, 2, 3, 4, 5]);
+        assert_eq!(ifreq.out_mirror_md, vec![1, 2, 3, 4, 5]);
+        assert_eq!(ifreq.dpackets, 1);
+        assert_eq!(ifreq.hw_queues, vec![1, 2, 3, 4, 5]);
+        assert_eq!(ifreq.isid, 1);
+        assert_eq!(ifreq.pbb_mac, MacAddress::broadcast());
+        assert_eq!(ifreq.vhostuser_mode, 1);
+        assert_eq!(ifreq.mcast_vrf, 1);
+        assert_eq!(ifreq.if_guid, vec![1, 2, 3, 4, 5]);
+        assert_eq!(ifreq.fat_flow_exclude_ip_list, vec![Ipv4Addr::from(1)]);
+        assert_eq!(ifreq.fat_flow_exclude_ip6_list, vec![Ipv6Addr::from(1)]);
+        assert_eq!(ifreq.fat_flow_exclude_ip6_plen_list, vec![1]);
+        assert_eq!(ifreq.fat_flow_src_prefix, vec![1]);
+        assert_eq!(ifreq.fat_flow_src_prefix_mask, vec![1]);
+        assert_eq!(ifreq.fat_flow_src_aggregate_plen, vec![1]);
+        assert_eq!(ifreq.fat_flow_dst_prefix, vec![1]);
+        assert_eq!(ifreq.fat_flow_dst_prefix_mask, vec![1]);
+        assert_eq!(ifreq.fat_flow_dst_aggregate_plen, vec![1]);
+        assert_eq!(ifreq.intf_status, 1);
+        assert_eq!(ifreq.fab_name, "test_fab name".to_string());
+        assert_eq!(ifreq.fab_drv_name, "test_fab_drv name".to_string());
+        assert_eq!(ifreq.num_bond_slave, 1);
+        assert_eq!(ifreq.bond_slave_name, "test_bond_slave name".to_string());
+        assert_eq!(
+            ifreq.bond_slave_drv_name,
+            "test_bond_slave_drv name".to_string()
+        );
+        assert_eq!(ifreq.vlan_tag, 1);
+        assert_eq!(ifreq.vlan_name, "test vlan".to_string());
     }
 }

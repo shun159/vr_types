@@ -179,23 +179,20 @@ impl NhRequest {
         encoder.nhr_label_list = utils::into_mut_ptr::<i32>(&self.label_list);
         encoder.nhr_label_list_size = self.label_list.len() as u32;
         encoder.nhr_nh_count = self.nh_count;
-        encoder.nhr_tun_sip6 =
-            utils::into_mut_ptr::<i8>(&Self::in6_addr_to_vec(self.tun_sip6));
+        encoder.nhr_tun_sip6 = Self::in6_addr_to_vec(self.tun_sip6);
         encoder.nhr_tun_sip6_size = if self.tun_sip6.is_unspecified() {
             0u32
         } else {
             VR_IP6_ADDRESS_LEN
         };
-        encoder.nhr_tun_dip6 =
-            utils::into_mut_ptr::<i8>(&Self::in6_addr_to_vec(self.tun_dip6));
+        encoder.nhr_tun_dip6 = Self::in6_addr_to_vec(self.tun_dip6);
         encoder.nhr_tun_dip6_size = if self.tun_dip6.is_unspecified() {
             0u32
         } else {
             VR_IP6_ADDRESS_LEN
         };
         encoder.nhr_ecmp_config_hash = self.ecmp_config_hash;
-        encoder.nhr_pbb_mac =
-            utils::into_mut_ptr(&Self::mac_to_vec(self.pbb_mac));
+        encoder.nhr_pbb_mac = Self::mac_to_vec(self.pbb_mac);
         encoder.nhr_pbb_mac_size = if self.pbb_mac.is_nil() {
             0u32
         } else {
@@ -204,8 +201,7 @@ impl NhRequest {
         encoder.nhr_encap_crypt_oif_id = self.encap_crypt_oif_id;
         encoder.nhr_crypt_traffic = self.crypt_traffic;
         encoder.nhr_crypt_path_available = self.crypt_path_available;
-        encoder.nhr_rw_dst_mac =
-            utils::into_mut_ptr(&Self::mac_to_vec(self.rw_dst_mac));
+        encoder.nhr_rw_dst_mac = Self::mac_to_vec(self.rw_dst_mac);
         encoder.nhr_rw_dst_mac_size = if self.rw_dst_mac.is_nil() {
             0u32
         } else {
@@ -288,49 +284,60 @@ impl NhRequest {
         }
     }
 
-    fn mac_to_vec(addr: MacAddress) -> Vec<i8> {
-        let mut v: Vec<i8> = Vec::new();
+    fn mac_to_vec(addr: MacAddress) -> *mut i8 {
         let octets = if addr.is_nil() {
             vec![]
         } else {
             addr.as_bytes().to_vec()
         };
-        for (i, o) in octets.into_iter().enumerate() {
-            v[i] = o as i8
-        }
 
-        return v;
+        utils::into_mut_ptr(&octets) as *mut i8
     }
 
     fn in_addr_to_u32(addr: Ipv4Addr) -> u32 {
         let v = addr.octets().to_vec();
-        ((v[3] as u32) << 24)
-            | ((v[2] as u32) << 16)
-            | ((v[1] as u32) << 8)
-            | (v[0] as u32)
+        ((v[0] as u32) << 24)
+            | ((v[1] as u32) << 16)
+            | ((v[2] as u32) << 8)
+            | (v[3] as u32)
     }
 
-    fn in6_addr_to_vec(addr: Ipv6Addr) -> Vec<i8> {
-        let mut v: Vec<i8> = Vec::new();
+    fn in6_addr_to_vec(addr: Ipv6Addr) -> *mut i8 {
         let octets = if addr.is_unspecified() {
             vec![]
         } else {
-            addr.octets().to_vec()
+            let v: Vec<i8> = Vec::new();
+            addr.octets().iter().fold(v, |mut acc, &o| {
+                acc.push(o as i8);
+                acc
+            })
         };
-        for (i, o) in octets.into_iter().enumerate() {
-            v[i] = o as i8;
-        }
-        return v;
+
+        utils::into_mut_ptr(&octets)
     }
 
     fn read_tun_ip6(tun_ip6: *mut i8, ip6_size: u32) -> Ipv6Addr {
-        if ip6_size == VR_IP6_ADDRESS_LEN / 2 {
-            let v: Vec<u16> = utils::free_buf::<u16>(
-                tun_ip6 as *mut u16,
-                (VR_IP6_ADDRESS_LEN / 2) as usize,
-            );
-
-            Ipv6Addr::new(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7])
+        if ip6_size == VR_IP6_ADDRESS_LEN {
+            let ip6_v: Vec<i8> =
+                utils::free_buf(tun_ip6, VR_IP6_ADDRESS_LEN as usize);
+            Ipv6Addr::from(
+                ((ip6_v[0] as u128) << 120)
+                    | ((ip6_v[1] as u128) << 112)
+                    | ((ip6_v[2] as u128) << 104)
+                    | ((ip6_v[3] as u128) << 96)
+                    | ((ip6_v[4] as u128) << 88)
+                    | ((ip6_v[5] as u128) << 80)
+                    | ((ip6_v[6] as u128) << 72)
+                    | ((ip6_v[7] as u128) << 64)
+                    | ((ip6_v[8] as u128) << 56)
+                    | ((ip6_v[9] as u128) << 48)
+                    | ((ip6_v[10] as u128) << 40)
+                    | ((ip6_v[11] as u128) << 32)
+                    | ((ip6_v[12] as u128) << 24)
+                    | ((ip6_v[13] as u128) << 16)
+                    | ((ip6_v[14] as u128) << 8)
+                    | (ip6_v[15] as u128),
+            )
         } else {
             Ipv6Addr::UNSPECIFIED
         }
@@ -377,5 +384,71 @@ mod test_vr_nexthop {
         assert_eq!(nhreq.crypt_traffic, 0);
         assert_eq!(nhreq.rw_dst_mac, MacAddress::nil());
         assert_eq!(nhreq.transport_label, 0);
+    }
+
+    #[test]
+    fn complex_request() {
+        let mut nhreq: NhRequest = NhRequest::default();
+        nhreq.op = SandeshOp::Get;
+        nhreq._type = NhType::Composite;
+        nhreq.family = 7; // AF_BRIDGE
+        nhreq.id = 1;
+        nhreq.rid = 1;
+        nhreq.encap_oif_id = 1;
+        nhreq.encap_len = 5;
+        nhreq.encap_family = 1;
+        nhreq.vrf = 1;
+        nhreq.tun_sip = Ipv4Addr::LOCALHOST;
+        nhreq.tun_dip = Ipv4Addr::LOCALHOST;
+        nhreq.tun_sport = 1;
+        nhreq.tun_dport = 1;
+        nhreq.ref_cnt = 1;
+        nhreq.marker = 1;
+        nhreq.flags = 1;
+        nhreq.encap = vec![1, 2, 3, 4, 5];
+        nhreq.nh_list = vec![1, 2, 3, 4, 5];
+        nhreq.label_list = vec![1, 2, 3, 4, 5];
+        nhreq.nh_count = 5;
+        nhreq.tun_sip6 = Ipv6Addr::LOCALHOST;
+        nhreq.tun_dip6 = Ipv6Addr::LOCALHOST;
+        nhreq.ecmp_config_hash = 1;
+        nhreq.pbb_mac = MacAddress::broadcast();
+        nhreq.encap_crypt_oif_id = 1;
+        nhreq.crypt_traffic = 1;
+        nhreq.crypt_path_available = 1;
+        nhreq.rw_dst_mac = MacAddress::broadcast();
+        nhreq.transport_label = 1;
+
+        let bytes = nhreq.write().unwrap();
+        let nhreq: NhRequest = NhRequest::read(bytes).unwrap();
+
+        assert_eq!(nhreq.op, SandeshOp::Get);
+        assert_eq!(nhreq._type, NhType::Composite);
+        assert_eq!(nhreq.family, 7);
+        assert_eq!(nhreq.id, 1);
+        assert_eq!(nhreq.rid, 1);
+        assert_eq!(nhreq.encap_oif_id, 1);
+        assert_eq!(nhreq.encap_len, 5);
+        assert_eq!(nhreq.encap_family, 1);
+        assert_eq!(nhreq.vrf, 1);
+        assert_eq!(nhreq.tun_sip, Ipv4Addr::LOCALHOST);
+        assert_eq!(nhreq.tun_dip, Ipv4Addr::LOCALHOST);
+        assert_eq!(nhreq.tun_sport, 1);
+        assert_eq!(nhreq.tun_dport, 1);
+        assert_eq!(nhreq.ref_cnt, 1);
+        assert_eq!(nhreq.marker, 1);
+        assert_eq!(nhreq.flags, 1);
+        assert_eq!(nhreq.encap, vec![1, 2, 3, 4, 5]);
+        assert_eq!(nhreq.nh_list, vec![1, 2, 3, 4, 5]);
+        assert_eq!(nhreq.label_list, vec![1, 2, 3, 4, 5]);
+        assert_eq!(nhreq.tun_sip6, Ipv6Addr::LOCALHOST);
+        assert_eq!(nhreq.tun_dip6, Ipv6Addr::LOCALHOST);
+        assert_eq!(nhreq.ecmp_config_hash, 1);
+        assert_eq!(nhreq.pbb_mac, MacAddress::broadcast());
+        assert_eq!(nhreq.encap_crypt_oif_id, 1);
+        assert_eq!(nhreq.crypt_path_available, 1);
+        assert_eq!(nhreq.crypt_traffic, 1);
+        assert_eq!(nhreq.rw_dst_mac, MacAddress::broadcast());
+        assert_eq!(nhreq.transport_label, 1);
     }
 }
