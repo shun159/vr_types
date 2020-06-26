@@ -11,6 +11,7 @@ pub mod vr_interface;
 pub mod vr_nexthop;
 pub mod vr_pkt_droplog;
 pub mod vr_types;
+pub mod vr_vxlan;
 #[allow(non_upper_case_globals)]
 #[allow(non_camel_case_types)]
 #[allow(non_snake_case)]

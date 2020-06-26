@@ -4,7 +4,9 @@
 use crate::sandesh::SandeshOp;
 use crate::vr_types_binding::vr_vxlan_req;
 use crate::vr_types::VrSandesh;
+use std::convert::TryInto;
 
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct VxlanRequest {
     pub op: SandeshOp,
     pub rid:  i16,
@@ -49,5 +51,37 @@ impl VxlanRequest {
                 Ok(vxlanr)
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod test_vr_vxlan {
+    use crate::sandesh::SandeshOp;
+    use crate::vr_vxlan::VxlanRequest;
+
+    #[test]
+    fn empty_request() {
+        let vxlanr: VxlanRequest = VxlanRequest::default();
+        let bytes = vxlanr.write().unwrap();
+        let vxlanr: VxlanRequest = VxlanRequest::read(bytes).unwrap();
+        assert_eq!(vxlanr.op, SandeshOp::Add);
+        assert_eq!(vxlanr.rid, 0);
+        assert_eq!(vxlanr.vnid, 0);
+        assert_eq!(vxlanr.nhid, 0);
+    }
+
+    #[test]
+    fn complex_request() {
+        let mut vxlanr: VxlanRequest = VxlanRequest::default();
+        vxlanr.op = SandeshOp::Dump;
+        vxlanr.rid = 1;
+        vxlanr.vnid = 1;
+        vxlanr.nhid = 1;
+        let bytes = vxlanr.write().unwrap();
+        let vxlanr: VxlanRequest = VxlanRequest::read(bytes).unwrap();
+        assert_eq!(vxlanr.op, SandeshOp::Dump);
+        assert_eq!(vxlanr.rid, 1);
+        assert_eq!(vxlanr.vnid, 1);
+        assert_eq!(vxlanr.nhid, 1);
     }
 }
