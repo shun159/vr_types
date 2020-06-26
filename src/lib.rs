@@ -8,6 +8,7 @@ pub mod sandesh;
 pub mod utils;
 pub mod vr_flow;
 pub mod vr_interface;
+pub mod vr_mirror;
 pub mod vr_mpls;
 pub mod vr_nexthop;
 pub mod vr_pkt_droplog;

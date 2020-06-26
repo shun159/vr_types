@@ -1,3 +1,6 @@
+// Copyright 2020 Eishun Kondoh
+// SPDX-License-Identifier: Apache-2.0
+
 use crate::sandesh::SandeshOp;
 use crate::vr_types::VrSandesh;
 use crate::vr_types_binding::vr_mpls_req;
