@@ -2,25 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::sandesh::SandeshOp;
-use crate::vr_types_binding::vr_vxlan_req;
 use crate::vr_types::VrSandesh;
+use crate::vr_types_binding::vr_vxlan_req;
 use std::convert::TryInto;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct VxlanRequest {
     pub op: SandeshOp,
-    pub rid:  i16,
+    pub rid: i16,
     pub vnid: i32,
-    pub nhid: i32
+    pub nhid: i32,
 }
 
 impl Default for VxlanRequest {
     fn default() -> VxlanRequest {
         VxlanRequest {
-            op:   SandeshOp::Add,
-            rid:  0,
+            op: SandeshOp::Add,
+            rid: 0,
             vnid: 0,
-            nhid: 0
+            nhid: 0,
         }
     }
 }
