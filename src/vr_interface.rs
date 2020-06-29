@@ -136,7 +136,7 @@ pub struct IfRequest {
     pub ip: Ipv4Addr,
     pub ip6: Ipv6Addr,
     pub context: i32,
-    pub mir_id: i16,
+    pub mirror_id: i16,
     pub speed: i32,
     pub duplex: i32,
     pub vlan_id: i16,
@@ -221,7 +221,7 @@ impl Default for IfRequest {
             ip: Ipv4Addr::UNSPECIFIED,
             ip6: Ipv6Addr::UNSPECIFIED,
             context: 0,
-            mir_id: 0,
+            mirror_id: 0,
             speed: 0,
             duplex: 0,
             vlan_id: 0,
@@ -318,7 +318,7 @@ impl IfRequest {
         encoder.vifr_ip6_u = ((vifr_ip6 & IPV6_UPPER_MASK) >> 64) as u64;
         encoder.vifr_ip6_l = (vifr_ip6 & IPV6_LOWER_MASK) as u64;
         encoder.vifr_context = self.context;
-        encoder.vifr_mir_id = self.mir_id;
+        encoder.vifr_mirror_id = self.mirror_id;
         encoder.vifr_speed = self.speed;
         encoder.vifr_duplex = self.duplex;
         encoder.vifr_vlan_id = self.vlan_id;
@@ -485,7 +485,7 @@ impl IfRequest {
                         | (decoder.vifr_ip6_l as u128),
                 );
                 vifr.context = decoder.vifr_context;
-                vifr.mir_id = decoder.vifr_mir_id;
+                vifr.mirror_id = decoder.vifr_mirror_id;
                 vifr.speed = decoder.vifr_speed;
                 vifr.duplex = decoder.vifr_duplex;
                 vifr.vlan_id = decoder.vifr_vlan_id;
@@ -767,7 +767,7 @@ mod test_vr_interface {
         assert_eq!(ifreq.ip, Ipv4Addr::UNSPECIFIED);
         assert_eq!(ifreq.ip6, Ipv6Addr::UNSPECIFIED);
         assert_eq!(ifreq.context, 0);
-        assert_eq!(ifreq.mir_id, 0);
+        assert_eq!(ifreq.mirror_id, 0);
         assert_eq!(ifreq.speed, 0);
         assert_eq!(ifreq.duplex, 0);
         assert_eq!(ifreq.vlan_id, 0);
@@ -855,7 +855,7 @@ mod test_vr_interface {
         ifreq.ip = Ipv4Addr::LOCALHOST;
         ifreq.ip6 = Ipv6Addr::LOCALHOST;
         ifreq.context = 1;
-        ifreq.mir_id = 1;
+        ifreq.mirror_id = 1;
         ifreq.speed = 1;
         ifreq.duplex = 1;
         ifreq.vlan_id = 1;
@@ -939,7 +939,7 @@ mod test_vr_interface {
         assert_eq!(ifreq.ip, Ipv4Addr::LOCALHOST);
         assert_eq!(ifreq.ip6, Ipv6Addr::LOCALHOST);
         assert_eq!(ifreq.context, 1);
-        assert_eq!(ifreq.mir_id, 1);
+        assert_eq!(ifreq.mirror_id, 1);
         assert_eq!(ifreq.speed, 1);
         assert_eq!(ifreq.duplex, 1);
         assert_eq!(ifreq.vlan_id, 1);
