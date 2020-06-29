@@ -20,4 +20,5 @@ pub mod vr_types;
 #[allow(unused_variables)]
 #[allow(improper_ctypes)]
 pub mod vr_types_binding;
+pub mod vr_vrf;
 pub mod vr_vxlan;
