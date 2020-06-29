@@ -14,7 +14,7 @@ pub struct VrfRequest {
     pub flags: i32,
     pub hbfl_vif_idx: i32,
     pub hbfr_vif_idx: i32,
-    pub marker: i32
+    pub marker: i32,
 }
 
 impl Default for VrfRequest {
@@ -26,7 +26,7 @@ impl Default for VrfRequest {
             flags: 0,
             hbfl_vif_idx: 0,
             hbfr_vif_idx: 0,
-            marker: 0
+            marker: 0,
         }
     }
 }
@@ -94,7 +94,6 @@ mod test_vr_vrf {
         vrf.hbfl_vif_idx = 1;
         vrf.hbfr_vif_idx = 2;
         vrf.marker = 1;
-
 
         let bytes = vrf.write().unwrap();
         let vrf: VrfRequest = VrfRequest::read(bytes).unwrap();

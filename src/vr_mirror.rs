@@ -16,7 +16,7 @@ pub struct MirrorRequest {
     pub flags: i32,
     pub marker: i32,
     pub vni: i32,
-    pub vlan: i16
+    pub vlan: i16,
 }
 
 impl Default for MirrorRequest {
@@ -30,7 +30,7 @@ impl Default for MirrorRequest {
             flags: 0,
             marker: 0,
             vni: 0,
-            vlan: 0
+            vlan: 0,
         }
     }
 }

@@ -12,7 +12,7 @@ pub struct MplsRequest {
     pub rid: i16,
     pub label: i32,
     pub nhid: i32,
-    pub marker: i32
+    pub marker: i32,
 }
 
 impl Default for MplsRequest {
@@ -22,7 +22,7 @@ impl Default for MplsRequest {
             rid: 0,
             label: 0,
             nhid: 0,
-            marker: 0
+            marker: 0,
         }
     }
 }
