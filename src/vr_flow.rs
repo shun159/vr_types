@@ -1,35 +1,36 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::vr_types_binding::flow_op;
-use std::convert::TryFrom;
+use crate::vr_types::VrSandesh;
+use crate::vr_types_binding::{flow_op, vr_flow_req};
+use std::convert::{TryInto, TryFrom};
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
-pub const VR_FLOW_RESP_FLAG_DELETED: i16 = 0x0001;
+pub const VR_FLOW_RESP_FLAG_DELETED: u16 = 0x0001;
 
-pub const VR_FLOW_FLAG_ACTIVE: i16 = 0x0001;
-pub const VR_FLOW_FLAG_MODIFIED: i16 = 0x0100;
-pub const VR_FLOW_FLAG_NEW_FLOW: i16 = 0x0200;
-pub const VR_FLOW_FLAG_EVICT_CANDIDATE: i16 = 0x0400;
-pub const VR_FLOW_FLAG_EVICTED: i16 = 0x0800;
-pub const VR_RFLOW_VALID: i16 = 0x1000;
-pub const VR_FLOW_FLAG_MIRROR: i16 = 0x2000;
-pub const VR_FLOW_FLAG_VRFT: i16 = 0x4000;
-pub const VR_FLOW_FLAG_LINK_LOCAL: i16 = 0x8000;
+pub const VR_FLOW_FLAG_ACTIVE: u16 = 0x0001;
+pub const VR_FLOW_FLAG_MODIFIED: u16 = 0x0100;
+pub const VR_FLOW_FLAG_NEW_FLOW: u16 = 0x0200;
+pub const VR_FLOW_FLAG_EVICT_CANDIDATE: u16 = 0x0400;
+pub const VR_FLOW_FLAG_EVICTED: u16 = 0x0800;
+pub const VR_RFLOW_VALID: u16 = 0x1000;
+pub const VR_FLOW_FLAG_MIRROR: u16 = 0x2000;
+pub const VR_FLOW_FLAG_VRFT: u16 = 0x4000;
+pub const VR_FLOW_FLAG_LINK_LOCAL: u16 = 0x8000;
 
 // for NAT
-pub const VR_FLOW_FLAG_SNAT: i16 = 0x2;
-pub const VR_FLOW_FLAG_SPAT: i16 = 0x4;
-pub const VR_FLOW_FLAG_DNAT: i16 = 0x8;
-pub const VR_FLOW_FLAG_DPAT: i16 = 0x10;
-pub const VR_FLOW_FLAG_NAT_MASK: i16 = (VR_FLOW_FLAG_SNAT
+pub const VR_FLOW_FLAG_SNAT: u16 = 0x2;
+pub const VR_FLOW_FLAG_SPAT: u16 = 0x4;
+pub const VR_FLOW_FLAG_DNAT: u16 = 0x8;
+pub const VR_FLOW_FLAG_DPAT: u16 = 0x10;
+pub const VR_FLOW_FLAG_NAT_MASK: u16 = (VR_FLOW_FLAG_SNAT
     | VR_FLOW_FLAG_SPAT
     | VR_FLOW_FLAG_DNAT
     | VR_FLOW_FLAG_DPAT);
 
 // for TRAP
-pub const VR_FLOW_FLAG_TRAP_ECMP: i16 = 0x20;
-pub const VR_FLOW_FLAG_DELETE_MARKED: i16 = 0x40;
+pub const VR_FLOW_FLAG_TRAP_ECMP: u16 = 0x20;
+pub const VR_FLOW_FLAG_DELETE_MARKED: u16 = 0x40;
 
 pub const VR_IP6_ADDRESS_LEN: u32 = 16;
 
@@ -114,7 +115,7 @@ pub enum FlowDropReason {
     ReverseOutFwaasPolicy,
 }
 
-impl TryFrom<i16> for FlowDropReason {
+impl TryFrom<u16> for FlowDropReason {
     type Error = ();
 
     fn try_from(v: u16) -> Result<Self, Self::Error> {
@@ -234,8 +235,8 @@ pub struct FlowRequest {
     pub flags: i16,
     pub rindex: i32,
     pub family: i32,
-    pub flow_sip: IpAddr,
-    pub flow_dip: IpAddr,
+    pub flow_sip: Option<IpAddr>,
+    pub flow_dip: Option<IpAddr>,
     pub flow_sport: u16,
     pub flow_dport: u16,
     pub flow_proto: i8,
@@ -243,7 +244,7 @@ pub struct FlowRequest {
     pub flow_dvrf: u16,
     pub mirror_id: u16,
     pub sec_mirror_id: u16,
-    pub mirror_sip: Ipv4Addr,
+    pub mirror_sip: IpAddr,
     pub mirror_sport: u16,
     pub pcap_meta_data: Vec<u8>,
     pub mirror_vrf: u16,
@@ -252,8 +253,8 @@ pub struct FlowRequest {
     pub flow_nh_id: u32,
     pub drop_reason: FlowDropReason,
     pub gen_id: i8,
-    pub reverse_flow_sip: IpAddr,
-    pub reverse_flow_dip: IpAddr,
+    pub reverse_flow_sip: Option<IpAddr>,
+    pub reverse_flow_dip: Option<IpAddr>,
     pub reverse_flow_nh_id: u32,
     pub reverse_flow_sport: u16,
     pub reverse_flow_dport: u16,
@@ -272,9 +273,9 @@ impl Default for FlowRequest {
             action: FlowAction::Drop,
             flags: 0,
             rindex: 0,
-            family: libc::ETH_P_IP as i32,
-            flow_sip: IpAddr::V4(Ipv4Addr::UNSPECIFIED),
-            flow_dip: IpAddr::V4(Ipv4Addr::UNSPECIFIED),
+            family: 0,
+            flow_sip: None,
+            flow_dip: None,
             flow_sport: 0,
             flow_dport: 0,
             flow_proto: 0,
@@ -282,7 +283,7 @@ impl Default for FlowRequest {
             flow_dvrf: 0,
             mirror_id: 0,
             sec_mirror_id: 0,
-            mirror_sip: Ipv4Addr::UNSPECIFIED,
+            mirror_sip: IpAddr::V4(Ipv4Addr::UNSPECIFIED),
             mirror_sport: 0,
             pcap_meta_data: vec![],
             mirror_vrf: 0,
@@ -291,8 +292,8 @@ impl Default for FlowRequest {
             flow_nh_id: 0,
             drop_reason: FlowDropReason::Unknown,
             gen_id: 0,
-            reverse_flow_sip: IpAddr::V4(Ipv4Addr::UNSPECIFIED),
-            reverse_flow_dip: IpAddr::V4(Ipv4Addr::UNSPECIFIED),
+            reverse_flow_sip: None,
+            reverse_flow_dip: None,
             reverse_flow_nh_id: 0,
             reverse_flow_sport: 0,
             reverse_flow_dport: 0,
@@ -301,5 +302,85 @@ impl Default for FlowRequest {
             extflags: 0,
             flags1: 0,
         }
+    }
+}
+
+impl FlowRequest {
+    pub fn read<'a>(buf: Vec<u8>) -> Result<FlowRequest, &'a str> {
+        let decoder: vr_flow_req = vr_flow_req::new();
+        match decoder.read(buf) {
+            Err(_) => Err("Failed to read binary"),
+            Ok(_) => {
+                let mut fr: FlowRequest = FlowRequest::default();
+                fr.op = decoder.fr_op.try_into().unwrap();
+                fr.rid = decoder.fr_rid;
+                fr.index = decoder.fr_index;
+                fr.action = decoder.fr_action.try_into().unwrap();
+                fr.rindex = decoder.fr_rindex;
+                fr.family = decoder.fr_family;
+                fr.flow_sip = Self::read_ip(
+                    decoder.fr_family,
+                    decoder.fr_flow_sip_u,
+                    decoder.fr_flow_sip_l
+                );
+                fr.flow_dip = Self::read_ip(
+                    decoder.fr_family,
+                    decoder.fr_flow_dip_u,
+                    decoder.fr_flow_dip_l
+                );
+                fr.flow_sport = decoder.fr_flow_sport;
+                fr.flow_dport = decoder.fr_flow_dport;
+                fr.flow_proto = decoder.fr_flow_proto;
+                fr.flow_vrf = decoder.fr_flow_vrf;
+                fr.flow_dvrf = decoder.fr_flow_dvrf;
+                fr.mirror_id = decoder.fr_mir_id;
+                fr.sec_mirror_id = decoder.fr_sec_mir_id;
+                fr.mirror_sip = Self::read_ip4(decoder.fr_mir_sip as u128);
+                fr.mirror_sport = decoder.fr_mir_sport;
+                fr.ecmp_nh_index = decoder.fr_ecmp_nh_index;
+                fr.src_nh_index = decoder.fr_src_nh_index;
+                fr.flow_nh_id = decoder.fr_flow_nh_id;
+                fr.drop_reason = decoder.fr_drop_reason.try_into().unwrap();
+                fr.gen_id = decoder.fr_gen_id;
+                fr.reverse_flow_sip = Self::read_ip(
+                    decoder.fr_family,
+                    decoder.fr_rflow_sip_u,
+                    decoder.fr_rflow_sip_l
+                );
+                fr.reverse_flow_dip = Self::read_ip(
+                    decoder.fr_family,
+                    decoder.fr_rflow_dip_u,
+                    decoder.fr_rflow_dip_l
+                );
+                fr.reverse_flow_nh_id = decoder.fr_rflow_nh_id;
+                fr.reverse_flow_sport = decoder.fr_rflow_sport;
+                fr.reverse_flow_dport = decoder.fr_rflow_dport;
+                fr.qos_id = decoder.fr_qos_id;
+                fr.ttl = decoder.fr_ttl;
+                fr.extflags = decoder.fr_extflags;
+                fr.flags1 = decoder.fr_flags1;
+                Ok(fr)
+            }
+        }
+    }
+
+    fn read_ip(family: i32, ip_u: u64, ip_l: u64) -> Option<IpAddr> {
+        let ip: u128 = (ip_u as u128) << 64 | ip_l as u128;
+        match family {
+            x if x == libc::AF_INET6 as i32 =>
+                Some(Self::read_ip6(ip)),
+            x if x == libc::AF_INET as i32 =>
+                Some(Self::read_ip4(ip)),
+            _ =>
+                None
+        }
+    }
+
+    fn read_ip6(ip: u128) -> IpAddr {
+        IpAddr::V6(Ipv6Addr::from(ip as u128))
+    }
+
+    fn read_ip4(ip: u128) -> IpAddr {
+        IpAddr::V4(Ipv4Addr::from((ip & 0x00000000_ffffffff) as u32))
     }
 }

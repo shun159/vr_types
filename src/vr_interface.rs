@@ -318,7 +318,7 @@ impl IfRequest {
         encoder.vifr_ip6_u = ((vifr_ip6 & IPV6_UPPER_MASK) >> 64) as u64;
         encoder.vifr_ip6_l = (vifr_ip6 & IPV6_LOWER_MASK) as u64;
         encoder.vifr_context = self.context;
-        encoder.vifr_mirror_id = self.mirror_id;
+        encoder.vifr_mir_id = self.mirror_id;
         encoder.vifr_speed = self.speed;
         encoder.vifr_duplex = self.duplex;
         encoder.vifr_vlan_id = self.vlan_id;
@@ -485,7 +485,7 @@ impl IfRequest {
                         | (decoder.vifr_ip6_l as u128),
                 );
                 vifr.context = decoder.vifr_context;
-                vifr.mirror_id = decoder.vifr_mirror_id;
+                vifr.mirror_id = decoder.vifr_mir_id;
                 vifr.speed = decoder.vifr_speed;
                 vifr.duplex = decoder.vifr_duplex;
                 vifr.vlan_id = decoder.vifr_vlan_id;

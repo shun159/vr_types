@@ -143,10 +143,10 @@ impl RouteRequest {
 
     fn read_ip(family: i32, ptr: *mut i8, size: u32) -> Option<IpAddr> {
         match family {
-            libc::ETH_P_IP if size == 4 => {
+            libc::AF_INET if size == 4 => {
                 Some(IpAddr::V4(Self::read_ip4(ptr)))
             }
-            libc::ETH_P_IPV6 if size == 16 => {
+            libc::AF_INET6 if size == 16 => {
                 Some(IpAddr::V6(Self::read_ip6(ptr)))
             }
             _ => None,
@@ -241,7 +241,7 @@ mod test_vr_route {
         let mut rtr: RouteRequest = RouteRequest::default();
         rtr.op = SandeshOp::Dump;
         rtr.vrf_id = 1;
-        rtr.family = libc::ETH_P_IP as i32;
+        rtr.family = libc::AF_INET as i32;
         rtr.prefix = Some(IpAddr::V4(Ipv4Addr::LOCALHOST));
         rtr.prefix_len = 32;
         rtr.rid = 1;
@@ -259,7 +259,7 @@ mod test_vr_route {
 
         assert_eq!(rtr.op, SandeshOp::Dump);
         assert_eq!(rtr.vrf_id, 1);
-        assert_eq!(rtr.family, libc::ETH_P_IP as i32);
+        assert_eq!(rtr.family, libc::AF_INET as i32);
         assert_eq!(rtr.prefix, Some(IpAddr::V4(Ipv4Addr::LOCALHOST)));
         assert_eq!(rtr.prefix_len, 32);
         assert_eq!(rtr.rid, 1);
@@ -278,7 +278,7 @@ mod test_vr_route {
         let mut rtr: RouteRequest = RouteRequest::default();
         rtr.op = SandeshOp::Dump;
         rtr.vrf_id = 1;
-        rtr.family = libc::ETH_P_IPV6 as i32;
+        rtr.family = libc::AF_INET6 as i32;
         rtr.prefix = Some(IpAddr::V6(Ipv6Addr::LOCALHOST));
         rtr.prefix_len = 128;
         rtr.rid = 1;
@@ -296,7 +296,7 @@ mod test_vr_route {
 
         assert_eq!(rtr.op, SandeshOp::Dump);
         assert_eq!(rtr.vrf_id, 1);
-        assert_eq!(rtr.family, libc::ETH_P_IPV6 as i32);
+        assert_eq!(rtr.family, libc::AF_INET6 as i32);
         assert_eq!(rtr.prefix, Some(IpAddr::V6(Ipv6Addr::LOCALHOST)));
         assert_eq!(rtr.prefix_len, 128);
         assert_eq!(rtr.rid, 1);
