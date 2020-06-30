@@ -14,7 +14,7 @@ pub struct VrfAssignRequest {
     pub vif_vrf: i32,
     pub vlan_id: i16,
     pub marker: i16,
-    pub nh_id: i32
+    pub nh_id: i32,
 }
 
 impl Default for VrfAssignRequest {
@@ -26,7 +26,7 @@ impl Default for VrfAssignRequest {
             vif_vrf: 0,
             vlan_id: 0,
             marker: 0,
-            nh_id: 0
+            nh_id: 0,
         }
     }
 }

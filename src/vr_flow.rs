@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::utils;
-use crate::vr_types_binding::{flow_op, vr_flow_req};
 use crate::vr_types::VrSandesh;
+use crate::vr_types_binding::{flow_op, vr_flow_req};
 use std::convert::{TryFrom, TryInto};
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
@@ -331,7 +331,8 @@ impl FlowRequest {
         let mirror_sip = Self::write_ip(&Some(self.mirror_sip)).1 as u32;
         encoder.fr_mir_sip = mirror_sip;
         encoder.fr_mir_sport = self.mirror_sport;
-        encoder.fr_pcap_meta_data = utils::into_mut_ptr(&self.pcap_meta_data) as *mut i8;
+        encoder.fr_pcap_meta_data =
+            utils::into_mut_ptr(&self.pcap_meta_data) as *mut i8;
         encoder.fr_pcap_meta_data_size = self.pcap_meta_data.len() as u32;
         encoder.fr_mir_vrf = self.mirror_vrf;
         encoder.fr_ecmp_nh_index = self.ecmp_nh_index;
@@ -426,7 +427,8 @@ impl FlowRequest {
             }
             Some(IpAddr::V6(ip)) => {
                 let ip = utils::write_ip6(*ip);
-                let ip_u = ((ip & 0xffffffffffffffff_0000000000000000) >> 64) as u64;
+                let ip_u =
+                    ((ip & 0xffffffffffffffff_0000000000000000) >> 64) as u64;
                 let ip_l = (ip & 0x0000000000000000_ffffffffffffffff) as u64;
                 (ip_u, ip_l)
             }

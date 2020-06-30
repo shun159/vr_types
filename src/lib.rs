@@ -22,4 +22,5 @@ pub mod vr_types;
 pub mod vr_types_binding;
 pub mod vr_vrf;
 pub mod vr_vrf_assign;
+pub mod vr_vrf_stats;
 pub mod vr_vxlan;
