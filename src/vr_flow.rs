@@ -1,9 +1,9 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::vr_types::VrSandesh;
 use crate::utils;
 use crate::vr_types_binding::{flow_op, vr_flow_req};
+use crate::vr_types::VrSandesh;
 use std::convert::{TryFrom, TryInto};
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
