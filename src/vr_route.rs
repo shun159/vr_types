@@ -143,9 +143,7 @@ impl RouteRequest {
 
     fn read_ip(family: i32, ptr: *mut i8, size: u32) -> Option<IpAddr> {
         match family {
-            libc::AF_INET if size == 4 => {
-                Some(IpAddr::V4(Self::read_ip4(ptr)))
-            }
+            libc::AF_INET if size == 4 => Some(IpAddr::V4(Self::read_ip4(ptr))),
             libc::AF_INET6 if size == 16 => {
                 Some(IpAddr::V6(Self::read_ip6(ptr)))
             }

@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::vr_types::VrSandesh;
+use crate::utils;
 use crate::vr_types_binding::{flow_op, vr_flow_req};
-use std::convert::{TryInto, TryFrom};
+use std::convert::{TryFrom, TryInto};
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 pub const VR_FLOW_RESP_FLAG_DELETED: u16 = 0x0001;
@@ -34,7 +35,7 @@ pub const VR_FLOW_FLAG_DELETE_MARKED: u16 = 0x40;
 
 pub const VR_IP6_ADDRESS_LEN: u32 = 16;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum FlowOp {
     Set,
     List,
@@ -54,7 +55,7 @@ impl TryFrom<flow_op> for FlowOp {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum FlowAction {
     Drop,
     Hold,
@@ -76,7 +77,7 @@ impl TryFrom<i16> for FlowAction {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum FlowDropReason {
     Unknown,
     UnavailableIntf,
@@ -226,7 +227,7 @@ impl TryFrom<u16> for FlowDropReason {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct FlowRequest {
     pub op: FlowOp,
     pub rid: i16,
@@ -306,6 +307,58 @@ impl Default for FlowRequest {
 }
 
 impl FlowRequest {
+    pub fn write(&self) -> Result<Vec<u8>, &str> {
+        let mut encoder: vr_flow_req = vr_flow_req::new();
+        encoder.fr_op = self.op as u32;
+        encoder.fr_rid = self.rid;
+        encoder.fr_index = self.index;
+        encoder.fr_action = self.action as i16;
+        encoder.fr_rindex = self.rindex;
+        encoder.fr_family = self.family;
+        let flow_sip = Self::write_ip(&self.flow_sip);
+        encoder.fr_flow_sip_u = flow_sip.0;
+        encoder.fr_flow_sip_l = flow_sip.1;
+        let flow_dip = Self::write_ip(&self.flow_dip);
+        encoder.fr_flow_dip_u = flow_dip.0;
+        encoder.fr_flow_dip_l = flow_dip.1;
+        encoder.fr_flow_sport = self.flow_sport;
+        encoder.fr_flow_dport = self.flow_dport;
+        encoder.fr_flow_proto = self.flow_proto;
+        encoder.fr_flow_vrf = self.flow_vrf;
+        encoder.fr_flow_dvrf = self.flow_dvrf;
+        encoder.fr_mir_id = self.mirror_id;
+        encoder.fr_sec_mir_id = self.sec_mirror_id;
+        let mirror_sip = Self::write_ip(&Some(self.mirror_sip)).1 as u32;
+        encoder.fr_mir_sip = mirror_sip;
+        encoder.fr_mir_sport = self.mirror_sport;
+        encoder.fr_pcap_meta_data = utils::into_mut_ptr(&self.pcap_meta_data) as *mut i8;
+        encoder.fr_pcap_meta_data_size = self.pcap_meta_data.len() as u32;
+        encoder.fr_mir_vrf = self.mirror_vrf;
+        encoder.fr_ecmp_nh_index = self.ecmp_nh_index;
+        encoder.fr_src_nh_index = self.src_nh_index;
+        encoder.fr_flow_nh_id = self.flow_nh_id;
+        encoder.fr_drop_reason = self.drop_reason as u16;
+        encoder.fr_gen_id = self.gen_id;
+        let rflow_sip = Self::write_ip(&self.reverse_flow_sip);
+        encoder.fr_rflow_sip_u = rflow_sip.0;
+        encoder.fr_rflow_sip_l = rflow_sip.1;
+        let rflow_dip = Self::write_ip(&self.reverse_flow_dip);
+        encoder.fr_rflow_dip_u = rflow_dip.0;
+        encoder.fr_rflow_dip_l = rflow_dip.1;
+        encoder.fr_rflow_nh_id = self.reverse_flow_nh_id;
+        encoder.fr_rflow_sport = self.reverse_flow_sport;
+        encoder.fr_rflow_dport = self.reverse_flow_dport;
+        encoder.fr_qos_id = self.qos_id;
+        encoder.fr_ttl = self.ttl;
+        encoder.fr_extflags = self.extflags;
+        encoder.fr_flags1 = self.flags1;
+
+        match encoder.write() {
+            Err(_) => Err("Failed to write binary"),
+            Ok(v) => Ok(v),
+        }
+    }
+
     pub fn read<'a>(buf: Vec<u8>) -> Result<FlowRequest, &'a str> {
         let decoder: vr_flow_req = vr_flow_req::new();
         match decoder.read(buf) {
@@ -321,12 +374,12 @@ impl FlowRequest {
                 fr.flow_sip = Self::read_ip(
                     decoder.fr_family,
                     decoder.fr_flow_sip_u,
-                    decoder.fr_flow_sip_l
+                    decoder.fr_flow_sip_l,
                 );
                 fr.flow_dip = Self::read_ip(
                     decoder.fr_family,
                     decoder.fr_flow_dip_u,
-                    decoder.fr_flow_dip_l
+                    decoder.fr_flow_dip_l,
                 );
                 fr.flow_sport = decoder.fr_flow_sport;
                 fr.flow_dport = decoder.fr_flow_dport;
@@ -345,12 +398,12 @@ impl FlowRequest {
                 fr.reverse_flow_sip = Self::read_ip(
                     decoder.fr_family,
                     decoder.fr_rflow_sip_u,
-                    decoder.fr_rflow_sip_l
+                    decoder.fr_rflow_sip_l,
                 );
                 fr.reverse_flow_dip = Self::read_ip(
                     decoder.fr_family,
                     decoder.fr_rflow_dip_u,
-                    decoder.fr_rflow_dip_l
+                    decoder.fr_rflow_dip_l,
                 );
                 fr.reverse_flow_nh_id = decoder.fr_rflow_nh_id;
                 fr.reverse_flow_sport = decoder.fr_rflow_sport;
@@ -364,15 +417,28 @@ impl FlowRequest {
         }
     }
 
+    fn write_ip(ip: &Option<IpAddr>) -> (u64, u64) {
+        match ip {
+            None => (0u64, 0u64),
+            Some(IpAddr::V4(ip)) => {
+                let ip = utils::write_ip4(*ip) as u64;
+                (0u64, ip)
+            }
+            Some(IpAddr::V6(ip)) => {
+                let ip = utils::write_ip6(*ip);
+                let ip_u = ((ip & 0xffffffffffffffff_0000000000000000) >> 64) as u64;
+                let ip_l = (ip & 0x0000000000000000_ffffffffffffffff) as u64;
+                (ip_u, ip_l)
+            }
+        }
+    }
+
     fn read_ip(family: i32, ip_u: u64, ip_l: u64) -> Option<IpAddr> {
         let ip: u128 = (ip_u as u128) << 64 | ip_l as u128;
         match family {
-            x if x == libc::AF_INET6 as i32 =>
-                Some(Self::read_ip6(ip)),
-            x if x == libc::AF_INET as i32 =>
-                Some(Self::read_ip4(ip)),
-            _ =>
-                None
+            x if x == libc::AF_INET6 as i32 => Some(Self::read_ip6(ip)),
+            x if x == libc::AF_INET as i32 => Some(Self::read_ip4(ip)),
+            _ => None,
         }
     }
 
