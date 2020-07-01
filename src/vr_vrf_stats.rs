@@ -86,6 +86,7 @@ impl Default for VrfStatsRequest {
 impl VrfStatsRequest {
     pub fn write(&self) -> Result<Vec<u8>, &str> {
         let mut encoder: vr_vrf_stats_req = vr_vrf_stats_req::new();
+        encoder.h_op = self.op as u32;
         encoder.vsr_rid = self.rid;
         encoder.vsr_family = self.family;
         encoder.vsr_type = self._type;

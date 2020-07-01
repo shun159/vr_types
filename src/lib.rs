@@ -12,6 +12,7 @@ pub mod vr_mirror;
 pub mod vr_mpls;
 pub mod vr_nexthop;
 pub mod vr_pkt_droplog;
+pub mod vr_response;
 pub mod vr_route;
 pub mod vr_types;
 #[allow(non_upper_case_globals)]
