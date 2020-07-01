@@ -33,7 +33,7 @@ impl Default for PktDropLog {
             pkt_droplog_max_bufsz: 0,
             pkt_droplog_en: 0,
             pkt_droplog_sysctl_en: 0,
-            pkt_droplog_arr: vec![]
+            pkt_droplog_arr: vec![],
         }
     }
 }
@@ -48,7 +48,8 @@ impl PktDropLog {
         encoder.vdl_pkt_droplog_max_bufsz = self.pkt_droplog_max_bufsz;
         encoder.vdl_pkt_droplog_en = self.pkt_droplog_en;
         encoder.vdl_pkt_droplog_sysctl_en = self.pkt_droplog_sysctl_en;
-        encoder.vdl_pkt_droplog_arr = utils::into_mut_ptr(&self.pkt_droplog_arr);
+        encoder.vdl_pkt_droplog_arr =
+            utils::into_mut_ptr(&self.pkt_droplog_arr);
         encoder.vdl_pkt_droplog_arr_size = self.pkt_droplog_arr.len() as u32;
         match encoder.write() {
             Err(_) => Err("Failed to write binary"),
@@ -72,7 +73,7 @@ impl PktDropLog {
                 vdl.pkt_droplog_sysctl_en = decoder.vdl_pkt_droplog_sysctl_en;
                 vdl.pkt_droplog_arr = utils::free_buf(
                     decoder.vdl_pkt_droplog_arr,
-                    decoder.vdl_pkt_droplog_arr_size as usize
+                    decoder.vdl_pkt_droplog_arr_size as usize,
                 );
                 Ok(vdl)
             }
