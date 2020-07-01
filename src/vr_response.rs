@@ -9,14 +9,14 @@ use std::convert::TryInto;
 #[derive(Debug, Copy, Clone)]
 pub struct VrResponse {
     pub op: SandeshOp,
-    pub code: i32
+    pub code: i32,
 }
 
 impl Default for VrResponse {
     fn default() -> VrResponse {
         VrResponse {
             op: SandeshOp::Add,
-            code: 0
+            code: 0,
         }
     }
 }
