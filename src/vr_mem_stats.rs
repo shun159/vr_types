@@ -362,6 +362,7 @@ mod test_vr_mem_stats {
     fn complex_request() {
         let mut vms: MemStats = MemStats::default();
 
+        vms.op = SandeshOp::Dump;
         vms.rid = 1;
         vms.alloced = 1;
         vms.freed = 1;
@@ -437,6 +438,7 @@ mod test_vr_mem_stats {
         let bytes = vms.write().unwrap();
         let vms: MemStats = MemStats::read(bytes).unwrap();
 
+        assert_eq!(vms.op, SandeshOp::Dump);
         assert_eq!(vms.rid, 1);
         assert_eq!(vms.alloced, 1);
         assert_eq!(vms.freed, 1);
