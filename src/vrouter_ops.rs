@@ -294,8 +294,8 @@ impl VrouterOps {
 
 #[cfg(test)]
 mod test_vrouter_ops {
-    use crate::vrouter_ops::VrouterOps;
     use crate::sandesh::SandeshOp;
+    use crate::vrouter_ops::VrouterOps;
 
     #[test]
     fn empty_requset() {
