@@ -14,6 +14,12 @@ pub enum SandeshOp {
     Reset,
 }
 
+impl Default for SandeshOp {
+    fn default() -> SandeshOp {
+        SandeshOp::Add
+    }
+}
+
 impl TryFrom<vr_types_binding::sandesh_op> for SandeshOp {
     type Error = ();
 

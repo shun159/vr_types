@@ -6,7 +6,7 @@ use crate::vr_types::VrSandesh;
 use crate::vr_types_binding::vr_mem_stats_req;
 use std::convert::TryInto;
 
-pub struct MemStats {
+pub struct MemStatsRequest {
     pub op: SandeshOp,
     pub rid: i16,
     pub alloced: i64,
@@ -81,9 +81,9 @@ pub struct MemStats {
     pub interface_fat_flow_ipv6_exclude_list_object: i64,
 }
 
-impl Default for MemStats {
-    fn default() -> MemStats {
-        MemStats {
+impl Default for MemStatsRequest {
+    fn default() -> MemStatsRequest {
+        MemStatsRequest {
             op: SandeshOp::Add,
             rid: 0,
             alloced: 0,
@@ -160,7 +160,7 @@ impl Default for MemStats {
     }
 }
 
-impl MemStats {
+impl MemStatsRequest {
     pub fn write(&self) -> Result<Vec<u8>, &str> {
         let mut encoder: vr_mem_stats_req = vr_mem_stats_req::new();
         encoder.h_op = self.op as u32;
@@ -251,12 +251,12 @@ impl MemStats {
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<MemStats, &'a str> {
+    pub fn read<'a>(buf: Vec<u8>) -> Result<MemStatsRequest, &'a str> {
         let decoder: vr_mem_stats_req = vr_mem_stats_req::new();
         match decoder.read(buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
-                let mut vms: MemStats = MemStats::default();
+                let mut vms: MemStatsRequest = MemStatsRequest::default();
                 vms.op = decoder.h_op.try_into().unwrap();
                 vms.rid = decoder.vms_rid;
                 vms.alloced = decoder.vms_alloced;
@@ -356,11 +356,11 @@ impl MemStats {
 #[cfg(test)]
 mod test_vr_mem_stats {
     use crate::sandesh::SandeshOp;
-    use crate::vr_mem_stats::MemStats;
+    use crate::vr_mem_stats::MemStatsRequest;
 
     #[test]
     fn complex_request() {
-        let mut vms: MemStats = MemStats::default();
+        let mut vms: MemStatsRequest = MemStatsRequest::default();
 
         vms.op = SandeshOp::Dump;
         vms.rid = 1;
@@ -436,7 +436,7 @@ mod test_vr_mem_stats {
         vms.interface_fat_flow_ipv6_exclude_list_object = 1;
 
         let bytes = vms.write().unwrap();
-        let vms: MemStats = MemStats::read(bytes).unwrap();
+        let vms: MemStatsRequest = MemStatsRequest::read(bytes).unwrap();
 
         assert_eq!(vms.op, SandeshOp::Dump);
         assert_eq!(vms.rid, 1);
@@ -514,9 +514,9 @@ mod test_vr_mem_stats {
 
     #[test]
     fn empty_requset() {
-        let vms: MemStats = MemStats::default();
+        let vms: MemStatsRequest = MemStatsRequest::default();
         let bytes = vms.write().unwrap();
-        let vms: MemStats = MemStats::read(bytes).unwrap();
+        let vms: MemStatsRequest = MemStatsRequest::read(bytes).unwrap();
 
         assert_eq!(vms.rid, 0);
         assert_eq!(vms.alloced, 0);
