@@ -6,6 +6,7 @@ extern crate libc;
 pub mod genetlink;
 pub mod sandesh;
 pub mod utils;
+pub mod vr_bridge_table_data;
 pub mod vr_drop_stats;
 pub mod vr_fc_map;
 pub mod vr_flow;
