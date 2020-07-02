@@ -9,6 +9,7 @@ pub mod utils;
 pub mod vr_drop_stats;
 pub mod vr_fc_map;
 pub mod vr_flow;
+pub mod vr_flow_response;
 pub mod vr_interface;
 pub mod vr_mem_stats;
 pub mod vr_mirror;
