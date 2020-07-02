@@ -15,7 +15,7 @@ pub struct FlowResponse {
     pub bytes: u32,
     pub packets: u32,
     pub stats_oflow: u32,
-    pub gen_id: i8
+    pub gen_id: i8,
 }
 
 impl Default for FlowResponse {
@@ -28,7 +28,7 @@ impl Default for FlowResponse {
             bytes: 0,
             packets: 0,
             stats_oflow: 0,
-            gen_id: 0
+            gen_id: 0,
         }
     }
 }
@@ -65,7 +65,7 @@ impl FlowResponse {
                 fresp.stats_oflow = decoder.fresp_stats_oflow;
                 fresp.gen_id = decoder.fresp_gen_id;
                 Ok(fresp)
-            },
+            }
         }
     }
 }
