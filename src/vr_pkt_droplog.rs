@@ -9,7 +9,7 @@ use std::convert::TryInto;
 
 pub const VR_PKT_DROP_LOG_MAX: u32 = 200;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct PktDropLog {
     pub op: SandeshOp,
     pub rid: i16,

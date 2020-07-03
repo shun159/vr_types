@@ -8,7 +8,7 @@ use std::convert::TryInto;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct BridgeTableData {
     pub op: SandeshOp,
     pub rid: u16,

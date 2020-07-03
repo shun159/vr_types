@@ -15,6 +15,7 @@ pub mod vr_flow_table_data;
 pub mod vr_hugepage_config;
 pub mod vr_interface;
 pub mod vr_mem_stats;
+pub mod vr_message;
 pub mod vr_mirror;
 pub mod vr_mpls;
 pub mod vr_nexthop;

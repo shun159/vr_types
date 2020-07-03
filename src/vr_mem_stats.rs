@@ -6,6 +6,7 @@ use crate::vr_types::VrSandesh;
 use crate::vr_types_binding::vr_mem_stats_req;
 use std::convert::TryInto;
 
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct MemStatsRequest {
     pub op: SandeshOp,
     pub rid: i16,

@@ -6,7 +6,7 @@ use crate::vr_types::VrSandesh;
 use crate::vr_types_binding::vr_vrf_assign_req;
 use std::convert::TryInto;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct VrfAssignRequest {
     pub op: SandeshOp,
     pub rid: i16,

@@ -1,25 +1,17 @@
-PROGNAME := sandesh
-INCDIR := sandesh/library/c
-SRCDIR := sandesh/library
-LIBDIR := c
-OUTDIR := target/build
-TARGET := $(OUTDIR)/$(PROGNAME)
-SRCS := $(wildcard $(SRCDIR)/*.c) $(wildcard $(SRCDIR)/$(LIBDIR)/*.c)
-OBJS := $(addprefix $(OUTDIR)/,$(patsubst %.c,%.o,$(SRCS)))
-#$(warning $(OBJS))
+## Copyright 2020 Eishun Kondoh
+## SPDX-License-Identifier: Apache-2.0
 
-CC = gcc
-CFLAGS = -Wall -O2 -I $(INCDIR) -pthread -ggdb -g -O0
+GENC_SRCDIR	= gen-c/
+BINDGEN_OPTS = -o src/vr_types_binding.rs \
+		 					 --no-layout-tests \
+							 --use-array-pointers-in-arguments \
+							 --generate-block -- \
+						   -I.
 
-.PHONY: all clean
-all: $(TARGET)
+all: compile-idl bind
 
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+compile-idl:
+	./sandesh_idl --gen c priv/vr.sandesh
 
-$(OUTDIR)/%.o:%.c
-	@if [ ! -e `dirname $@` ]; then mkdir -p `dirname $@`; fi
-	$(CC) $(CFLAGS) -o $@ -c $<
-
-clean:
-	rm -rf $(OUTDIR)
+bind:
+	bindgen $(wildcard $(GENC_SRCDIR)/*.h) $(BINDGEN_OPTS)

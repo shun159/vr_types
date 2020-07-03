@@ -10,7 +10,7 @@ use eui48::MacAddress;
 use std::convert::{From, TryFrom, TryInto};
 use std::net::{Ipv4Addr, Ipv6Addr};
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum NhType {
     Dead,
     Rcv,
@@ -44,7 +44,7 @@ impl TryFrom<i8> for NhType {
 }
 
 // Defined in vr_nexthop.h
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum NhEcmpConfigHash {
     Proto = 0x01,
     SrcIP = 0x02,
@@ -53,7 +53,7 @@ pub enum NhEcmpConfigHash {
     DstPort = 0x10,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum NhFlag {
     Valid = 0x00000001,
     PolicyEnabled = 0x00000002,
@@ -84,8 +84,8 @@ pub enum NhFlag {
     ValidateMcastSrc = 0x08000000,
 }
 
-#[derive(Debug, PartialEq)]
-pub struct NhRequest {
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct NexthopRequest {
     pub op: SandeshOp,
     pub _type: NhType,
     pub family: i8, // One of AF_*
@@ -117,9 +117,9 @@ pub struct NhRequest {
     pub transport_label: u32,
 }
 
-impl Default for NhRequest {
-    fn default() -> NhRequest {
-        NhRequest {
+impl Default for NexthopRequest {
+    fn default() -> NexthopRequest {
+        NexthopRequest {
             op: SandeshOp::Add,
             _type: NhType::Dead,
             family: 0,
@@ -153,7 +153,7 @@ impl Default for NhRequest {
     }
 }
 
-impl NhRequest {
+impl NexthopRequest {
     pub fn write(&self) -> Result<Vec<u8>, &str> {
         let mut encoder: vr_nexthop_req = vr_nexthop_req::new();
         encoder.h_op = self.op as u32;
@@ -215,12 +215,12 @@ impl NhRequest {
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<NhRequest, &'a str> {
+    pub fn read<'a>(buf: Vec<u8>) -> Result<NexthopRequest, &'a str> {
         let decoder = vr_nexthop_req::new();
         match decoder.read(buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
-                let mut nhr = NhRequest::default();
+                let mut nhr = NexthopRequest::default();
                 nhr.op = decoder.h_op.try_into().unwrap();
                 nhr._type = decoder.nhr_type.try_into().unwrap();
                 nhr.family = decoder.nhr_family;
@@ -347,15 +347,15 @@ impl NhRequest {
 #[cfg(test)]
 mod test_vr_nexthop {
     use crate::sandesh::SandeshOp;
-    use crate::vr_nexthop::{NhRequest, NhType};
+    use crate::vr_nexthop::{NexthopRequest, NhType};
     use eui48::MacAddress;
     use std::net::{Ipv4Addr, Ipv6Addr};
 
     #[test]
     fn empty_request() {
-        let nhreq: NhRequest = NhRequest::default();
+        let nhreq: NexthopRequest = NexthopRequest::default();
         let bytes = nhreq.write().unwrap();
-        let nhreq: NhRequest = NhRequest::read(bytes).unwrap();
+        let nhreq: NexthopRequest = NexthopRequest::read(bytes).unwrap();
         assert_eq!(nhreq.op, SandeshOp::Add);
         assert_eq!(nhreq._type, NhType::Dead);
         assert_eq!(nhreq.family, 0);
@@ -388,7 +388,7 @@ mod test_vr_nexthop {
 
     #[test]
     fn complex_request() {
-        let mut nhreq: NhRequest = NhRequest::default();
+        let mut nhreq: NexthopRequest = NexthopRequest::default();
         nhreq.op = SandeshOp::Get;
         nhreq._type = NhType::Composite;
         nhreq.family = 7; // AF_BRIDGE
@@ -420,7 +420,7 @@ mod test_vr_nexthop {
         nhreq.transport_label = 1;
 
         let bytes = nhreq.write().unwrap();
-        let nhreq: NhRequest = NhRequest::read(bytes).unwrap();
+        let nhreq: NexthopRequest = NexthopRequest::read(bytes).unwrap();
 
         assert_eq!(nhreq.op, SandeshOp::Get);
         assert_eq!(nhreq._type, NhType::Composite);

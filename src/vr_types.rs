@@ -1212,6 +1212,17 @@ mod test_encode_types {
         );
         assert_eq!(53, res.len())
     }
+
+    #[test]
+    fn vrouter_ops() {
+        let req = vrouter_ops::new();
+        let res = req.write().unwrap();
+        assert_eq!(
+            "vr_hugepage_config",
+            sandesh_info_t::sname_from_bytes(&res)
+        );
+        assert_eq!(53, res.len())
+    }
 }
 
 #[cfg(test)]

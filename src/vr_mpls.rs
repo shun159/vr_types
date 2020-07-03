@@ -6,7 +6,7 @@ use crate::vr_types::VrSandesh;
 use crate::vr_types_binding::vr_mpls_req;
 use std::convert::TryInto;
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct MplsRequest {
     pub op: SandeshOp,
     pub rid: i16,

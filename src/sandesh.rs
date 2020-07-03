@@ -4,7 +4,7 @@
 use crate::vr_types_binding;
 use std::convert::TryFrom;
 
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum SandeshOp {
     Add,
     Get,

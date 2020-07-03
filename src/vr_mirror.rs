@@ -6,7 +6,7 @@ use crate::vr_types::VrSandesh;
 use crate::vr_types_binding::vr_mirror_req;
 use std::convert::TryInto;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct MirrorRequest {
     pub op: SandeshOp,
     pub index: i16,

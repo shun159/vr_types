@@ -16,7 +16,7 @@ pub const VIF_MAX_MIRROR_MD_SIZE: u32 = 0xFF;
 pub const IPV6_UPPER_MASK: u128 = 0xffffffffffffffff_0000000000000000;
 pub const IPV6_LOWER_MASK: u128 = 0x0000000000000000_ffffffffffffffff;
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum IfType {
     Host = 0,
     Agent = 1,
@@ -51,7 +51,7 @@ impl TryFrom<i32> for IfType {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum IfFlag {
     PolicyEnabled = 0x0000001,
     Xconnect = 0x0000002,
@@ -93,8 +93,8 @@ pub enum IfFlag {
     MockDevice = 0x4000000,
 }
 
-#[derive(Debug, PartialEq)]
-pub struct IfRequest {
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct InterfaceRequest {
     pub op: SandeshOp,
     pub core: u32,
     pub _type: IfType,
@@ -177,9 +177,9 @@ pub struct IfRequest {
     pub vlan_name: String,
 }
 
-impl Default for IfRequest {
-    fn default() -> IfRequest {
-        IfRequest {
+impl Default for InterfaceRequest {
+    fn default() -> InterfaceRequest {
+        InterfaceRequest {
             op: SandeshOp::Add,
             core: 0,
             _type: IfType::Host,
@@ -264,7 +264,7 @@ impl Default for IfRequest {
     }
 }
 
-impl IfRequest {
+impl InterfaceRequest {
     pub fn write(&self) -> Result<Vec<u8>, &str> {
         let mut encoder: vr_interface_req = vr_interface_req::new();
         encoder.h_op = self.op as u32;
@@ -429,12 +429,12 @@ impl IfRequest {
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<IfRequest, &'a str> {
+    pub fn read<'a>(buf: Vec<u8>) -> Result<InterfaceRequest, &'a str> {
         let decoder: vr_interface_req = vr_interface_req::new();
         match decoder.read(buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
-                let mut vifr = IfRequest::default();
+                let mut vifr = InterfaceRequest::default();
                 vifr.op = decoder.h_op.try_into().unwrap();
                 vifr.core = decoder.vifr_core;
                 vifr._type = decoder.vifr_type.try_into().unwrap();
@@ -717,15 +717,15 @@ impl IfRequest {
 #[cfg(test)]
 mod test_vr_interface {
     use crate::sandesh::SandeshOp;
-    use crate::vr_interface::{IfRequest, IfType};
+    use crate::vr_interface::{IfType, InterfaceRequest};
     use eui48::MacAddress;
     use std::net::{Ipv4Addr, Ipv6Addr};
 
     #[test]
     fn empty_request() {
-        let ifreq: IfRequest = IfRequest::default();
+        let ifreq: InterfaceRequest = InterfaceRequest::default();
         let bytes = ifreq.write().unwrap();
-        let ifreq: IfRequest = IfRequest::read(bytes).unwrap();
+        let ifreq: InterfaceRequest = InterfaceRequest::read(bytes).unwrap();
         assert_eq!(ifreq.op, SandeshOp::Add);
         assert_eq!(ifreq.core, 0);
         assert_eq!(ifreq._type, IfType::Host);
@@ -812,7 +812,7 @@ mod test_vr_interface {
 
     #[test]
     fn complex_request() {
-        let mut ifreq: IfRequest = IfRequest::default();
+        let mut ifreq: InterfaceRequest = InterfaceRequest::default();
 
         ifreq.op = SandeshOp::Dump;
         ifreq.core = 1;
@@ -896,7 +896,7 @@ mod test_vr_interface {
         ifreq.vlan_name = "test vlan".to_string();
 
         let bytes = ifreq.write().unwrap();
-        let ifreq: IfRequest = IfRequest::read(bytes).unwrap();
+        let ifreq: InterfaceRequest = InterfaceRequest::read(bytes).unwrap();
 
         assert_eq!(ifreq.op, SandeshOp::Dump);
         assert_eq!(ifreq.core, 1);

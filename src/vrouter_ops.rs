@@ -9,7 +9,7 @@ use std::convert::TryInto;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct VrouterOps {
     pub op: SandeshOp,
     pub rid: i32,

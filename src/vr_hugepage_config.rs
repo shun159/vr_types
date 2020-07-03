@@ -7,7 +7,7 @@ use crate::vr_types::VrSandesh;
 use crate::vr_types_binding::vr_hugepage_config;
 use std::convert::TryInto;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct HugepageConfig {
     pub op: SandeshOp,
     pub mem: Vec<u64>,

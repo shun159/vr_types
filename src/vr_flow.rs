@@ -35,7 +35,7 @@ pub const VR_FLOW_FLAG_DELETE_MARKED: u16 = 0x40;
 
 pub const VR_IP6_ADDRESS_LEN: u32 = 16;
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum FlowOp {
     Set,
     List,
@@ -55,7 +55,7 @@ impl TryFrom<flow_op> for FlowOp {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum FlowAction {
     Drop,
     Hold,
@@ -77,7 +77,7 @@ impl TryFrom<i16> for FlowAction {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum FlowDropReason {
     Unknown,
     UnavailableIntf,
@@ -227,7 +227,7 @@ impl TryFrom<u16> for FlowDropReason {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct FlowRequest {
     pub op: FlowOp,
     pub rid: i16,

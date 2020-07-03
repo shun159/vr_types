@@ -6,7 +6,7 @@ use crate::vr_types::VrSandesh;
 use crate::vr_types_binding::vr_vxlan_req;
 use std::convert::TryInto;
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct VxlanRequest {
     pub op: SandeshOp,
     pub rid: i16,

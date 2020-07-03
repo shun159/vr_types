@@ -1,13 +1,7 @@
 use std::env;
 use std::path::{Path, PathBuf};
-use std::process::Command;
 
 fn main() {
-    Command::new("./sandesh_idl")
-        .args(&["--gen", "c", "priv/vr.sandesh"])
-        .output()
-        .expect("Failed to generate Sandesh IDL");
-
     let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
     let out_dir = PathBuf::from(env::var_os("OUT_DIR").unwrap());
     let out_dir_str = out_dir.to_str().unwrap();
@@ -34,20 +28,19 @@ fn main() {
         .out_dir(out_dir_str)
         .compile("vr_types");
 
-    println!("cargo:rustc-link-search=native={}", out_dir_str);
-    println!(
-        "cargo:rustc-link-search=native={}",
-        Path::new(&dir).join("sandesh/library/c").display()
-    );
-    println!(
-        "cargo:rustc-link-search=native={}",
-        Path::new(&dir).join("sandesh/library/c/protocol").display()
-    );
-    println!(
-        "cargo:rustc-link-search=native={}",
-        Path::new(&dir)
-            .join("sandesh/library/c/transport")
-            .display()
-    );
-    println!("cargo:rustc-link-lib=vr_types");
+    vec![
+        "sandesh/library/c",
+        "sandesh/library/c/protocol",
+        "sandesh/library/c/transport",
+    ]
+    .iter()
+    .fold(vec![], |mut acc, &p| {
+        let path = Path::new(&dir).join(p);
+        acc.push(path);
+        acc
+    })
+    .iter()
+    .for_each(|path| {
+        println!("cargo:rustc-link-search=native={}", path.display());
+    });
 }

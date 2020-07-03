@@ -9,7 +9,7 @@ use eui48::MacAddress;
 use std::convert::TryInto;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum RouteFlag {
     Valid = 0x01,
     LabelVaild = 0x02,
@@ -20,7 +20,7 @@ pub enum RouteFlag {
     EvpnControlProcessing = 0x40,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct RouteRequest {
     pub op: SandeshOp,
     pub vrf_id: i32,

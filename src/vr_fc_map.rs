@@ -7,7 +7,7 @@ use crate::vr_types::VrSandesh;
 use crate::vr_types_binding::vr_fc_map_req;
 use std::convert::TryInto;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct FcMapRequest {
     pub op: SandeshOp,
     pub rid: u16,
