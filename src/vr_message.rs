@@ -1,28 +1,28 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::vr_bridge_table_data::BridgeTableData;
-use crate::vr_drop_stats::DropStats;
-use crate::vr_fc_map::FcMapRequest;
-use crate::vr_flow::FlowRequest;
-use crate::vr_flow_response::FlowResponse;
-use crate::vr_flow_table_data::FlowTableData;
-use crate::vr_hugepage_config::HugepageConfig;
-use crate::vr_interface::InterfaceRequest;
-use crate::vr_mem_stats::MemStatsRequest;
-use crate::vr_mirror::MirrorRequest;
-use crate::vr_mpls::MplsRequest;
-use crate::vr_nexthop::NexthopRequest;
-use crate::vr_pkt_droplog::PktDropLog;
-use crate::vr_qos_map::QosMapRequest;
-use crate::vr_response::VrResponse;
-use crate::vr_route::RouteRequest;
-use crate::vr_types_binding::sandesh_info_t;
-use crate::vr_vrf::VrfRequest;
-use crate::vr_vrf_assign::VrfAssignRequest;
-use crate::vr_vrf_stats::VrfStatsRequest;
-use crate::vr_vxlan::VxlanRequest;
-use crate::vrouter_ops::VrouterOps;
+use vr_messages::vr_bridge_table_data::BridgeTableData;
+use vr_messages::vr_drop_stats::DropStats;
+use vr_messages::vr_fc_map::FcMapRequest;
+use vr_messages::vr_flow::FlowRequest;
+use vr_messages::vr_flow_response::FlowResponse;
+use vr_messages::vr_flow_table_data::FlowTableData;
+use vr_messages::vr_hugepage_config::HugepageConfig;
+use vr_messages::vr_interface::InterfaceRequest;
+use vr_messages::vr_mem_stats::MemStatsRequest;
+use vr_messages::vr_mirror::MirrorRequest;
+use vr_messages::vr_mpls::MplsRequest;
+use vr_messages::vr_nexthop::NexthopRequest;
+use vr_messages::vr_pkt_droplog::PktDropLog;
+use vr_messages::vr_qos_map::QosMapRequest;
+use vr_messages::vr_response::VrResponse;
+use vr_messages::vr_route::RouteRequest;
+use vr_messages::vr_types_binding::sandesh_info_t;
+use vr_messages::vr_vrf::VrfRequest;
+use vr_messages::vr_vrf_assign::VrfAssignRequest;
+use vr_messages::vr_vrf_stats::VrfStatsRequest;
+use vr_messages::vr_vxlan::VxlanRequest;
+use vr_messages::vrouter_ops::VrouterOps;
 use std::convert::{TryFrom, TryInto};
 
 #[derive(Debug, Clone, Eq, PartialEq)]
