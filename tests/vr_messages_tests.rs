@@ -24,11 +24,16 @@ mod test_vr_messages {
     use vr_type::vr_messages::vr_vrf_stats::VrfStatsRequest;
     use vr_type::vr_messages::vr_vxlan::VxlanRequest;
     use vr_type::vr_messages::vrouter_ops::VrouterOps;
-
     use vr_type::vr_messages::Message;
 
     #[test]
     fn bridge_table_data() {
+        use netlink_packet_core::NetlinkMessage;
+        let payload = Message::BridgeTableData(BridgeTableData::default());
+        let mut packet = NetlinkMessage::from(payload);
+        packet.finalize();
+        println!("{:?}", packet);
+
         let req = Message::BridgeTableData(BridgeTableData::default());
         let bytes = req.to_bytes().unwrap();
         assert_eq!(
@@ -235,5 +240,39 @@ mod test_vr_messages {
             Message::VrouterOps(VrouterOps::default()),
             Message::from_bytes(bytes).unwrap()
         );
+    }
+}
+
+#[cfg(test)]
+mod test_netlink_header {
+    use vr_type::vr_messages::vr_bridge_table_data::BridgeTableData;
+    use vr_type::vr_messages::Message;
+    use vr_type::vr_messages::sandesh::SandeshOp::Add;
+    use netlink_packet_core::{NetlinkMessage, NetlinkPayload};
+
+    #[test]
+    fn bridge_table_data() {
+        let payload = Message::BridgeTableData(BridgeTableData::default());
+        let mut packet = NetlinkMessage::from(payload);
+        packet.finalize();
+        assert_eq!(packet.header.length, 72);
+        assert_eq!(packet.header.message_type, 1);
+        assert_eq!(packet.header.flags, 0);
+        assert_eq!(packet.header.sequence_number, 0);
+        assert_eq!(packet.header.port_number, 0);
+        assert_eq!(
+            packet.payload,
+            NetlinkPayload::InnerMessage(
+                Message::BridgeTableData(
+                    BridgeTableData {
+                        op: Add,
+                        rid: 0,
+                        size: 0,
+                        dev: 0,
+                        file_path: "".to_string()
+                    }
+                )
+            )
+        )
     }
 }
