@@ -181,10 +181,7 @@ mod test_encode_types {
     fn vrouter_ops() {
         let req = vrouter_ops::new();
         let res = req.write().unwrap();
-        assert_eq!(
-            "vrouter_ops",
-            sandesh_info_t::sname_from_bytes(&res)
-        );
+        assert_eq!("vrouter_ops", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(324, res.len())
     }
 }

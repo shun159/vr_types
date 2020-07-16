@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::sandesh::SandeshOp;
-use crate::utils;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_qos_map_req;
+use crate::utils;
 use std::convert::TryInto;
 
 #[derive(Default, Debug, Clone, Eq, PartialEq)]

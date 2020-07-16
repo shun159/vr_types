@@ -1,10 +1,10 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::utils;
 use super::vr_flow::FlowOp;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_flow_table_data;
+use crate::utils;
 use std::convert::TryInto;
 use std::ffi::CString;
 use std::os::raw::c_char;

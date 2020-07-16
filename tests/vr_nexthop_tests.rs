@@ -3,10 +3,10 @@
 
 #[cfg(test)]
 mod test_vr_nexthop {
-    use vr_type::vr_messages::sandesh::SandeshOp;
-    use vr_type::vr_messages::vr_nexthop::{NexthopRequest, NhType};
     use eui48::MacAddress;
     use std::net::{Ipv4Addr, Ipv6Addr};
+    use vr_type::vr_messages::sandesh::SandeshOp;
+    use vr_type::vr_messages::vr_nexthop::{NexthopRequest, NhType};
 
     #[test]
     fn empty_request() {

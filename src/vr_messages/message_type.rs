@@ -56,7 +56,7 @@ impl TryFrom<Vec<u8>> for MessageType {
             "vr_vrf_stats_req" => Ok(MessageType::VrfStatsRequest),
             "vr_vxlan_req" => Ok(MessageType::VxlanRequest),
             "vrouter_ops" => Ok(MessageType::VrouterOps),
-            &_ => Ok(MessageType::Unknown)
+            &_ => Ok(MessageType::Unknown),
         }
     }
 }

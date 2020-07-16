@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::sandesh::SandeshOp;
-use crate::utils;
 use super::vr_flow::VR_IP6_ADDRESS_LEN;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::*;
+use crate::utils;
 use eui48::MacAddress;
 use std::convert::{From, TryFrom, TryInto};
 use std::net::{Ipv4Addr, Ipv6Addr};

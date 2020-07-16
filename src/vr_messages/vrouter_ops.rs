@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::sandesh::SandeshOp;
-use crate::utils;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vrouter_ops;
+use crate::utils;
 use std::convert::TryInto;
 use std::ffi::CString;
 use std::os::raw::c_char;

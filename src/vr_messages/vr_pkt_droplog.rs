@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::sandesh::SandeshOp;
-use crate::utils;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_pkt_drop_log_req;
+use crate::utils;
 use std::convert::TryInto;
 
 pub const VR_PKT_DROP_LOG_MAX: u32 = 200;

@@ -3,10 +3,10 @@
 
 #[cfg(test)]
 mod test_vr_interface {
-    use vr_type::vr_messages::sandesh::SandeshOp;
-    use vr_type::vr_messages::vr_interface::{IfType, InterfaceRequest};
     use eui48::MacAddress;
     use std::net::{Ipv4Addr, Ipv6Addr};
+    use vr_type::vr_messages::sandesh::SandeshOp;
+    use vr_type::vr_messages::vr_interface::{IfType, InterfaceRequest};
 
     #[test]
     fn empty_request() {

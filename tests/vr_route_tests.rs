@@ -3,10 +3,10 @@
 
 #[cfg(test)]
 mod test_vr_route {
-    use vr_type::vr_messages::sandesh::SandeshOp;
-    use vr_type::vr_messages::vr_route::RouteRequest;
     use eui48::MacAddress;
     use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+    use vr_type::vr_messages::sandesh::SandeshOp;
+    use vr_type::vr_messages::vr_route::RouteRequest;
 
     #[test]
     fn empty_request() {

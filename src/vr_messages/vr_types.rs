@@ -1,12 +1,12 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::utils;
 use super::vr_flow;
 use super::vr_interface;
 use super::vr_nexthop;
 use super::vr_pkt_droplog;
 use super::vr_types_binding::*;
+use crate::utils;
 
 use byteorder::{NetworkEndian, ReadBytesExt};
 use libc::{time_t, AF_INET6};
