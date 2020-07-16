@@ -6,19 +6,10 @@ use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_response;
 use std::convert::TryInto;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct VrResponse {
     pub op: SandeshOp,
     pub code: i32,
-}
-
-impl Default for VrResponse {
-    fn default() -> VrResponse {
-        VrResponse {
-            op: SandeshOp::Add,
-            code: 0,
-        }
-    }
 }
 
 impl VrResponse {

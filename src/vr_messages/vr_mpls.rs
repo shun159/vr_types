@@ -6,25 +6,13 @@ use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_mpls_req;
 use std::convert::TryInto;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct MplsRequest {
     pub op: SandeshOp,
     pub rid: i16,
     pub label: i32,
     pub nhid: i32,
     pub marker: i32,
-}
-
-impl Default for MplsRequest {
-    fn default() -> MplsRequest {
-        MplsRequest {
-            op: SandeshOp::Add,
-            rid: 0,
-            label: 0,
-            nhid: 0,
-            marker: 0,
-        }
-    }
 }
 
 impl MplsRequest {

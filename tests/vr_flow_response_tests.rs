@@ -11,7 +11,7 @@ mod test_vr_vxlan {
         let fresp: FlowResponse = FlowResponse::default();
         let bytes = fresp.write().unwrap();
         let fresp: FlowResponse = FlowResponse::read(bytes).unwrap();
-        assert_eq!(fresp.op, FlowOp::Get);
+        assert_eq!(fresp.op, FlowOp::Set);
         assert_eq!(fresp.rid, 0);
         assert_eq!(fresp.flags, 0);
         assert_eq!(fresp.index, 0);

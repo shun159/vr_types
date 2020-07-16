@@ -7,23 +7,12 @@ use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_hugepage_config;
 use std::convert::TryInto;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct HugepageConfig {
     pub op: SandeshOp,
     pub mem: Vec<u64>,
     pub msize: Vec<u32>,
     pub resp: u32,
-}
-
-impl Default for HugepageConfig {
-    fn default() -> HugepageConfig {
-        HugepageConfig {
-            op: SandeshOp::Add,
-            mem: vec![],
-            msize: vec![],
-            resp: 0,
-        }
-    }
 }
 
 impl HugepageConfig {

@@ -9,7 +9,7 @@ use std::convert::TryInto;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct FlowTableData {
     pub op: FlowOp,
     pub rid: u16,
@@ -28,30 +28,6 @@ pub struct FlowTableData {
     pub hold_stat: Vec<u32>,
     pub burst_free_tokens: u32,
     pub hold_entries: u32,
-}
-
-impl Default for FlowTableData {
-    fn default() -> FlowTableData {
-        FlowTableData {
-            op: FlowOp::Get,
-            rid: 0,
-            size: 0,
-            dev: 0,
-            file_path: "".to_string(),
-            used_entries: 0,
-            processed: 0,
-            deleted: 0,
-            added: 0,
-            created: 0,
-            changed: 0,
-            hold_oflows: 0,
-            cpus: 0,
-            oflow_entries: 0,
-            hold_stat: vec![],
-            burst_free_tokens: 0,
-            hold_entries: 0,
-        }
-    }
 }
 
 impl FlowTableData {

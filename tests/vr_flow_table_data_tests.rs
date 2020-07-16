@@ -11,7 +11,7 @@ mod test_vr_flow_table_data {
         let ftable: FlowTableData = FlowTableData::default();
         let bytes = ftable.write().unwrap();
         let ftable: FlowTableData = FlowTableData::read(bytes).unwrap();
-        assert_eq!(ftable.op, FlowOp::Get);
+        assert_eq!(ftable.op, FlowOp::Set);
         assert_eq!(ftable.rid, 0);
         assert_eq!(ftable.size, 0);
         assert_eq!(ftable.dev, 0);

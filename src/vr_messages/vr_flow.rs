@@ -55,6 +55,12 @@ impl TryFrom<flow_op> for FlowOp {
     }
 }
 
+impl Default for FlowOp {
+    fn default() -> FlowOp {
+        FlowOp::Set
+    }
+}
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum FlowAction {
     Drop,
@@ -74,6 +80,12 @@ impl TryFrom<i16> for FlowAction {
             x if x == FlowAction::Nat as i16 => Ok(FlowAction::Nat),
             _ => Err(()),
         }
+    }
+}
+
+impl Default for FlowAction {
+    fn default() -> FlowAction {
+        FlowAction::Drop
     }
 }
 
@@ -224,6 +236,12 @@ impl TryFrom<u16> for FlowDropReason {
             }
             _ => Err(()),
         }
+    }
+}
+
+impl Default for FlowDropReason {
+    fn default() -> FlowDropReason {
+        FlowDropReason::Unknown
     }
 }
 

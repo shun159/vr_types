@@ -6,7 +6,7 @@ use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_drop_stats_req;
 use std::convert::TryInto;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct DropStats {
     pub op: SandeshOp,
     pub rid: i16,
@@ -62,67 +62,6 @@ pub struct DropStats {
     pub pkt_loop: i64,
     pub no_crypt_path: i64,
     pub invalid_hbs_pkt: i64,
-}
-
-impl Default for DropStats {
-    fn default() -> DropStats {
-        DropStats {
-            op: SandeshOp::Add,
-            rid: 0,
-            core: 0,
-            discard: 0,
-            pcpu_stats_failure_status: 0,
-            pull: 0,
-            invalid_if: 0,
-            invalid_arp: 0,
-            trap_no_if: 0,
-            nowhere_to_go: 0,
-            flow_queue_limit_exceeded: 0,
-            flow_no_memory: 0,
-            flow_invalid_protocol: 0,
-            flow_nat_no_rflow: 0,
-            flow_action_drop: 0,
-            flow_action_invalid: 0,
-            flow_unusable: 0,
-            flow_table_full: 0,
-            interface_tx_discard: 0,
-            interface_drop: 0,
-            duplicated: 0,
-            push: 0,
-            ttl_exceeded: 0,
-            invalid_nh: 0,
-            invalid_label: 0,
-            invalid_protocol: 0,
-            interface_rx_discard: 0,
-            invalid_mcast_source: 0,
-            head_alloc_fail: 0,
-            pcow_fail: 0,
-            mcast_df_bit: 0,
-            mcast_clone_fail: 0,
-            no_memory: 0,
-            rewrite_fail: 0,
-            misc: 0,
-            invalid_packet: 0,
-            cksum_err: 0,
-            no_fmd: 0,
-            cloned_original: 0,
-            invalid_vnid: 0,
-            frag_err: 0,
-            invalid_source: 0,
-            l2_no_route: 0,
-            fragment_queue_fail: 0,
-            vlan_fwd_tx: 0,
-            vlan_fwd_enq: 0,
-            drop_new_flow: 0,
-            flow_evict: 0,
-            trap_original: 0,
-            leaf_to_leaf: 0,
-            bmac_isid_mismatch: 0,
-            pkt_loop: 0,
-            no_crypt_path: 0,
-            invalid_hbs_pkt: 0,
-        }
-    }
 }
 
 impl DropStats {

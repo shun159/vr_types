@@ -8,25 +8,13 @@ use std::convert::TryInto;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct BridgeTableData {
     pub op: SandeshOp,
     pub rid: u16,
     pub size: u32,
     pub dev: u16,
     pub file_path: String,
-}
-
-impl Default for BridgeTableData {
-    fn default() -> BridgeTableData {
-        BridgeTableData {
-            op: SandeshOp::Add,
-            rid: 0,
-            size: 0,
-            dev: 0,
-            file_path: "".to_string(),
-        }
-    }
 }
 
 impl BridgeTableData {

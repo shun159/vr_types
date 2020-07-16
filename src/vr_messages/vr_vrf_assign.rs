@@ -6,7 +6,7 @@ use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_vrf_assign_req;
 use std::convert::TryInto;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct VrfAssignRequest {
     pub op: SandeshOp,
     pub rid: i16,
@@ -15,20 +15,6 @@ pub struct VrfAssignRequest {
     pub vlan_id: i16,
     pub marker: i16,
     pub nh_id: i32,
-}
-
-impl Default for VrfAssignRequest {
-    fn default() -> VrfAssignRequest {
-        VrfAssignRequest {
-            op: SandeshOp::Add,
-            rid: 0,
-            vif_index: 0,
-            vif_vrf: 0,
-            vlan_id: 0,
-            marker: 0,
-            nh_id: 0,
-        }
-    }
 }
 
 impl VrfAssignRequest {

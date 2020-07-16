@@ -6,23 +6,12 @@ use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_vxlan_req;
 use std::convert::TryInto;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct VxlanRequest {
     pub op: SandeshOp,
     pub rid: i16,
     pub vnid: i32,
     pub nhid: i32,
-}
-
-impl Default for VxlanRequest {
-    fn default() -> VxlanRequest {
-        VxlanRequest {
-            op: SandeshOp::Add,
-            rid: 0,
-            vnid: 0,
-            nhid: 0,
-        }
-    }
 }
 
 impl VxlanRequest {

@@ -6,7 +6,7 @@ use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_vrf_stats_req;
 use std::convert::TryInto;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct VrfStatsRequest {
     pub op: SandeshOp,
     pub rid: i16,
@@ -41,46 +41,6 @@ pub struct VrfStatsRequest {
     pub uuc_floods: i64,
     pub pbb_tunnels: i64,
     pub udp_mpls_over_mpls_tunnels: i64,
-}
-
-impl Default for VrfStatsRequest {
-    fn default() -> VrfStatsRequest {
-        VrfStatsRequest {
-            op: SandeshOp::Add,
-            rid: 0,
-            family: 0,
-            _type: 0,
-            vrf: 0,
-            discards: 0,
-            resolves: 0,
-            receives: 0,
-            ecmp_composites: 0,
-            l2_mcast_composites: 0,
-            fabric_composites: 0,
-            udp_tunnels: 0,
-            udp_mpls_tunnels: 0,
-            gre_mpls_tunnels: 0,
-            l2_encaps: 0,
-            encaps: 0,
-            marker: 0,
-            gros: 0,
-            diags: 0,
-            encap_composites: 0,
-            evpn_composites: 0,
-            vrf_translates: 0,
-            vxlan_tunnels: 0,
-            arp_virtual_proxy: 0,
-            arp_virtual_stitch: 0,
-            arp_virtual_flood: 0,
-            arp_physical_stitch: 0,
-            arp_tor_proxy: 0,
-            arp_physical_flood: 0,
-            l2_receives: 0,
-            uuc_floods: 0,
-            pbb_tunnels: 0,
-            udp_mpls_over_mpls_tunnels: 0,
-        }
-    }
 }
 
 impl VrfStatsRequest {

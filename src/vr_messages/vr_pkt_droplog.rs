@@ -9,7 +9,7 @@ use std::convert::TryInto;
 
 pub const VR_PKT_DROP_LOG_MAX: u32 = 200;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct PktDropLog {
     pub op: SandeshOp,
     pub rid: i16,
@@ -20,22 +20,6 @@ pub struct PktDropLog {
     pub pkt_droplog_en: i16,
     pub pkt_droplog_sysctl_en: i16,
     pub pkt_droplog_arr: Vec<i8>,
-}
-
-impl Default for PktDropLog {
-    fn default() -> PktDropLog {
-        PktDropLog {
-            op: SandeshOp::Add,
-            rid: 0,
-            core: 0,
-            log_idx: 0,
-            max_num_cores: 0,
-            pkt_droplog_max_bufsz: 0,
-            pkt_droplog_en: 0,
-            pkt_droplog_sysctl_en: 0,
-            pkt_droplog_arr: vec![],
-        }
-    }
 }
 
 impl PktDropLog {

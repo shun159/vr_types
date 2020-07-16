@@ -31,6 +31,12 @@ pub enum IfType {
     Max = 10,
 }
 
+impl Default for IfType {
+    fn default() -> IfType {
+        IfType::Host
+    }
+}
+
 impl TryFrom<i32> for IfType {
     type Error = ();
     fn try_from(v: i32) -> Result<Self, Self::Error> {

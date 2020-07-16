@@ -6,7 +6,7 @@ use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_mirror_req;
 use std::convert::TryInto;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct MirrorRequest {
     pub op: SandeshOp,
     pub index: i16,
@@ -17,22 +17,6 @@ pub struct MirrorRequest {
     pub marker: i32,
     pub vni: i32,
     pub vlan: i16,
-}
-
-impl Default for MirrorRequest {
-    fn default() -> MirrorRequest {
-        MirrorRequest {
-            op: SandeshOp::Add,
-            index: 0,
-            rid: 0,
-            nhid: 0,
-            users: 0,
-            flags: 0,
-            marker: 0,
-            vni: 0,
-            vlan: 0,
-        }
-    }
 }
 
 impl MirrorRequest {

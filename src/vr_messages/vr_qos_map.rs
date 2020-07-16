@@ -7,7 +7,7 @@ use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_qos_map_req;
 use std::convert::TryInto;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct QosMapRequest {
     pub op: SandeshOp,
     pub rid: u16,
@@ -19,23 +19,6 @@ pub struct QosMapRequest {
     pub dotonep: Vec<i8>,
     pub dotonep_fc_id: Vec<i8>,
     pub marker: i16,
-}
-
-impl Default for QosMapRequest {
-    fn default() -> QosMapRequest {
-        QosMapRequest {
-            op: SandeshOp::Add,
-            rid: 0,
-            id: 0,
-            dscp: vec![],
-            dscp_fc_id: vec![],
-            mpls_qos: vec![],
-            mpls_qos_fc_id: vec![],
-            dotonep: vec![],
-            dotonep_fc_id: vec![],
-            marker: 0,
-        }
-    }
 }
 
 impl QosMapRequest {

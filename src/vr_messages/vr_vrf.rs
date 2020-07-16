@@ -6,7 +6,7 @@ use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_vrf_req;
 use std::convert::TryInto;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct VrfRequest {
     pub op: SandeshOp,
     pub rid: i16,
@@ -15,20 +15,6 @@ pub struct VrfRequest {
     pub hbfl_vif_idx: i32,
     pub hbfr_vif_idx: i32,
     pub marker: i32,
-}
-
-impl Default for VrfRequest {
-    fn default() -> VrfRequest {
-        VrfRequest {
-            op: SandeshOp::Add,
-            rid: 0,
-            idx: 0,
-            flags: 0,
-            hbfl_vif_idx: 0,
-            hbfr_vif_idx: 0,
-            marker: 0,
-        }
-    }
 }
 
 impl VrfRequest {

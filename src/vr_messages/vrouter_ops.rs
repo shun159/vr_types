@@ -9,7 +9,7 @@ use std::convert::TryInto;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct VrouterOps {
     pub op: SandeshOp,
     pub rid: i32,
@@ -95,58 +95,6 @@ pub struct VrouterOps {
     pub pkt_droplog_en: i8,
     // Vrouter Packet drop log minimum enable
     pub pkt_droplog_min_en: i8,
-}
-
-impl Default for VrouterOps {
-    fn default() -> VrouterOps {
-        VrouterOps {
-            op: SandeshOp::Add,
-            rid: 0,
-            mpls_labels: 0,
-            nexthops: 0,
-            bridge_entries: 0,
-            overflow_flow_bridge_entries: 0,
-            flow_entries: 0,
-            overflow_flow_entries: 0,
-            interfaces: 0,
-            mirror_entries: 0,
-            vrfs: 0,
-            build_info: "".to_string(),
-            log_level: 0,
-            log_type_enable: vec![],
-            log_type_disable: vec![],
-            perfr: 0,
-            perfs: 0,
-            from_vm_mss_adj: 0,
-            to_vm_mss_adj: 0,
-            perfr1: 0,
-            perfr2: 0,
-            perfr3: 0,
-            perfp: 0,
-            perfq1: 0,
-            perfq2: 0,
-            perfq3: 0,
-            udp_coff: 0,
-            flow_hold_limit: 0,
-            mudp: 0,
-            flow_used_entries: 0,
-            flow_used_overflow_entries: 0,
-            bridge_used_entries: 0,
-            bridge_used_overflow_entries: 0,
-            burst_tokens: 0,
-            burst_interval: 0,
-            burst_step: 0,
-            memory_alloc_checks: 0,
-            priority_tagging: 0,
-            vif_bridge_entries: 0,
-            vif_overflow_flow_bridge_entries: 0,
-            packet_dump: 0,
-            pkt_droplog_bufsz: 0,
-            pkt_droplog_buf_en: 0,
-            pkt_droplog_en: 0,
-            pkt_droplog_min_en: 0,
-        }
-    }
 }
 
 impl VrouterOps {

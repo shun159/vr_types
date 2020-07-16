@@ -7,7 +7,7 @@ use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_fc_map_req;
 use std::convert::TryInto;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct FcMapRequest {
     pub op: SandeshOp,
     pub rid: u16,
@@ -17,21 +17,6 @@ pub struct FcMapRequest {
     pub dotonep: Vec<i8>,
     pub queue_id: Vec<i8>,
     pub marker: i16,
-}
-
-impl Default for FcMapRequest {
-    fn default() -> FcMapRequest {
-        FcMapRequest {
-            op: SandeshOp::Add,
-            rid: 0,
-            id: vec![],
-            dscp: vec![],
-            mpls_qos: vec![],
-            dotonep: vec![],
-            queue_id: vec![],
-            marker: 0,
-        }
-    }
 }
 
 impl FcMapRequest {

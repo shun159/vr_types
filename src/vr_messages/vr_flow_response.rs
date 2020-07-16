@@ -6,7 +6,7 @@ use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_flow_response;
 use std::convert::TryInto;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct FlowResponse {
     pub op: FlowOp,
     pub rid: u16,
@@ -16,21 +16,6 @@ pub struct FlowResponse {
     pub packets: u32,
     pub stats_oflow: u32,
     pub gen_id: i8,
-}
-
-impl Default for FlowResponse {
-    fn default() -> FlowResponse {
-        FlowResponse {
-            op: FlowOp::Get,
-            rid: 0,
-            flags: 0,
-            index: 0,
-            bytes: 0,
-            packets: 0,
-            stats_oflow: 0,
-            gen_id: 0,
-        }
-    }
 }
 
 impl FlowResponse {
