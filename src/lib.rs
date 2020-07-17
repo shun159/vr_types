@@ -3,6 +3,7 @@
 
 extern crate libc;
 
-pub mod genetlink;
 pub mod utils;
+pub mod genetlink;
+pub mod netlink;
 pub mod vr_messages;

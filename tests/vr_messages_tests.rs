@@ -32,7 +32,6 @@ mod test_vr_messages {
         let payload = Message::BridgeTableData(BridgeTableData::default());
         let mut packet = NetlinkMessage::from(payload);
         packet.finalize();
-        println!("{:?}", packet);
 
         let req = Message::BridgeTableData(BridgeTableData::default());
         let bytes = req.to_bytes().unwrap();
@@ -245,10 +244,10 @@ mod test_vr_messages {
 
 #[cfg(test)]
 mod test_netlink_header {
+    use netlink_packet_core::{NetlinkMessage, NetlinkPayload};
+    use vr_type::vr_messages::sandesh::SandeshOp::Add;
     use vr_type::vr_messages::vr_bridge_table_data::BridgeTableData;
     use vr_type::vr_messages::Message;
-    use vr_type::vr_messages::sandesh::SandeshOp::Add;
-    use netlink_packet_core::{NetlinkMessage, NetlinkPayload};
 
     #[test]
     fn bridge_table_data() {
@@ -262,17 +261,15 @@ mod test_netlink_header {
         assert_eq!(packet.header.port_number, 0);
         assert_eq!(
             packet.payload,
-            NetlinkPayload::InnerMessage(
-                Message::BridgeTableData(
-                    BridgeTableData {
-                        op: Add,
-                        rid: 0,
-                        size: 0,
-                        dev: 0,
-                        file_path: "".to_string()
-                    }
-                )
-            )
+            NetlinkPayload::InnerMessage(Message::BridgeTableData(
+                BridgeTableData {
+                    op: Add,
+                    rid: 0,
+                    size: 0,
+                    dev: 0,
+                    file_path: "".to_string()
+                }
+            ))
         )
     }
 }

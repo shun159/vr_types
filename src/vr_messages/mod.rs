@@ -32,29 +32,30 @@ pub mod vr_vrf_stats;
 pub mod vr_vxlan;
 pub mod vrouter_ops;
 
-use message_type::MessageType;
-use std::convert::TryInto;
-use vr_bridge_table_data::BridgeTableData;
-use vr_drop_stats::DropStats;
-use vr_fc_map::FcMapRequest;
-use vr_flow::FlowRequest;
-use vr_flow_response::FlowResponse;
-use vr_flow_table_data::FlowTableData;
-use vr_hugepage_config::HugepageConfig;
-use vr_interface::InterfaceRequest;
-use vr_mem_stats::MemStatsRequest;
-use vr_mirror::MirrorRequest;
-use vr_mpls::MplsRequest;
-use vr_nexthop::NexthopRequest;
-use vr_pkt_droplog::PktDropLog;
-use vr_qos_map::QosMapRequest;
-use vr_response::VrResponse;
-use vr_route::RouteRequest;
-use vr_vrf::VrfRequest;
-use vr_vrf_assign::VrfAssignRequest;
-use vr_vrf_stats::VrfStatsRequest;
-use vr_vxlan::VxlanRequest;
-use vrouter_ops::VrouterOps;
+pub use sandesh::*;
+pub use message_type::MessageType;
+pub use std::convert::TryInto;
+pub use vr_bridge_table_data::BridgeTableData;
+pub use vr_drop_stats::DropStats;
+pub use vr_fc_map::FcMapRequest;
+pub use vr_flow::FlowRequest;
+pub use vr_flow_response::FlowResponse;
+pub use vr_flow_table_data::FlowTableData;
+pub use vr_hugepage_config::HugepageConfig;
+pub use vr_interface::InterfaceRequest;
+pub use vr_mem_stats::MemStatsRequest;
+pub use vr_mirror::MirrorRequest;
+pub use vr_mpls::MplsRequest;
+pub use vr_nexthop::NexthopRequest;
+pub use vr_pkt_droplog::PktDropLog;
+pub use vr_qos_map::QosMapRequest;
+pub use vr_response::VrResponse;
+pub use vr_route::RouteRequest;
+pub use vr_vrf::VrfRequest;
+pub use vr_vrf_assign::VrfAssignRequest;
+pub use vr_vrf_stats::VrfStatsRequest;
+pub use vr_vxlan::VxlanRequest;
+pub use vrouter_ops::VrouterOps;
 
 use netlink_packet_core::{
     NetlinkDeserializable, NetlinkHeader, NetlinkPayload, NetlinkSerializable,
@@ -245,14 +246,17 @@ impl fmt::Display for DeserializeError {
 impl NetlinkDeserializable<Message> for Message {
     type Error = DeserializeError;
 
-    fn deserialize(header: &NetlinkHeader, payload: &[u8]) -> Result<Self, Self::Error> {
+    fn deserialize(
+        header: &NetlinkHeader,
+        payload: &[u8],
+    ) -> Result<Self, Self::Error> {
         match header.message_type {
-            msg_type if msg_type == VnswNlAttrs::VrMessageProtocol as u16 =>
-                Ok(Message::from_bytes(payload.to_vec()).unwrap()),
-            _ =>
-                Err(DeserializeError(
-                    "invalid message: unhanded message type"
-                ))
+            msg_type if msg_type == VnswNlAttrs::VrMessageProtocol as u16 => {
+                Ok(Message::from_bytes(payload.to_vec()).unwrap())
+            }
+            _ => {
+                Err(DeserializeError("invalid message: unhanded message type"))
+            }
         }
     }
 }
