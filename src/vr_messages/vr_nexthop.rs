@@ -217,7 +217,7 @@ impl NexthopRequest {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<NexthopRequest, &'a str> {
         let decoder = vr_nexthop_req::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut nhr = NexthopRequest::default();

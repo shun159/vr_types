@@ -33,7 +33,7 @@ impl BridgeTableData {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<BridgeTableData, &'a str> {
         let decoder: vr_bridge_table_data = vr_bridge_table_data::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to write binary"),
             Ok(_) => {
                 let mut btable: BridgeTableData = BridgeTableData::default();

@@ -10,6 +10,7 @@ use std::convert::TryInto;
 pub struct VrResponse {
     pub op: SandeshOp,
     pub code: i32,
+    pub response: Vec<u8>
 }
 
 impl VrResponse {
@@ -25,12 +26,13 @@ impl VrResponse {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<VrResponse, &'a str> {
         let decoder: vr_response = vr_response::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut resp: VrResponse = VrResponse::default();
                 resp.op = decoder.h_op.try_into().unwrap();
                 resp.code = decoder.resp_code;
+                resp.response = buf[(rxfer as usize)..].to_vec();
                 Ok(resp)
             }
         }

@@ -48,7 +48,7 @@ impl QosMapRequest {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<QosMapRequest, &'a str> {
         let decoder: vr_qos_map_req = vr_qos_map_req::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut qmr: QosMapRequest = QosMapRequest::default();

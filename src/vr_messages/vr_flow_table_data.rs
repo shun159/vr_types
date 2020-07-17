@@ -60,7 +60,7 @@ impl FlowTableData {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<FlowTableData, &'a str> {
         let decoder: vr_flow_table_data = vr_flow_table_data::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut ftable: FlowTableData = FlowTableData::default();

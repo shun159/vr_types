@@ -437,7 +437,7 @@ impl InterfaceRequest {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<InterfaceRequest, &'a str> {
         let decoder: vr_interface_req = vr_interface_req::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut vifr = InterfaceRequest::default();

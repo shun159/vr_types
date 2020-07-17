@@ -175,7 +175,7 @@ impl MemStatsRequest {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<MemStatsRequest, &'a str> {
         let decoder: vr_mem_stats_req = vr_mem_stats_req::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut vms: MemStatsRequest = MemStatsRequest::default();

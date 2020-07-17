@@ -31,7 +31,7 @@ impl MplsRequest {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<MplsRequest, &'a str> {
         let decoder: vr_mpls_req = vr_mpls_req::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut mr: MplsRequest = MplsRequest::default();

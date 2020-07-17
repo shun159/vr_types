@@ -46,6 +46,7 @@ impl TryFrom<flow_op> for FlowOp {
     type Error = ();
 
     fn try_from(v: u32) -> Result<Self, Self::Error> {
+        println!("v: {}", v);
         match v {
             x if x == FlowOp::Set as u32 => Ok(FlowOp::Set),
             x if x == FlowOp::List as u32 => Ok(FlowOp::List),
@@ -380,7 +381,7 @@ impl FlowRequest {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<FlowRequest, &'a str> {
         let decoder: vr_flow_req = vr_flow_req::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut fr: FlowRequest = FlowRequest::default();

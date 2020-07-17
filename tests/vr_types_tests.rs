@@ -196,7 +196,7 @@ mod test_decode_types {
         let mut req = vr_nexthop_req::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -205,7 +205,7 @@ mod test_decode_types {
         let mut req = vr_interface_req::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -214,7 +214,7 @@ mod test_decode_types {
         let mut req = vr_vxlan_req::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -223,7 +223,7 @@ mod test_decode_types {
         let mut req = vr_route_req::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -232,7 +232,7 @@ mod test_decode_types {
         let mut req = vr_mpls_req::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -241,7 +241,7 @@ mod test_decode_types {
         let mut req = vr_mirror_req::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -250,7 +250,7 @@ mod test_decode_types {
         let mut req = vr_vrf_req::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -259,7 +259,7 @@ mod test_decode_types {
         let mut req = vr_flow_req::new();
         req.fr_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.fr_op)
     }
 
@@ -268,7 +268,7 @@ mod test_decode_types {
         let mut req = vr_vrf_assign_req::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -277,7 +277,7 @@ mod test_decode_types {
         let mut req = vr_vrf_stats_req::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -286,7 +286,7 @@ mod test_decode_types {
         let mut req = vr_response::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -295,7 +295,7 @@ mod test_decode_types {
         let mut req = vr_mem_stats_req::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -304,7 +304,7 @@ mod test_decode_types {
         let mut req = vr_pkt_drop_log_req::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -313,7 +313,7 @@ mod test_decode_types {
         let mut req = vr_drop_stats_req::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -322,7 +322,7 @@ mod test_decode_types {
         let mut req = vr_qos_map_req::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -331,7 +331,7 @@ mod test_decode_types {
         let mut req = vr_fc_map_req::new();
         req.h_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.h_op)
     }
 
@@ -340,7 +340,7 @@ mod test_decode_types {
         let mut req = vr_flow_response::new();
         req.fresp_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.fresp_op)
     }
 
@@ -349,7 +349,7 @@ mod test_decode_types {
         let mut req = vr_flow_table_data::new();
         req.ftable_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.ftable_op)
     }
 
@@ -358,7 +358,7 @@ mod test_decode_types {
         let mut req = vr_bridge_table_data::new();
         req.btable_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.btable_op)
     }
 
@@ -367,7 +367,7 @@ mod test_decode_types {
         let mut req = vr_hugepage_config::new();
         req.vhp_op = 1;
         let bytes = req.write().unwrap();
-        let _ = req.read(bytes);
+        let _ = req.read(&bytes);
         assert_eq!(1, req.vhp_op)
     }
 }

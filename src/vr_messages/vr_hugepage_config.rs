@@ -32,7 +32,7 @@ impl HugepageConfig {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<HugepageConfig, &'a str> {
         let decoder: vr_hugepage_config = vr_hugepage_config::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to write binary"),
             Ok(_) => {
                 let mut vhp: HugepageConfig = HugepageConfig::default();

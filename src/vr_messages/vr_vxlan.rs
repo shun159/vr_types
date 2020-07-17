@@ -29,7 +29,7 @@ impl VxlanRequest {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<VxlanRequest, &'a str> {
         let decoder: vr_vxlan_req = vr_vxlan_req::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut vxlanr: VxlanRequest = VxlanRequest::default();

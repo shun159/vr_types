@@ -38,10 +38,10 @@ pub trait VrSandesh {
         }
     }
 
-    fn read(&self, buf: Vec<u8>) -> Result<i32, i32> {
+    fn read(&self, buf: &Vec<u8>) -> Result<i32, i32> {
         unsafe {
             let mut error = 0;
-            let buf_ptr = Box::into_raw(buf.into_boxed_slice()) as *mut u8;
+            let buf_ptr = Box::into_raw(buf.clone().into_boxed_slice()) as *mut u8;
             let buf_len = self.obj_len();
             let rsandesh = self.as_c_void();
             match self.read_binary_fn()(rsandesh, buf_ptr, buf_len, &mut error)

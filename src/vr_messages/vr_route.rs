@@ -92,7 +92,7 @@ impl RouteRequest {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<RouteRequest, &'a str> {
         let decoder: vr_route_req = vr_route_req::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut rtr: RouteRequest = RouteRequest::default();

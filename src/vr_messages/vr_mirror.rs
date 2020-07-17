@@ -40,7 +40,7 @@ impl MirrorRequest {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<MirrorRequest, &'a str> {
         let decoder: vr_mirror_req = vr_mirror_req::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut mirr: MirrorRequest = MirrorRequest::default();

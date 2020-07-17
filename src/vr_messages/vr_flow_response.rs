@@ -37,7 +37,7 @@ impl FlowResponse {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<FlowResponse, &'a str> {
         let decoder: vr_flow_response = vr_flow_response::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to write binary"),
             Ok(_) => {
                 let mut fresp: FlowResponse = FlowResponse::default();

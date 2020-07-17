@@ -35,7 +35,7 @@ impl VrfRequest {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<VrfRequest, &'a str> {
         let decoder: vr_vrf_req = vr_vrf_req::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut vrf: VrfRequest = VrfRequest::default();

@@ -159,7 +159,7 @@ impl VrouterOps {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<VrouterOps, &'a str> {
         let decoder: vrouter_ops = vrouter_ops::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut vo: VrouterOps = VrouterOps::default();

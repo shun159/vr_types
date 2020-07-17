@@ -129,7 +129,7 @@ impl DropStats {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<DropStats, &'a str> {
         let decoder: vr_drop_stats_req = vr_drop_stats_req::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut vds: DropStats = DropStats::default();

@@ -1,5 +1,6 @@
 use std::ffi::CString;
 use std::mem::size_of;
+use crate::vr_messages::*;
 
 pub trait Serialize {
     fn len(&self) -> u32;
@@ -44,5 +45,16 @@ impl Serialize for u32 {
 
     fn serialize(&self, buf: &mut [u8]) {
         buf.copy_from_slice(&self.to_ne_bytes())
+    }
+}
+
+impl Serialize for Message {
+    fn len(&self) -> u32 {
+        self.to_bytes().unwrap().len() as u32
+    }
+
+    fn serialize(&self, buf: &mut [u8]) {
+        let bytes = self.to_bytes().unwrap();
+        buf.copy_from_slice(&bytes[..])
     }
 }

@@ -43,7 +43,7 @@ impl FcMapRequest {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<FcMapRequest, &'a str> {
         let decoder: vr_fc_map_req = vr_fc_map_req::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut fmr: FcMapRequest = FcMapRequest::default();

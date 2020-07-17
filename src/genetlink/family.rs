@@ -1,13 +1,60 @@
 use super::raw::{CTRL_ATTR_FAMILY_ID, CTRL_ATTR_FAMILY_NAME, CTRL_CMD_GETFAMILY, GENL_ID_CTRL};
 use super::GenericNetlinkMessage;
-use crate::netlink::raw::NLM_F_REQUEST;
+use crate::netlink::raw::{NLM_F_REQUEST, NLM_F_DUMP};
 use crate::netlink::{deserialize_attrs, deserialize_u16, NetlinkAttr, NetlinkMessage, Serialize};
 use netlink_sys::{Socket, SocketAddr};
 use std::ffi::CString;
 use std::io;
 use thiserror::Error;
+use crate::vr_messages::*;
 
 const BUFFER_SIZE: usize = 512;
+
+pub fn test_p(socket: &Socket) { //-> Result<GenericNetlinkMessage<&[u8]>, FamilyError> {
+    let mut addr = SocketAddr::new(0, 0);
+    let mut req = VrouterOps::default();
+    req.op = SandeshOp::Get;
+    socket.get_address(&mut addr).unwrap();
+
+    let msg = NetlinkMessage {
+        ty: resolve_family_id(socket, "vrouter").unwrap().unwrap(),
+        flags: NLM_F_REQUEST,
+        seq: 1,
+        pid: addr.port_number(),
+        payload: GenericNetlinkMessage {
+            cmd: 1,
+            version: 0,
+            payload: &[NetlinkAttr {
+                ty: 1,
+                payload: Message::VrouterOps(req),
+            }] as &[_],
+        },
+    };
+    let mut buffer = [0; 10000];
+    let msg_len = msg.len() as usize;
+    msg.serialize(&mut buffer[..msg_len]);
+    socket.send(&buffer[..msg_len], 0).unwrap();
+
+    let mut buffer = [0; 10000];
+    let reply_len = socket.recv(&mut buffer, 0).unwrap();
+    let nl_msg = NetlinkMessage::deserialize(&buffer[..reply_len]);
+    let genl_msg = GenericNetlinkMessage::deserialize(nl_msg.payload).unwrap();
+    for attr in deserialize_attrs(genl_msg.payload) {
+        let (ty, value) = attr.unwrap();
+        if ty == 1 {
+            match Message::from_bytes(value.to_vec()) {
+                Ok(Message::VrResponse(resp)) if resp.op == SandeshOp::Response => {
+                    println!("ok resp {:#?}", Message::from_bytes(resp.response));
+                    return
+                }
+                resp => {
+                    println!("err {:?}", resp);
+                    return
+                }
+            };
+        }
+    }
+}
 
 pub fn resolve_family_id(socket: &Socket, name: &str) -> Result<Option<u16>, FamilyError> {
     let mut addr = SocketAddr::new(0, 0);
@@ -52,4 +99,18 @@ pub enum FamilyError {
     Netlink(#[from] crate::netlink::InvalidBuffer),
     #[error("invalid generic netlink message")]
     GenericNetlink(#[from] super::message::InvalidBuffer),
+}
+
+#[cfg(test)]
+mod test_test {
+    use netlink_sys::Socket;
+    use netlink_sys::Protocol::Generic;
+    use crate::genetlink::family::test_p;
+
+    #[test]
+    fn test() {
+        let socket = Socket::new(Generic).unwrap();
+        let res = test_p(&socket);
+        println!("{:?}", res);
+    }
 }

@@ -43,7 +43,7 @@ impl PktDropLog {
 
     pub fn read<'a>(buf: Vec<u8>) -> Result<PktDropLog, &'a str> {
         let decoder: vr_pkt_drop_log_req = vr_pkt_drop_log_req::new();
-        match decoder.read(buf) {
+        match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
             Ok(_) => {
                 let mut vdl: PktDropLog = PktDropLog::default();
