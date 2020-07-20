@@ -1,32 +1,38 @@
 use super::raw::{CTRL_ATTR_FAMILY_ID, CTRL_ATTR_FAMILY_NAME, CTRL_CMD_GETFAMILY, GENL_ID_CTRL};
 use super::GenericNetlinkMessage;
-use crate::netlink::raw::{NLM_F_REQUEST, NLM_F_DUMP};
+use crate::netlink::raw::{NLM_F_REQUEST, NLM_F_EXCL};
 use crate::netlink::{deserialize_attrs, deserialize_u16, NetlinkAttr, NetlinkMessage, Serialize};
 use netlink_sys::{Socket, SocketAddr};
 use std::ffi::CString;
 use std::io;
 use thiserror::Error;
 use crate::vr_messages::*;
+use eui48::MacAddress;
 
 const BUFFER_SIZE: usize = 512;
 
 pub fn test_p(socket: &Socket) { //-> Result<GenericNetlinkMessage<&[u8]>, FamilyError> {
     let mut addr = SocketAddr::new(0, 0);
-    let mut req = VrouterOps::default();
+    let mut req = InterfaceRequest::default();
     req.op = SandeshOp::Get;
+    req.name = "veth0".to_string();
+    req.os_idx = 50;
+    req._type = IfType::Virtual;
+    req.transport = 1; // VIF_TRANSPORT_ETH
+    req.mac = MacAddress::from_bytes(&[0xae, 0x07, 0xbe, 0x70, 0x12, 0x2a]).unwrap();
     socket.get_address(&mut addr).unwrap();
 
     let msg = NetlinkMessage {
         ty: resolve_family_id(socket, "vrouter").unwrap().unwrap(),
-        flags: NLM_F_REQUEST,
+        flags: NLM_F_REQUEST | NLM_F_EXCL,
         seq: 1,
-        pid: addr.port_number(),
+        pid: std::process::id(),
         payload: GenericNetlinkMessage {
             cmd: 1,
             version: 0,
             payload: &[NetlinkAttr {
                 ty: 1,
-                payload: Message::VrouterOps(req),
+                payload: Message::InterfaceRequest(req),
             }] as &[_],
         },
     };
@@ -43,7 +49,7 @@ pub fn test_p(socket: &Socket) { //-> Result<GenericNetlinkMessage<&[u8]>, Famil
         let (ty, value) = attr.unwrap();
         if ty == 1 {
             match Message::from_bytes(value.to_vec()) {
-                Ok(Message::VrResponse(resp)) if resp.op == SandeshOp::Response => {
+                Ok(Message::VrResponse(resp)) if resp.op == SandeshOp::Response && !(resp.code < 0) => {
                     println!("ok resp {:#?}", Message::from_bytes(resp.response));
                     return
                 }
