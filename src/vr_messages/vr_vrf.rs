@@ -12,7 +12,9 @@ pub struct VrfRequest {
     pub rid: i16,
     pub idx: i32,
     pub flags: i32,
+    // Host Based Firewall left virtual ifindex
     pub hbfl_vif_idx: i32,
+    // Host Based Firewall right virtual ifindex
     pub hbfr_vif_idx: i32,
     pub marker: i32,
 }

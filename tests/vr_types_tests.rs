@@ -117,7 +117,7 @@ mod test_encode_types {
         let req = vr_drop_stats_req::new();
         let res = req.write().unwrap();
         assert_eq!("vr_drop_stats_req", sandesh_info_t::sname_from_bytes(&res));
-        assert_eq!(593, res.len())
+        assert_eq!(626, res.len())
     }
 
     #[test]
@@ -174,7 +174,7 @@ mod test_encode_types {
             "vr_hugepage_config",
             sandesh_info_t::sname_from_bytes(&res)
         );
-        assert_eq!(53, res.len())
+        assert_eq!(77, res.len())
     }
 
     #[test]
@@ -182,7 +182,7 @@ mod test_encode_types {
         let req = vrouter_ops::new();
         let res = req.write().unwrap();
         assert_eq!("vrouter_ops", sandesh_info_t::sname_from_bytes(&res));
-        assert_eq!(324, res.len())
+        assert_eq!(328, res.len())
     }
 }
 

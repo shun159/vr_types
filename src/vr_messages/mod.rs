@@ -42,7 +42,7 @@ pub use vr_flow::*;
 pub use vr_flow_response::FlowResponse;
 pub use vr_flow_table_data::FlowTableData;
 pub use vr_hugepage_config::HugepageConfig;
-pub use vr_interface::InterfaceRequest;
+pub use vr_interface::*;
 pub use vr_mem_stats::MemStatsRequest;
 pub use vr_mirror::MirrorRequest;
 pub use vr_mpls::MplsRequest;

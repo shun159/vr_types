@@ -4861,6 +4861,8 @@ pub struct _vrouter_ops {
     pub __isset_vo_pkt_droplog_en: u_int8_t,
     pub vo_pkt_droplog_min_en: i8,
     pub __isset_vo_pkt_droplog_min_en: u_int8_t,
+    pub vo_close_flow_on_tcp_rst: i8,
+    pub __isset_vo_close_flow_on_tcp_rst: u_int8_t,
 }
 pub type vrouter_ops = _vrouter_ops;
 extern "C" {
@@ -5088,6 +5090,67 @@ extern "C" {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct _vr_info_req {
+    pub h_op: sandesh_op,
+    pub __isset_h_op: u_int8_t,
+    pub vdu_rid: i16,
+    pub __isset_vdu_rid: u_int8_t,
+    pub vdu_index: i16,
+    pub __isset_vdu_index: u_int8_t,
+    pub vdu_buff_table_id: i16,
+    pub __isset_vdu_buff_table_id: u_int8_t,
+    pub vdu_marker: i16,
+    pub __isset_vdu_marker: u_int8_t,
+    pub vdu_msginfo: i16,
+    pub __isset_vdu_msginfo: u_int8_t,
+    pub vdu_outbufsz: i32,
+    pub __isset_vdu_outbufsz: u_int8_t,
+    pub vdu_inbuf: *mut i8,
+    pub vdu_inbuf_size: u_int32_t,
+    pub __isset_vdu_inbuf: u_int8_t,
+    pub vdu_proc_info: *mut i8,
+    pub vdu_proc_info_size: u_int32_t,
+    pub __isset_vdu_proc_info: u_int8_t,
+}
+pub type vr_info_req = _vr_info_req;
+extern "C" {
+    pub fn vr_info_req_write(
+        wsandesh: *mut ::std::os::raw::c_void,
+        protocol: *mut ThriftProtocol,
+        error: *mut ::std::os::raw::c_int,
+    ) -> i32;
+}
+extern "C" {
+    pub fn vr_info_req_write_binary_to_buffer(
+        wsandesh: *mut ::std::os::raw::c_void,
+        buf: *mut u8,
+        buf_len: usize,
+        error: *mut ::std::os::raw::c_int,
+    ) -> i32;
+}
+extern "C" {
+    pub fn vr_info_req_read(
+        rsandesh: *mut ::std::os::raw::c_void,
+        protocol: *mut ThriftProtocol,
+        error: *mut ::std::os::raw::c_int,
+    ) -> i32;
+}
+extern "C" {
+    pub fn vr_info_req_read_binary_from_buffer(
+        rsandesh: *mut ::std::os::raw::c_void,
+        buf: *mut u8,
+        buf_len: usize,
+        error: *mut ::std::os::raw::c_int,
+    ) -> i32;
+}
+extern "C" {
+    pub fn vr_info_req_free(fsandesh: *mut ::std::os::raw::c_void);
+}
+extern "C" {
+    pub fn vr_info_req_process(pvr_info_req: *mut ::std::os::raw::c_void);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct _vr_pkt_drop_log_req {
     pub h_op: sandesh_op,
     pub __isset_h_op: u_int8_t,
@@ -5259,6 +5322,12 @@ pub struct _vr_drop_stats_req {
     pub __isset_vds_no_crypt_path: u_int8_t,
     pub vds_invalid_hbs_pkt: i64,
     pub __isset_vds_invalid_hbs_pkt: u_int8_t,
+    pub vds_no_frag_entry: i64,
+    pub __isset_vds_no_frag_entry: u_int8_t,
+    pub vds_icmp_error: i64,
+    pub __isset_vds_icmp_error: u_int8_t,
+    pub vds_clone_fail: i64,
+    pub __isset_vds_clone_fail: u_int8_t,
 }
 pub type vr_drop_stats_req = _vr_drop_stats_req;
 extern "C" {
@@ -5626,11 +5695,20 @@ pub struct _vr_hugepage_config {
     pub vhp_mem: *mut u64,
     pub vhp_mem_size: u_int32_t,
     pub __isset_vhp_mem: u_int8_t,
-    pub vhp_msize: *mut u32,
-    pub vhp_msize_size: u_int32_t,
-    pub __isset_vhp_msize: u_int8_t,
+    pub vhp_psize: *mut u32,
+    pub vhp_psize_size: u_int32_t,
+    pub __isset_vhp_psize: u_int8_t,
     pub vhp_resp: u32,
     pub __isset_vhp_resp: u_int8_t,
+    pub vhp_mem_sz: *mut u32,
+    pub vhp_mem_sz_size: u_int32_t,
+    pub __isset_vhp_mem_sz: u_int8_t,
+    pub vhp_file_paths: *mut i8,
+    pub vhp_file_paths_size: u_int32_t,
+    pub __isset_vhp_file_paths: u_int8_t,
+    pub vhp_file_path_sz: *mut u32,
+    pub vhp_file_path_sz_size: u_int32_t,
+    pub __isset_vhp_file_path_sz: u_int8_t,
 }
 pub type vr_hugepage_config = _vr_hugepage_config;
 extern "C" {

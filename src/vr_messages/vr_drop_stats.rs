@@ -62,6 +62,9 @@ pub struct DropStats {
     pub pkt_loop: i64,
     pub no_crypt_path: i64,
     pub invalid_hbs_pkt: i64,
+    pub no_frag_entry: i64,
+    pub icmp_error: i64,
+    pub clone_fail: i64
 }
 
 impl DropStats {
@@ -121,6 +124,9 @@ impl DropStats {
         encoder.vds_pkt_loop = self.pkt_loop;
         encoder.vds_no_crypt_path = self.no_crypt_path;
         encoder.vds_invalid_hbs_pkt = self.invalid_hbs_pkt;
+        encoder.vds_no_frag_entry = self.no_frag_entry;
+        encoder.vds_icmp_error = self.icmp_error;
+        encoder.vds_clone_fail = self.clone_fail;
         match encoder.write() {
             Err(_) => Err("Failed to write binary"),
             Ok(v) => Ok(v),
@@ -189,6 +195,9 @@ impl DropStats {
                 vds.pkt_loop = decoder.vds_pkt_loop;
                 vds.no_crypt_path = decoder.vds_no_crypt_path;
                 vds.invalid_hbs_pkt = decoder.vds_invalid_hbs_pkt;
+                vds.no_frag_entry = decoder.vds_no_frag_entry;
+                vds.icmp_error = decoder.vds_icmp_error;
+                vds.clone_fail = decoder.vds_clone_fail;
                 Ok(vds)
             }
         }

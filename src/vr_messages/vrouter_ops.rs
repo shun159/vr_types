@@ -95,6 +95,8 @@ pub struct VrouterOps {
     pub pkt_droplog_en: i8,
     // Vrouter Packet drop log minimum enable
     pub pkt_droplog_min_en: i8,
+    // Close flow on TCP rst
+    pub close_flow_on_tcp_rst: i8
 }
 
 impl VrouterOps {
@@ -150,6 +152,7 @@ impl VrouterOps {
         encoder.vo_pkt_droplog_buf_en = self.pkt_droplog_buf_en;
         encoder.vo_pkt_droplog_en = self.pkt_droplog_en;
         encoder.vo_pkt_droplog_min_en = self.pkt_droplog_min_en;
+        encoder.vo_close_flow_on_tcp_rst = self.close_flow_on_tcp_rst;
 
         match encoder.write() {
             Err(_) => Err("Failed to write binary"),
@@ -217,6 +220,7 @@ impl VrouterOps {
                 vo.pkt_droplog_buf_en = decoder.vo_pkt_droplog_buf_en;
                 vo.pkt_droplog_en = decoder.vo_pkt_droplog_en;
                 vo.pkt_droplog_min_en = decoder.vo_pkt_droplog_min_en;
+                vo.close_flow_on_tcp_rst = decoder.vo_close_flow_on_tcp_rst;
                 Ok(vo)
             }
         }
