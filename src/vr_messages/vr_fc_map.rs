@@ -10,6 +10,7 @@ use std::convert::TryInto;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct FcMapRequest {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub rid: u16,
     pub id: Vec<i16>,
     pub dscp: Vec<i8>,
@@ -45,8 +46,9 @@ impl FcMapRequest {
         let decoder: vr_fc_map_req = vr_fc_map_req::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut fmr: FcMapRequest = FcMapRequest::default();
+                fmr.read_length = rxfer as usize;
                 fmr.op = decoder.h_op.try_into().unwrap();
                 fmr.rid = decoder.fmr_rid;
                 fmr.id = utils::free_buf(

@@ -10,6 +10,7 @@ use std::convert::TryInto;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct QosMapRequest {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub rid: u16,
     pub id: u16,
     pub dscp: Vec<i8>,
@@ -50,8 +51,9 @@ impl QosMapRequest {
         let decoder: vr_qos_map_req = vr_qos_map_req::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut qmr: QosMapRequest = QosMapRequest::default();
+                qmr.read_length = rxfer as usize;
                 qmr.op = decoder.h_op.try_into().unwrap();
                 qmr.rid = decoder.qmr_rid;
                 qmr.dscp = utils::free_buf(

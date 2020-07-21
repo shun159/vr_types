@@ -9,6 +9,7 @@ use std::convert::TryInto;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct MplsRequest {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub rid: i16,
     pub label: i32,
     pub nhid: i32,
@@ -33,8 +34,9 @@ impl MplsRequest {
         let decoder: vr_mpls_req = vr_mpls_req::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut mr: MplsRequest = MplsRequest::default();
+                mr.read_length = rxfer as usize;
                 mr.op = decoder.h_op.try_into().unwrap();
                 mr.rid = decoder.mr_rid;
                 mr.label = decoder.mr_label;

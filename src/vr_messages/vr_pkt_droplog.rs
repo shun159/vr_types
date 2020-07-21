@@ -12,6 +12,7 @@ pub const VR_PKT_DROP_LOG_MAX: u32 = 200;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct PktDropLog {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub rid: i16,
     pub core: i16,
     pub log_idx: i16,
@@ -45,8 +46,9 @@ impl PktDropLog {
         let decoder: vr_pkt_drop_log_req = vr_pkt_drop_log_req::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut vdl: PktDropLog = PktDropLog::default();
+                vdl.read_length = rxfer as usize;
                 vdl.op = decoder.h_op.try_into().unwrap();
                 vdl.rid = decoder.vdl_rid;
                 vdl.core = decoder.vdl_core;

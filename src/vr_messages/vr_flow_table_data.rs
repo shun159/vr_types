@@ -12,6 +12,7 @@ use std::os::raw::c_char;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct FlowTableData {
     pub op: FlowOp,
+    pub read_length: usize,
     pub rid: u16,
     pub size: u32,
     pub dev: u16,
@@ -62,8 +63,9 @@ impl FlowTableData {
         let decoder: vr_flow_table_data = vr_flow_table_data::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut ftable: FlowTableData = FlowTableData::default();
+                ftable.read_length = rxfer as usize;
                 ftable.op = decoder.ftable_op.try_into().unwrap();
                 ftable.rid = decoder.ftable_rid;
                 ftable.size = decoder.ftable_size;

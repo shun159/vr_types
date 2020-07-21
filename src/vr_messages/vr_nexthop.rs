@@ -87,6 +87,7 @@ pub enum NhFlag {
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct NexthopRequest {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub _type: NhType,
     pub family: i8, // One of AF_*
     pub id: i32,
@@ -121,6 +122,7 @@ impl Default for NexthopRequest {
     fn default() -> NexthopRequest {
         NexthopRequest {
             op: SandeshOp::Add,
+            read_length: 0,
             _type: NhType::Dead,
             family: 0,
             id: 0,
@@ -219,8 +221,9 @@ impl NexthopRequest {
         let decoder = vr_nexthop_req::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut nhr = NexthopRequest::default();
+                nhr.read_length = rxfer as usize;
                 nhr.op = decoder.h_op.try_into().unwrap();
                 nhr._type = decoder.nhr_type.try_into().unwrap();
                 nhr.family = decoder.nhr_family;

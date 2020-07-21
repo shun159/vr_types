@@ -57,12 +57,6 @@ pub use vr_vrf_stats::VrfStatsRequest;
 pub use vr_vxlan::VxlanRequest;
 pub use vrouter_ops::VrouterOps;
 
-use netlink_packet_core::{
-    NetlinkDeserializable, NetlinkHeader, NetlinkPayload, NetlinkSerializable,
-};
-use std::error::Error;
-use std::fmt;
-
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Message {
     BridgeTableData(BridgeTableData),
@@ -209,79 +203,5 @@ impl Message {
             Message::VxlanRequest(vxlanr) => vxlanr.write(),
             Message::VrouterOps(vo) => vo.write(),
         }
-    }
-}
-
-// Netlink Codec
-
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub enum VnswNlAttrs {
-    Unspec = 0,
-    VrMessageProtocol = 1,
-    Max = 3,
-}
-
-// A custom error type for when deserialization fails. This is
-// required because `NetlinkDeserializable::Error` must implement
-// `std::error::Error`, so a simple `String` won't cut it.
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct DeserializeError(&'static str);
-
-impl Error for DeserializeError {
-    fn description(&self) -> &str {
-        self.0
-    }
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        None
-    }
-}
-
-impl fmt::Display for DeserializeError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
-
-// NetlinkDeserializable implementation
-impl NetlinkDeserializable<Message> for Message {
-    type Error = DeserializeError;
-
-    fn deserialize(
-        header: &NetlinkHeader,
-        payload: &[u8],
-    ) -> Result<Self, Self::Error> {
-        match header.message_type {
-            msg_type if msg_type == VnswNlAttrs::VrMessageProtocol as u16 => {
-                Ok(Message::from_bytes(payload.to_vec()).unwrap())
-            }
-            _ => {
-                Err(DeserializeError("invalid message: unhanded message type"))
-            }
-        }
-    }
-}
-
-impl NetlinkSerializable<Message> for Message {
-    fn message_type(&self) -> u16 {
-        VnswNlAttrs::VrMessageProtocol as u16
-    }
-
-    fn buffer_len(&self) -> usize {
-        self.to_bytes().unwrap().len()
-    }
-
-    fn serialize(&self, buf: &mut [u8]) {
-        let bytes = &self.to_bytes().unwrap();
-        buf.copy_from_slice(&bytes[..])
-    }
-}
-
-// It can be convenient to be able to create a NetlinkMessage directly
-// from a Message. Since NetlinkMessage<T> already implements
-// From<NetlinkPayload<T>>, we just need to implement
-// From<NetlinkPayload<Message>> for this to work.
-impl From<Message> for NetlinkPayload<Message> {
-    fn from(message: Message) -> Self {
-        NetlinkPayload::InnerMessage(message)
     }
 }

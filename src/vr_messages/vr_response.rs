@@ -9,8 +9,8 @@ use std::convert::TryInto;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct VrResponse {
     pub op: SandeshOp,
-    pub code: i32,
-    pub response: Vec<u8>
+    pub read_length: usize,
+    pub code: i32
 }
 
 impl VrResponse {
@@ -30,9 +30,9 @@ impl VrResponse {
             Err(_) => Err("Failed to read binary"),
             Ok(rxfer) => {
                 let mut resp: VrResponse = VrResponse::default();
+                resp.read_length = rxfer as usize;
                 resp.op = decoder.h_op.try_into().unwrap();
                 resp.code = decoder.resp_code;
-                resp.response = buf[(rxfer as usize)..].to_vec();
                 Ok(resp)
             }
         }

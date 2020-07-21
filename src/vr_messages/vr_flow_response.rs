@@ -9,6 +9,7 @@ use std::convert::TryInto;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct FlowResponse {
     pub op: FlowOp,
+    pub read_length: usize,
     pub rid: u16,
     pub flags: u16,
     pub index: u32,
@@ -39,8 +40,9 @@ impl FlowResponse {
         let decoder: vr_flow_response = vr_flow_response::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to write binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut fresp: FlowResponse = FlowResponse::default();
+                fresp.read_length = rxfer as usize;
                 fresp.op = decoder.fresp_op.try_into().unwrap();
                 fresp.rid = decoder.fresp_rid;
                 fresp.flags = decoder.fresp_flags;

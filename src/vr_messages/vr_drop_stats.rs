@@ -9,6 +9,7 @@ use std::convert::TryInto;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct DropStats {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub rid: i16,
     pub core: i16,
     pub discard: i64,
@@ -137,8 +138,9 @@ impl DropStats {
         let decoder: vr_drop_stats_req = vr_drop_stats_req::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut vds: DropStats = DropStats::default();
+                vds.read_length = rxfer as usize;
                 vds.op = decoder.h_op.try_into().unwrap();
                 vds.rid = decoder.vds_rid;
                 vds.core = decoder.vds_core;

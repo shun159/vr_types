@@ -10,6 +10,7 @@ use std::convert::TryInto;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct HugepageConfig {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub mem: Vec<u64>,
     pub psize: Vec<u32>,
     pub resp: u32,
@@ -43,8 +44,9 @@ impl HugepageConfig {
         let decoder: vr_hugepage_config = vr_hugepage_config::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to write binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut vhp: HugepageConfig = HugepageConfig::default();
+                vhp.read_length = rxfer as usize;
                 vhp.op = decoder.vhp_op.try_into().unwrap();
                 vhp.mem = utils::free_buf(
                     decoder.vhp_mem,

@@ -9,6 +9,7 @@ use std::convert::TryInto;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct MirrorRequest {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub index: i16,
     pub rid: i16,
     pub nhid: i32,
@@ -42,8 +43,9 @@ impl MirrorRequest {
         let decoder: vr_mirror_req = vr_mirror_req::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut mirr: MirrorRequest = MirrorRequest::default();
+                mirr.read_length = rxfer as usize;
                 mirr.op = decoder.h_op.try_into().unwrap();
                 mirr.index = decoder.mirr_index;
                 mirr.rid = decoder.mirr_rid;

@@ -102,6 +102,7 @@ pub enum IfFlag {
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct InterfaceRequest {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub core: u32,
     pub _type: IfType,
     pub flags: i32,
@@ -187,6 +188,7 @@ impl Default for InterfaceRequest {
     fn default() -> InterfaceRequest {
         InterfaceRequest {
             op: SandeshOp::Add,
+            read_length: 0,
             core: 0,
             _type: IfType::Host,
             flags: 0,
@@ -439,8 +441,9 @@ impl InterfaceRequest {
         let decoder: vr_interface_req = vr_interface_req::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut vifr = InterfaceRequest::default();
+                vifr.read_length = rxfer as usize;
                 vifr.op = decoder.h_op.try_into().unwrap();
                 vifr.core = decoder.vifr_core;
                 vifr._type = decoder.vifr_type.try_into().unwrap();

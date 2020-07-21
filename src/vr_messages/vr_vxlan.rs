@@ -9,6 +9,7 @@ use std::convert::TryInto;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct VxlanRequest {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub rid: i16,
     pub vnid: i32,
     pub nhid: i32,
@@ -31,8 +32,9 @@ impl VxlanRequest {
         let decoder: vr_vxlan_req = vr_vxlan_req::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut vxlanr: VxlanRequest = VxlanRequest::default();
+                vxlanr.read_length = rxfer as usize;
                 vxlanr.op = decoder.h_op.try_into().unwrap();
                 vxlanr.rid = decoder.vxlanr_rid;
                 vxlanr.vnid = decoder.vxlanr_vnid;

@@ -49,8 +49,8 @@ pub fn test_p(socket: &Socket) { //-> Result<GenericNetlinkMessage<&[u8]>, Famil
         let (ty, value) = attr.unwrap();
         if ty == 1 {
             match Message::from_bytes(value.to_vec()) {
-                Ok(Message::VrResponse(resp)) if resp.op == SandeshOp::Response && !(resp.code < 0) => {
-                    println!("ok resp {:#?}", Message::from_bytes(resp.response));
+                Ok(Message::VrResponse(resp)) if resp.op == SandeshOp::Response => {
+                    println!("ok resp {:#?}", resp);
                     return
                 }
                 resp => {

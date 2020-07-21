@@ -12,6 +12,7 @@ use std::os::raw::c_char;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct VrouterOps {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub rid: i32,
     // MPLS Lables limit
     pub mpls_labels: i32,
@@ -164,8 +165,9 @@ impl VrouterOps {
         let decoder: vrouter_ops = vrouter_ops::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut vo: VrouterOps = VrouterOps::default();
+                vo.read_length = rxfer as usize;
                 vo.op = decoder.h_op.try_into().unwrap();
                 vo.rid = decoder.vo_rid;
                 vo.mpls_labels = decoder.vo_mpls_labels;

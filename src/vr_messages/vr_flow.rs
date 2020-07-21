@@ -46,7 +46,6 @@ impl TryFrom<flow_op> for FlowOp {
     type Error = ();
 
     fn try_from(v: u32) -> Result<Self, Self::Error> {
-        println!("v: {}", v);
         match v {
             x if x == FlowOp::Set as u32 => Ok(FlowOp::Set),
             x if x == FlowOp::List as u32 => Ok(FlowOp::List),
@@ -249,6 +248,7 @@ impl Default for FlowDropReason {
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct FlowRequest {
     pub op: FlowOp,
+    pub read_length: usize,
     pub rid: i16,
     pub index: i32,
     pub action: FlowAction,
@@ -288,6 +288,7 @@ impl Default for FlowRequest {
     fn default() -> FlowRequest {
         FlowRequest {
             op: FlowOp::Set,
+            read_length: 0,
             rid: 0,
             index: 0,
             action: FlowAction::Drop,
@@ -383,8 +384,9 @@ impl FlowRequest {
         let decoder: vr_flow_req = vr_flow_req::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut fr: FlowRequest = FlowRequest::default();
+                fr.read_length = rxfer as usize;
                 fr.op = decoder.fr_op.try_into().unwrap();
                 fr.rid = decoder.fr_rid;
                 fr.index = decoder.fr_index;

@@ -11,6 +11,7 @@ use std::os::raw::c_char;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct BridgeTableData {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub rid: u16,
     pub size: u32,
     pub dev: u16,
@@ -35,8 +36,9 @@ impl BridgeTableData {
         let decoder: vr_bridge_table_data = vr_bridge_table_data::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to write binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut btable: BridgeTableData = BridgeTableData::default();
+                btable.read_length = rxfer as usize;
                 btable.op = decoder.btable_op.try_into().unwrap();
                 btable.rid = decoder.btable_rid;
                 btable.size = decoder.btable_size;

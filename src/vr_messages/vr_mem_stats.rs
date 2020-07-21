@@ -9,6 +9,7 @@ use std::convert::TryInto;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct MemStatsRequest {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub rid: i16,
     pub alloced: i64,
     pub freed: i64,
@@ -177,8 +178,9 @@ impl MemStatsRequest {
         let decoder: vr_mem_stats_req = vr_mem_stats_req::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut vms: MemStatsRequest = MemStatsRequest::default();
+                vms.read_length = rxfer as usize;
                 vms.op = decoder.h_op.try_into().unwrap();
                 vms.rid = decoder.vms_rid;
                 vms.alloced = decoder.vms_alloced;

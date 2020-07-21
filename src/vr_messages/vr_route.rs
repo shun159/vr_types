@@ -23,6 +23,7 @@ pub enum RouteFlag {
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct RouteRequest {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub vrf_id: i32,
     pub family: i32,
     pub prefix: Option<IpAddr>,
@@ -42,6 +43,7 @@ impl Default for RouteRequest {
     fn default() -> RouteRequest {
         RouteRequest {
             op: SandeshOp::Add,
+            read_length: 0,
             vrf_id: 0,
             family: 0,
             prefix: None,
@@ -94,8 +96,9 @@ impl RouteRequest {
         let decoder: vr_route_req = vr_route_req::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut rtr: RouteRequest = RouteRequest::default();
+                rtr.read_length = rxfer as usize;
                 rtr.op = decoder.h_op.try_into().unwrap();
                 rtr.vrf_id = decoder.rtr_vrf_id;
                 rtr.family = decoder.rtr_family;

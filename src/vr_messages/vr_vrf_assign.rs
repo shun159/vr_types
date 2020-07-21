@@ -9,6 +9,7 @@ use std::convert::TryInto;
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct VrfAssignRequest {
     pub op: SandeshOp,
+    pub read_length: usize,
     pub rid: i16,
     pub vif_index: i16,
     pub vif_vrf: i32,
@@ -37,8 +38,9 @@ impl VrfAssignRequest {
         let decoder: vr_vrf_assign_req = vr_vrf_assign_req::new();
         match decoder.read(&buf) {
             Err(_) => Err("Failed to read binary"),
-            Ok(_) => {
+            Ok(rxfer) => {
                 let mut var: VrfAssignRequest = VrfAssignRequest::default();
+                var.read_length = rxfer as usize;
                 var.op = decoder.h_op.try_into().unwrap();
                 var.rid = decoder.var_rid;
                 var.vif_index = decoder.var_vif_index;
