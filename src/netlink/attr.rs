@@ -14,7 +14,7 @@ impl<P: Serialize> NetlinkAttr<P> {
     pub fn new(ty: u16, payload: P) -> NetlinkAttr<P> {
         NetlinkAttr {
             ty: ty,
-            payload: payload
+            payload: payload,
         }
     }
 }

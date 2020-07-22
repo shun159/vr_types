@@ -1,4 +1,13 @@
 use thiserror::Error;
+use std::io;
+
+#[derive(Debug, Error)]
+pub enum NetlinkReadError {
+    #[error("io")]
+    Io(#[from] io::Error),
+    #[error("invalid netlink message")]
+    Netlink(#[from] InvalidBuffer),
+}
 
 #[derive(Debug, Error)]
 pub enum InvalidBuffer {

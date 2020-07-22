@@ -1,9 +1,9 @@
 use super::raw::{nlmsghdr, NLMSG_LENGTH};
 use super::Serialize;
+use crate::genetlink::GenericNetlinkMessage;
+use netlink_sys::Socket;
 use std::process;
 use zerocopy::LayoutVerified;
-use netlink_sys::Socket;
-use crate::genetlink::GenericNetlinkMessage;
 
 #[derive(Debug)]
 pub struct NetlinkMessage<P> {
@@ -25,19 +25,22 @@ impl<P: Serialize> NetlinkMessage<P> {
         }
     }
 
-    pub fn send_nl(&self, socket: Socket) {
-        let mut buffer = [0; 0xffff];
+    pub fn send_nl(&self, socket: &Socket) {
+        let mut buffer = [0; 1000];
         let byte_size = self.len() as usize;
         self.serialize(&mut buffer[..byte_size]);
         socket.send(&buffer[..byte_size], 0).unwrap();
     }
 
     // Generic NETLINK message specfic shortcut fucntion
-    pub fn recv_nl(&self, socket: Socket) -> NetlinkMessage<GenericNetlinkMessage<Vec<u8>>> {
-        let mut buffer = [0; 0xffff];
+    pub fn recv_nl(
+        socket: &Socket,
+    ) -> NetlinkMessage<GenericNetlinkMessage<Vec<u8>>> {
+        let mut buffer = [0; 1000];
         let reply_len = socket.recv(&mut buffer, 0).unwrap();
         let nl_msg = NetlinkMessage::deserialize(&buffer[..reply_len]);
-        let genl_msg = GenericNetlinkMessage::deserialize(nl_msg.payload).unwrap();
+        let genl_msg =
+            GenericNetlinkMessage::deserialize(nl_msg.payload).unwrap();
         NetlinkMessage::new(
             nl_msg.ty,
             nl_msg.flags,
@@ -45,8 +48,8 @@ impl<P: Serialize> NetlinkMessage<P> {
             GenericNetlinkMessage::new(
                 genl_msg.cmd,
                 genl_msg.version,
-                genl_msg.payload.to_vec()
-            )
+                genl_msg.payload.to_vec(),
+            ),
         )
     }
 }
