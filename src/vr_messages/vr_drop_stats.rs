@@ -65,7 +65,7 @@ pub struct DropStats {
     pub invalid_hbs_pkt: i64,
     pub no_frag_entry: i64,
     pub icmp_error: i64,
-    pub clone_fail: i64
+    pub clone_fail: i64,
 }
 
 impl DropStats {

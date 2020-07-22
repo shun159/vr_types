@@ -32,8 +32,8 @@ pub mod vr_vrf_stats;
 pub mod vr_vxlan;
 pub mod vrouter_ops;
 
-pub use sandesh::*;
 pub use message_type::MessageType;
+pub use sandesh::*;
 pub use std::convert::TryInto;
 pub use vr_bridge_table_data::BridgeTableData;
 pub use vr_drop_stats::DropStats;

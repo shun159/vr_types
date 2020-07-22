@@ -1,17 +1,23 @@
-use super::raw::{CTRL_ATTR_FAMILY_ID, CTRL_ATTR_FAMILY_NAME, CTRL_CMD_GETFAMILY, GENL_ID_CTRL};
+use super::raw::{
+    CTRL_ATTR_FAMILY_ID, CTRL_ATTR_FAMILY_NAME, CTRL_CMD_GETFAMILY,
+    GENL_ID_CTRL,
+};
 use super::GenericNetlinkMessage;
-use crate::netlink::raw::{NLM_F_REQUEST, NLM_F_EXCL};
-use crate::netlink::{deserialize_attrs, deserialize_u16, NetlinkAttr, NetlinkMessage, Serialize};
+use crate::netlink::raw::{NLM_F_EXCL, NLM_F_REQUEST};
+use crate::netlink::{
+    deserialize_attrs, deserialize_u16, NetlinkAttr, NetlinkMessage, Serialize,
+};
+use crate::vr_messages::*;
+use eui48::MacAddress;
 use netlink_sys::{Socket, SocketAddr};
 use std::ffi::CString;
 use std::io;
 use thiserror::Error;
-use crate::vr_messages::*;
-use eui48::MacAddress;
 
 const BUFFER_SIZE: usize = 512;
 
-pub fn test_p(socket: &Socket) { //-> Result<GenericNetlinkMessage<&[u8]>, FamilyError> {
+pub fn test_p(socket: &Socket) {
+    //-> Result<GenericNetlinkMessage<&[u8]>, FamilyError> {
     let mut addr = SocketAddr::new(0, 0);
     let mut req = InterfaceRequest::default();
     req.op = SandeshOp::Get;
@@ -19,7 +25,8 @@ pub fn test_p(socket: &Socket) { //-> Result<GenericNetlinkMessage<&[u8]>, Famil
     req.os_idx = 50;
     req._type = IfType::Virtual;
     req.transport = 1; // VIF_TRANSPORT_ETH
-    req.mac = MacAddress::from_bytes(&[0xae, 0x07, 0xbe, 0x70, 0x12, 0x2a]).unwrap();
+    req.mac =
+        MacAddress::from_bytes(&[0xae, 0x07, 0xbe, 0x70, 0x12, 0x2a]).unwrap();
     socket.get_address(&mut addr).unwrap();
 
     let msg = NetlinkMessage {
@@ -49,20 +56,25 @@ pub fn test_p(socket: &Socket) { //-> Result<GenericNetlinkMessage<&[u8]>, Famil
         let (ty, value) = attr.unwrap();
         if ty == 1 {
             match Message::from_bytes(value.to_vec()) {
-                Ok(Message::VrResponse(resp)) if resp.op == SandeshOp::Response => {
+                Ok(Message::VrResponse(resp))
+                    if resp.op == SandeshOp::Response =>
+                {
                     println!("ok resp {:#?}", resp);
-                    return
+                    return;
                 }
                 resp => {
                     println!("err {:?}", resp);
-                    return
+                    return;
                 }
             };
         }
     }
 }
 
-pub fn resolve_family_id(socket: &Socket, name: &str) -> Result<Option<u16>, FamilyError> {
+pub fn resolve_family_id(
+    socket: &Socket,
+    name: &str,
+) -> Result<Option<u16>, FamilyError> {
     let mut addr = SocketAddr::new(0, 0);
     socket.get_address(&mut addr)?;
 
@@ -109,9 +121,9 @@ pub enum FamilyError {
 
 #[cfg(test)]
 mod test_test {
-    use netlink_sys::Socket;
-    use netlink_sys::Protocol::Generic;
     use crate::genetlink::family::test_p;
+    use netlink_sys::Protocol::Generic;
+    use netlink_sys::Socket;
 
     #[test]
     fn test() {

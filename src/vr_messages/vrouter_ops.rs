@@ -97,7 +97,7 @@ pub struct VrouterOps {
     // Vrouter Packet drop log minimum enable
     pub pkt_droplog_min_en: i8,
     // Close flow on TCP rst
-    pub close_flow_on_tcp_rst: i8
+    pub close_flow_on_tcp_rst: i8,
 }
 
 impl VrouterOps {

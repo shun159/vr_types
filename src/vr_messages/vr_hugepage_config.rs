@@ -16,7 +16,7 @@ pub struct HugepageConfig {
     pub resp: u32,
     pub mem_size: Vec<u32>,
     pub file_paths: Vec<i8>,
-    pub file_path_size: Vec<u32>
+    pub file_path_size: Vec<u32>,
 }
 
 impl HugepageConfig {

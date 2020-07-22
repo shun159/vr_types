@@ -10,7 +10,7 @@ use std::convert::TryInto;
 pub struct VrResponse {
     pub op: SandeshOp,
     pub read_length: usize,
-    pub code: i32
+    pub code: i32,
 }
 
 impl VrResponse {

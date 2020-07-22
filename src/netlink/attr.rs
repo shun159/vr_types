@@ -5,9 +5,18 @@ use std::mem::size_of;
 use zerocopy::LayoutVerified;
 
 #[derive(Debug)]
-pub struct NetlinkAttr<P> {
+pub struct NetlinkAttr<P: Serialize> {
     pub ty: u16,
     pub payload: P,
+}
+
+impl<P: Serialize> NetlinkAttr<P> {
+    pub fn new(ty: u16, payload: P) -> NetlinkAttr<P> {
+        NetlinkAttr {
+            ty: ty,
+            payload: payload
+        }
+    }
 }
 
 impl<P: Serialize> Serialize for NetlinkAttr<P> {
@@ -19,7 +28,8 @@ impl<P: Serialize> Serialize for NetlinkAttr<P> {
     fn serialize(&self, buf: &mut [u8]) {
         let attr_len = size_of::<nlattr>();
         let (attr, payload) = buf.split_at_mut(attr_len);
-        let mut attr = LayoutVerified::<_, nlattr>::new(attr).expect("invalid buffer");
+        let mut attr =
+            LayoutVerified::<_, nlattr>::new(attr).expect("invalid buffer");
         let payload_len = self.payload.len() as usize;
         attr.nla_len = attr_len as u16 + payload_len as u16;
         attr.nla_type = self.ty;

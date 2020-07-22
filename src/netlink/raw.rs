@@ -203,7 +203,9 @@ mod tests {
             "Alignment of sockaddr_nl"
         );
         assert_eq!(
-            unsafe { &(*(null::<sockaddr_nl>())).nl_family as *const _ as usize },
+            unsafe {
+                &(*(null::<sockaddr_nl>())).nl_family as *const _ as usize
+            },
             0usize,
             "Offset of field: sockaddr_nl::nl_family"
         );
@@ -218,7 +220,9 @@ mod tests {
             "Offset of field: sockaddr_nl::nl_pid"
         );
         assert_eq!(
-            unsafe { &(*(null::<sockaddr_nl>())).nl_groups as *const _ as usize },
+            unsafe {
+                &(*(null::<sockaddr_nl>())).nl_groups as *const _ as usize
+            },
             8usize,
             "Offset of field: sockaddr_nl::nl_groups"
         );
@@ -239,7 +243,9 @@ mod tests {
             "Offset of field: nlmsghdr::nlmsg_type"
         );
         assert_eq!(
-            unsafe { &(*(null::<nlmsghdr>())).nlmsg_flags as *const _ as usize },
+            unsafe {
+                &(*(null::<nlmsghdr>())).nlmsg_flags as *const _ as usize
+            },
             6usize,
             "Offset of field: nlmsghdr::nlmsg_flags"
         );
@@ -291,22 +297,30 @@ mod tests {
             "Alignment of nl_mmap_req"
         );
         assert_eq!(
-            unsafe { &(*(null::<nl_mmap_req>())).nm_block_size as *const _ as usize },
+            unsafe {
+                &(*(null::<nl_mmap_req>())).nm_block_size as *const _ as usize
+            },
             0usize,
             "Offset of field: nl_mmap_req::nm_block_size"
         );
         assert_eq!(
-            unsafe { &(*(null::<nl_mmap_req>())).nm_block_nr as *const _ as usize },
+            unsafe {
+                &(*(null::<nl_mmap_req>())).nm_block_nr as *const _ as usize
+            },
             4usize,
             "Offset of field: nl_mmap_req::nm_block_nr"
         );
         assert_eq!(
-            unsafe { &(*(null::<nl_mmap_req>())).nm_frame_size as *const _ as usize },
+            unsafe {
+                &(*(null::<nl_mmap_req>())).nm_frame_size as *const _ as usize
+            },
             8usize,
             "Offset of field: nl_mmap_req::nm_frame_size"
         );
         assert_eq!(
-            unsafe { &(*(null::<nl_mmap_req>())).nm_frame_nr as *const _ as usize },
+            unsafe {
+                &(*(null::<nl_mmap_req>())).nm_frame_nr as *const _ as usize
+            },
             12usize,
             "Offset of field: nl_mmap_req::nm_frame_nr"
         );
@@ -321,7 +335,9 @@ mod tests {
             "Alignment of nl_mmap_hdr"
         );
         assert_eq!(
-            unsafe { &(*(null::<nl_mmap_hdr>())).nm_status as *const _ as usize },
+            unsafe {
+                &(*(null::<nl_mmap_hdr>())).nm_status as *const _ as usize
+            },
             0usize,
             "Offset of field: nl_mmap_hdr::nm_status"
         );
@@ -331,7 +347,9 @@ mod tests {
             "Offset of field: nl_mmap_hdr::nm_len"
         );
         assert_eq!(
-            unsafe { &(*(null::<nl_mmap_hdr>())).nm_group as *const _ as usize },
+            unsafe {
+                &(*(null::<nl_mmap_hdr>())).nm_group as *const _ as usize
+            },
             8usize,
             "Offset of field: nl_mmap_hdr::nm_group"
         );
@@ -381,12 +399,16 @@ mod tests {
             "Alignment of nla_bitfield32"
         );
         assert_eq!(
-            unsafe { &(*(null::<nla_bitfield32>())).value as *const _ as usize },
+            unsafe {
+                &(*(null::<nla_bitfield32>())).value as *const _ as usize
+            },
             0usize,
             "Offset of field: nla_bitfield32::value"
         );
         assert_eq!(
-            unsafe { &(*(null::<nla_bitfield32>())).selector as *const _ as usize },
+            unsafe {
+                &(*(null::<nla_bitfield32>())).selector as *const _ as usize
+            },
             4usize,
             "Offset of field: nla_bitfield32::selector"
         );
