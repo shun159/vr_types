@@ -20,7 +20,6 @@ pub fn resolve_family_id(name: &str) -> Result<Option<u16>, NetlinkReadError> {
     let nl_msg = NetlinkMessage::new(
         GENL_ID_CTRL,
         NLM_F_REQUEST,
-        1,
         GenericNetlinkMessage::new(
             CTRL_CMD_GETFAMILY,
             NETLINK_VERSION,

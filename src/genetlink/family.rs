@@ -61,19 +61,3 @@ pub fn test_p(socket: &Socket) {
         }
     }
 }
-
-#[cfg(test)]
-mod test_test {
-    use crate::genetlink::family::test_p;
-    use crate::genetlink::resolve_family_id;
-    use netlink_sys::Protocol::Generic;
-    use netlink_sys::Socket;
-
-    #[test]
-    fn test() {
-        let res = resolve_family_id("vrouter");
-        println!("resolve family: {:#?}", res);
-        //let res = test_p(&socket);
-        //println!("{:?}", res);
-    }
-}

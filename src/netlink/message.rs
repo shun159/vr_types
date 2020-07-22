@@ -15,11 +15,11 @@ pub struct NetlinkMessage<P> {
 }
 
 impl<P: Serialize> NetlinkMessage<P> {
-    pub fn new(ty: u16, flags: u16, seq: u32, payload: P) -> NetlinkMessage<P> {
+    pub fn new(ty: u16, flags: u16, payload: P) -> NetlinkMessage<P> {
         NetlinkMessage {
             ty: ty,
             flags: flags,
-            seq: seq,
+            seq: 0,
             pid: process::id(),
             payload: payload,
         }
@@ -44,7 +44,6 @@ impl<P: Serialize> NetlinkMessage<P> {
         NetlinkMessage::new(
             nl_msg.ty,
             nl_msg.flags,
-            nl_msg.pid,
             GenericNetlinkMessage::new(
                 genl_msg.cmd,
                 genl_msg.version,
