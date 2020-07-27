@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::sandesh::SandeshOp;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_vxlan_req;
@@ -16,22 +17,22 @@ pub struct VxlanRequest {
 }
 
 impl VxlanRequest {
-    pub fn write(&self) -> Result<Vec<u8>, &str> {
+    pub fn write(&self) -> Result<Vec<u8>, CodecError> {
         let mut encoder: vr_vxlan_req = vr_vxlan_req::new();
         encoder.h_op = self.op as u32;
         encoder.vxlanr_rid = self.rid;
         encoder.vxlanr_vnid = self.vnid;
         encoder.vxlanr_nhid = self.nhid;
         match encoder.write() {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<VxlanRequest, &'a str> {
+    pub fn read(buf: Vec<u8>) -> Result<VxlanRequest, CodecError> {
         let decoder: vr_vxlan_req = vr_vxlan_req::new();
         match decoder.read(&buf) {
-            Err(_) => Err("Failed to read binary"),
+            Err(e) => Err(e),
             Ok(rxfer) => {
                 let mut vxlanr: VxlanRequest = VxlanRequest::default();
                 vxlanr.read_length = rxfer as usize;

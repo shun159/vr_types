@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::sandesh::SandeshOp;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_route_req;
@@ -62,7 +63,7 @@ impl Default for RouteRequest {
 }
 
 impl RouteRequest {
-    pub fn write(&self) -> Result<Vec<u8>, &str> {
+    pub fn write(&self) -> Result<Vec<u8>, CodecError> {
         let mut encoder: vr_route_req = vr_route_req::new();
         encoder.h_op = self.op as u32;
         encoder.rtr_vrf_id = self.vrf_id;
@@ -87,15 +88,15 @@ impl RouteRequest {
         encoder.rtr_index = self.index;
 
         match encoder.write() {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<RouteRequest, &'a str> {
+    pub fn read(buf: Vec<u8>) -> Result<RouteRequest, CodecError> {
         let decoder: vr_route_req = vr_route_req::new();
         match decoder.read(&buf) {
-            Err(_) => Err("Failed to read binary"),
+            Err(e) => Err(e),
             Ok(rxfer) => {
                 let mut rtr: RouteRequest = RouteRequest::default();
                 rtr.read_length = rxfer as usize;

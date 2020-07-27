@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::sandesh::SandeshOp;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_pkt_drop_log_req;
@@ -24,7 +25,7 @@ pub struct PktDropLog {
 }
 
 impl PktDropLog {
-    pub fn write(&self) -> Result<Vec<u8>, &str> {
+    pub fn write(&self) -> Result<Vec<u8>, CodecError> {
         let mut encoder: vr_pkt_drop_log_req = vr_pkt_drop_log_req::new();
         encoder.vdl_rid = self.rid;
         encoder.vdl_core = self.core;
@@ -37,15 +38,15 @@ impl PktDropLog {
             utils::into_mut_ptr(&self.pkt_droplog_arr);
         encoder.vdl_pkt_droplog_arr_size = self.pkt_droplog_arr.len() as u32;
         match encoder.write() {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<PktDropLog, &'a str> {
+    pub fn read(buf: Vec<u8>) -> Result<PktDropLog, CodecError> {
         let decoder: vr_pkt_drop_log_req = vr_pkt_drop_log_req::new();
         match decoder.read(&buf) {
-            Err(_) => Err("Failed to read binary"),
+            Err(e) => Err(e),
             Ok(rxfer) => {
                 let mut vdl: PktDropLog = PktDropLog::default();
                 vdl.read_length = rxfer as usize;

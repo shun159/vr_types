@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::sandesh::SandeshOp;
 use super::vr_flow::VR_IP6_ADDRESS_LEN;
 use super::vr_types::VrSandesh;
@@ -156,7 +157,7 @@ impl Default for NexthopRequest {
 }
 
 impl NexthopRequest {
-    pub fn write(&self) -> Result<Vec<u8>, &str> {
+    pub fn write(&self) -> Result<Vec<u8>, CodecError> {
         let mut encoder: vr_nexthop_req = vr_nexthop_req::new();
         encoder.h_op = self.op as u32;
         encoder.nhr_type = self._type as i8;
@@ -212,15 +213,15 @@ impl NexthopRequest {
         encoder.nhr_transport_label = self.transport_label;
 
         match encoder.write() {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<NexthopRequest, &'a str> {
+    pub fn read(buf: Vec<u8>) -> Result<NexthopRequest, CodecError> {
         let decoder = vr_nexthop_req::new();
         match decoder.read(&buf) {
-            Err(_) => Err("Failed to read binary"),
+            Err(e) => Err(e),
             Ok(rxfer) => {
                 let mut nhr = NexthopRequest::default();
                 nhr.read_length = rxfer as usize;

@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::sandesh::SandeshOp;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_vrf_stats_req;
@@ -45,7 +46,7 @@ pub struct VrfStatsRequest {
 }
 
 impl VrfStatsRequest {
-    pub fn write(&self) -> Result<Vec<u8>, &str> {
+    pub fn write(&self) -> Result<Vec<u8>, CodecError> {
         let mut encoder: vr_vrf_stats_req = vr_vrf_stats_req::new();
         encoder.h_op = self.op as u32;
         encoder.vsr_rid = self.rid;
@@ -83,15 +84,15 @@ impl VrfStatsRequest {
             self.udp_mpls_over_mpls_tunnels;
 
         match encoder.write() {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<VrfStatsRequest, &'a str> {
+    pub fn read(buf: Vec<u8>) -> Result<VrfStatsRequest, CodecError> {
         let decoder: vr_vrf_stats_req = vr_vrf_stats_req::new();
         match decoder.read(&buf) {
-            Err(_) => Err("Failed to read binary"),
+            Err(e) => Err(e),
             Ok(rxfer) => {
                 let mut vsr: VrfStatsRequest = VrfStatsRequest::default();
                 vsr.read_length = rxfer as usize;

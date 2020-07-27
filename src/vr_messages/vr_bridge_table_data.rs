@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::sandesh::SandeshOp;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_bridge_table_data;
@@ -19,7 +20,7 @@ pub struct BridgeTableData {
 }
 
 impl BridgeTableData {
-    pub fn write(&self) -> Result<Vec<u8>, &str> {
+    pub fn write(&self) -> Result<Vec<u8>, CodecError> {
         let mut encoder: vr_bridge_table_data = vr_bridge_table_data::new();
         encoder.btable_op = self.op as u32;
         encoder.btable_rid = self.rid;
@@ -27,15 +28,15 @@ impl BridgeTableData {
         encoder.btable_dev = self.dev;
         encoder.btable_file_path = Self::write_cstring(&self.file_path);
         match encoder.write() {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<BridgeTableData, &'a str> {
+    pub fn read(buf: Vec<u8>) -> Result<BridgeTableData, CodecError> {
         let decoder: vr_bridge_table_data = vr_bridge_table_data::new();
         match decoder.read(&buf) {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(rxfer) => {
                 let mut btable: BridgeTableData = BridgeTableData::default();
                 btable.read_length = rxfer as usize;

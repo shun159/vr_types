@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::sandesh::SandeshOp;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::*;
@@ -10,7 +11,7 @@ use std::convert::{TryFrom, TryInto};
 use std::ffi::CString;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::os::raw::c_char;
-use std::{slice, str};
+use std::slice;
 
 pub const VIF_MAX_MIRROR_MD_SIZE: u32 = 0xFF;
 pub const IPV6_UPPER_MASK: u128 = 0xffffffffffffffff_0000000000000000;
@@ -273,7 +274,7 @@ impl Default for InterfaceRequest {
 }
 
 impl InterfaceRequest {
-    pub fn write(&self) -> Result<Vec<u8>, &str> {
+    pub fn write(&self) -> Result<Vec<u8>, CodecError> {
         let mut encoder: vr_interface_req = vr_interface_req::new();
         encoder.h_op = self.op as u32;
         encoder.vifr_core = self.core;
@@ -432,15 +433,15 @@ impl InterfaceRequest {
         encoder.vifr_vlan_name_size = self.vlan_name.len() as u32;
 
         match encoder.write() {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<InterfaceRequest, &'a str> {
+    pub fn read(buf: Vec<u8>) -> Result<InterfaceRequest, CodecError> {
         let decoder: vr_interface_req = vr_interface_req::new();
         match decoder.read(&buf) {
-            Err(_) => Err("Failed to read binary"),
+            Err(e) => Err(e),
             Ok(rxfer) => {
                 let mut vifr = InterfaceRequest::default();
                 vifr.read_length = rxfer as usize;

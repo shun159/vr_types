@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::sandesh::SandeshOp;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_mirror_req;
@@ -21,7 +22,7 @@ pub struct MirrorRequest {
 }
 
 impl MirrorRequest {
-    pub fn write(&self) -> Result<Vec<u8>, &str> {
+    pub fn write(&self) -> Result<Vec<u8>, CodecError> {
         let mut encoder: vr_mirror_req = vr_mirror_req::new();
         encoder.h_op = self.op as u32;
         encoder.mirr_index = self.index;
@@ -34,15 +35,15 @@ impl MirrorRequest {
         encoder.mirr_vlan = self.vlan;
 
         match encoder.write() {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<MirrorRequest, &'a str> {
+    pub fn read(buf: Vec<u8>) -> Result<MirrorRequest, CodecError> {
         let decoder: vr_mirror_req = vr_mirror_req::new();
         match decoder.read(&buf) {
-            Err(_) => Err("Failed to read binary"),
+            Err(e) => Err(e),
             Ok(rxfer) => {
                 let mut mirr: MirrorRequest = MirrorRequest::default();
                 mirr.read_length = rxfer as usize;

@@ -7,7 +7,7 @@ mod genetlink_test {
 
     #[test]
     fn resolve_family_id_test() {
-        let expect = Some(29);
+        let expect = 29;
         let response = resolve_family_id("TASKSTATS").unwrap();
         assert_eq!(expect, response);
     }

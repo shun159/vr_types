@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::sandesh::SandeshOp;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_mpls_req;
@@ -17,7 +18,7 @@ pub struct MplsRequest {
 }
 
 impl MplsRequest {
-    pub fn write(&self) -> Result<Vec<u8>, &str> {
+    pub fn write(&self) -> Result<Vec<u8>, CodecError> {
         let mut encoder: vr_mpls_req = vr_mpls_req::new();
         encoder.h_op = self.op as u32;
         encoder.mr_rid = self.rid;
@@ -25,15 +26,15 @@ impl MplsRequest {
         encoder.mr_nhid = self.nhid;
         encoder.mr_label = self.label;
         match encoder.write() {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<MplsRequest, &'a str> {
+    pub fn read(buf: Vec<u8>) -> Result<MplsRequest, CodecError> {
         let decoder: vr_mpls_req = vr_mpls_req::new();
         match decoder.read(&buf) {
-            Err(_) => Err("Failed to read binary"),
+            Err(e) => Err(e),
             Ok(rxfer) => {
                 let mut mr: MplsRequest = MplsRequest::default();
                 mr.read_length = rxfer as usize;

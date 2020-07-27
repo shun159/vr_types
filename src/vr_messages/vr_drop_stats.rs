@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::sandesh::SandeshOp;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_drop_stats_req;
@@ -69,7 +70,7 @@ pub struct DropStats {
 }
 
 impl DropStats {
-    pub fn write(&self) -> Result<Vec<u8>, &str> {
+    pub fn write(&self) -> Result<Vec<u8>, CodecError> {
         let mut encoder: vr_drop_stats_req = vr_drop_stats_req::new();
         encoder.h_op = self.op as u32;
         encoder.vds_rid = self.rid;
@@ -129,15 +130,15 @@ impl DropStats {
         encoder.vds_icmp_error = self.icmp_error;
         encoder.vds_clone_fail = self.clone_fail;
         match encoder.write() {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<DropStats, &'a str> {
+    pub fn read(buf: Vec<u8>) -> Result<DropStats, CodecError> {
         let decoder: vr_drop_stats_req = vr_drop_stats_req::new();
         match decoder.read(&buf) {
-            Err(_) => Err("Failed to read binary"),
+            Err(e) => Err(e),
             Ok(rxfer) => {
                 let mut vds: DropStats = DropStats::default();
                 vds.read_length = rxfer as usize;

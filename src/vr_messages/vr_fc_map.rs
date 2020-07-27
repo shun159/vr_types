@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::sandesh::SandeshOp;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_fc_map_req;
@@ -21,7 +22,7 @@ pub struct FcMapRequest {
 }
 
 impl FcMapRequest {
-    pub fn write(&self) -> Result<Vec<u8>, &str> {
+    pub fn write(&self) -> Result<Vec<u8>, CodecError> {
         let mut encoder: vr_fc_map_req = vr_fc_map_req::new();
         encoder.h_op = self.op as u32;
         encoder.fmr_rid = self.rid;
@@ -37,15 +38,15 @@ impl FcMapRequest {
         encoder.fmr_queue_id_size = self.queue_id.len() as u32;
         encoder.fmr_marker = self.marker;
         match encoder.write() {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<FcMapRequest, &'a str> {
+    pub fn read(buf: Vec<u8>) -> Result<FcMapRequest, CodecError> {
         let decoder: vr_fc_map_req = vr_fc_map_req::new();
         match decoder.read(&buf) {
-            Err(_) => Err("Failed to read binary"),
+            Err(e) => Err(e),
             Ok(rxfer) => {
                 let mut fmr: FcMapRequest = FcMapRequest::default();
                 fmr.read_length = rxfer as usize;

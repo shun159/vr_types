@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::vr_flow::FlowOp;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vr_flow_table_data;
@@ -32,7 +33,7 @@ pub struct FlowTableData {
 }
 
 impl FlowTableData {
-    pub fn write(&self) -> Result<Vec<u8>, &str> {
+    pub fn write(&self) -> Result<Vec<u8>, CodecError> {
         let mut encoder: vr_flow_table_data = vr_flow_table_data::new();
         encoder.ftable_op = self.op as u32;
         encoder.ftable_rid = self.rid;
@@ -54,15 +55,15 @@ impl FlowTableData {
         encoder.ftable_hold_entries = self.hold_entries;
 
         match encoder.write() {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<FlowTableData, &'a str> {
+    pub fn read(buf: Vec<u8>) -> Result<FlowTableData, CodecError> {
         let decoder: vr_flow_table_data = vr_flow_table_data::new();
         match decoder.read(&buf) {
-            Err(_) => Err("Failed to read binary"),
+            Err(e) => Err(e),
             Ok(rxfer) => {
                 let mut ftable: FlowTableData = FlowTableData::default();
                 ftable.read_length = rxfer as usize;

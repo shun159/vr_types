@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::{flow_op, vr_flow_req};
 use crate::utils;
@@ -327,7 +328,7 @@ impl Default for FlowRequest {
 }
 
 impl FlowRequest {
-    pub fn write(&self) -> Result<Vec<u8>, &str> {
+    pub fn write(&self) -> Result<Vec<u8>, CodecError> {
         let mut encoder: vr_flow_req = vr_flow_req::new();
         encoder.fr_op = self.op as u32;
         encoder.fr_rid = self.rid;
@@ -375,15 +376,15 @@ impl FlowRequest {
         encoder.fr_flags1 = self.flags1;
 
         match encoder.write() {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<FlowRequest, &'a str> {
+    pub fn read(buf: Vec<u8>) -> Result<FlowRequest, CodecError> {
         let decoder: vr_flow_req = vr_flow_req::new();
         match decoder.read(&buf) {
-            Err(_) => Err("Failed to read binary"),
+            Err(e) => Err(e),
             Ok(rxfer) => {
                 let mut fr: FlowRequest = FlowRequest::default();
                 fr.read_length = rxfer as usize;

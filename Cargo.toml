@@ -21,8 +21,8 @@ byteorder   = "1.3.4"
 eui48       = "0.4.6"
 log         = "0.4.8"
 once_cell   = "1.3.1"
-thiserror   = "1.0.14"
 zerocopy    = "0.3.0"
+thiserror   = "1.0.20"
 
 [profile.test]
 opt-level = 3

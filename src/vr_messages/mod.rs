@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+pub mod error;
 pub mod message_type;
 pub mod sandesh;
 pub mod vr_bridge_table_data;
@@ -32,6 +33,7 @@ pub mod vr_vrf_stats;
 pub mod vr_vxlan;
 pub mod vrouter_ops;
 
+pub use error::*;
 pub use message_type::MessageType;
 pub use sandesh::*;
 pub use std::convert::TryInto;
@@ -83,7 +85,7 @@ pub enum Message {
 }
 
 impl Message {
-    pub fn from_bytes<'a>(buf: Vec<u8>) -> Result<Message, &'a str> {
+    pub fn from_bytes<'a>(buf: Vec<u8>) -> Result<Message, CodecError> {
         match buf.clone().try_into().unwrap() {
             MessageType::BridgeTableData => match BridgeTableData::read(buf) {
                 Ok(req) => Ok(Message::BridgeTableData(req)),
@@ -174,12 +176,12 @@ impl Message {
                 Err(e) => Err(e),
             },
             MessageType::Unknown => {
-                Err("Failed to decode sandesh name from buffer")
+                Err(CodecError::UnknownMessageType)
             }
         }
     }
 
-    pub fn to_bytes(&self) -> Result<Vec<u8>, &str> {
+    pub fn to_bytes(&self) -> Result<Vec<u8>, CodecError> {
         match self {
             Message::BridgeTableData(btable) => btable.write(),
             Message::DropStats(vds) => vds.write(),

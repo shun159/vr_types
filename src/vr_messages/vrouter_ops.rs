@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::sandesh::SandeshOp;
 use super::vr_types::VrSandesh;
 use super::vr_types_binding::vrouter_ops;
@@ -101,7 +102,7 @@ pub struct VrouterOps {
 }
 
 impl VrouterOps {
-    pub fn write(&self) -> Result<Vec<u8>, &str> {
+    pub fn write(&self) -> Result<Vec<u8>, CodecError> {
         let mut encoder: vrouter_ops = vrouter_ops::new();
         encoder.h_op = self.op as u32;
         encoder.vo_rid = self.rid;
@@ -156,15 +157,15 @@ impl VrouterOps {
         encoder.vo_close_flow_on_tcp_rst = self.close_flow_on_tcp_rst;
 
         match encoder.write() {
-            Err(_) => Err("Failed to write binary"),
+            Err(e) => Err(e),
             Ok(v) => Ok(v),
         }
     }
 
-    pub fn read<'a>(buf: Vec<u8>) -> Result<VrouterOps, &'a str> {
+    pub fn read(buf: Vec<u8>) -> Result<VrouterOps, CodecError> {
         let decoder: vrouter_ops = vrouter_ops::new();
         match decoder.read(&buf) {
-            Err(_) => Err("Failed to read binary"),
+            Err(e) => Err(e),
             Ok(rxfer) => {
                 let mut vo: VrouterOps = VrouterOps::default();
                 vo.read_length = rxfer as usize;

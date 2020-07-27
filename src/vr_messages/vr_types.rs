@@ -1,6 +1,7 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
+use super::error::CodecError;
 use super::vr_flow;
 use super::vr_interface;
 use super::vr_nexthop;
@@ -23,7 +24,7 @@ pub trait VrSandesh {
         4usize * size_of::<Self::Type>()
     }
 
-    fn write(&self) -> Result<Vec<u8>, i32> {
+    fn write(&self) -> Result<Vec<u8>, CodecError> {
         unsafe {
             let mut error = 0;
             let wsandesh = self.as_c_void();
@@ -33,12 +34,12 @@ pub trait VrSandesh {
                 wxfer if wxfer >= 0 && error == 0 => {
                     Ok(utils::free_buf::<u8>(buf, wxfer as usize))
                 }
-                _ => Err(error),
+                _ => Err(CodecError::Write(error)),
             }
         }
     }
 
-    fn read(&self, buf: &Vec<u8>) -> Result<i32, i32> {
+    fn read(&self, buf: &Vec<u8>) -> Result<i32, CodecError> {
         unsafe {
             let mut error = 0;
             let buf_ptr =
@@ -48,7 +49,7 @@ pub trait VrSandesh {
             match self.read_binary_fn()(rsandesh, buf_ptr, buf_len, &mut error)
             {
                 rxfer if rxfer >= 0 && error == 0 => Ok(rxfer),
-                _ => Err(error),
+                _ => Err(CodecError::Read(error)),
             }
         }
     }
