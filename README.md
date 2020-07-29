@@ -9,7 +9,7 @@ transport sandesh messages to vrouter through `NETLINK_GENERIC`.
 Example:
 ----
 
-1. Add an veth interface to the vrouter and put its result on stdout.
+1. Add a veth interface to the vrouter and put its result on stdout.
 
 ```rust
 fn add_interface() {
