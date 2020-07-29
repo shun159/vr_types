@@ -86,46 +86,37 @@ impl RouteRequest {
         };
         encoder.rtr_replace_plen = self.replace_prefix_len;
         encoder.rtr_index = self.index;
-
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<RouteRequest, CodecError> {
         let decoder: vr_route_req = vr_route_req::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut rtr: RouteRequest = RouteRequest::default();
-                rtr.read_length = rxfer as usize;
-                rtr.op = decoder.h_op.try_into().unwrap();
-                rtr.vrf_id = decoder.rtr_vrf_id;
-                rtr.family = decoder.rtr_family;
-                rtr.prefix = Self::read_ip(
-                    decoder.rtr_family,
-                    decoder.rtr_prefix,
-                    decoder.rtr_prefix_size,
-                );
-                rtr.prefix_len = decoder.rtr_prefix_len;
-                rtr.rid = decoder.rtr_rid;
-                rtr.label_flags = decoder.rtr_label_flags;
-                rtr.label = decoder.rtr_label;
-                rtr.nh_id = decoder.rtr_nh_id;
-                rtr.marker = Self::read_ip(
-                    decoder.rtr_family,
-                    decoder.rtr_marker,
-                    decoder.rtr_marker_size,
-                );
-                rtr.marker_prefix_len = decoder.rtr_marker_plen;
-                rtr.mac =
-                    utils::read_mac_addr(decoder.rtr_mac, decoder.rtr_mac_size);
-                rtr.replace_prefix_len = decoder.rtr_replace_plen;
-                rtr.index = decoder.rtr_index;
-                Ok(rtr)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut rtr: RouteRequest = RouteRequest::default();
+        rtr.read_length = rxfer as usize;
+        rtr.op = decoder.h_op.try_into().unwrap();
+        rtr.vrf_id = decoder.rtr_vrf_id;
+        rtr.family = decoder.rtr_family;
+        rtr.prefix = Self::read_ip(
+            decoder.rtr_family,
+            decoder.rtr_prefix,
+            decoder.rtr_prefix_size,
+        );
+        rtr.prefix_len = decoder.rtr_prefix_len;
+        rtr.rid = decoder.rtr_rid;
+        rtr.label_flags = decoder.rtr_label_flags;
+        rtr.label = decoder.rtr_label;
+        rtr.nh_id = decoder.rtr_nh_id;
+        rtr.marker = Self::read_ip(
+            decoder.rtr_family,
+            decoder.rtr_marker,
+            decoder.rtr_marker_size,
+        );
+        rtr.marker_prefix_len = decoder.rtr_marker_plen;
+        rtr.mac = utils::read_mac_addr(decoder.rtr_mac, decoder.rtr_mac_size);
+        rtr.replace_prefix_len = decoder.rtr_replace_plen;
+        rtr.index = decoder.rtr_index;
+        Ok(rtr)
     }
 
     fn prefix_size(ip: Option<IpAddr>) -> u32 {
@@ -148,9 +139,7 @@ impl RouteRequest {
     fn read_ip(family: i32, ptr: *mut i8, size: u32) -> Option<IpAddr> {
         match family {
             libc::AF_INET if size == 4 => Some(IpAddr::V4(Self::read_ip4(ptr))),
-            libc::AF_INET6 if size == 16 => {
-                Some(IpAddr::V6(Self::read_ip6(ptr)))
-            }
+            libc::AF_INET6 if size == 16 => Some(IpAddr::V6(Self::read_ip6(ptr))),
             _ => None,
         }
     }

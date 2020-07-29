@@ -25,26 +25,19 @@ impl MplsRequest {
         encoder.mr_label = self.label;
         encoder.mr_nhid = self.nhid;
         encoder.mr_label = self.label;
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<MplsRequest, CodecError> {
         let decoder: vr_mpls_req = vr_mpls_req::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut mr: MplsRequest = MplsRequest::default();
-                mr.read_length = rxfer as usize;
-                mr.op = decoder.h_op.try_into().unwrap();
-                mr.rid = decoder.mr_rid;
-                mr.label = decoder.mr_label;
-                mr.nhid = decoder.mr_nhid;
-                mr.label = decoder.mr_label;
-                Ok(mr)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut mr: MplsRequest = MplsRequest::default();
+        mr.read_length = rxfer as usize;
+        mr.op = decoder.h_op.try_into().unwrap();
+        mr.rid = decoder.mr_rid;
+        mr.label = decoder.mr_label;
+        mr.nhid = decoder.mr_nhid;
+        mr.label = decoder.mr_label;
+        Ok(mr)
     }
 }

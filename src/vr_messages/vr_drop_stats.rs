@@ -129,80 +129,71 @@ impl DropStats {
         encoder.vds_no_frag_entry = self.no_frag_entry;
         encoder.vds_icmp_error = self.icmp_error;
         encoder.vds_clone_fail = self.clone_fail;
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<DropStats, CodecError> {
         let decoder: vr_drop_stats_req = vr_drop_stats_req::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut vds: DropStats = DropStats::default();
-                vds.read_length = rxfer as usize;
-                vds.op = decoder.h_op.try_into().unwrap();
-                vds.rid = decoder.vds_rid;
-                vds.core = decoder.vds_core;
-                vds.discard = decoder.vds_discard;
-                vds.pcpu_stats_failure_status =
-                    decoder.vds_pcpu_stats_failure_status;
-                vds.pull = decoder.vds_pull;
-                vds.invalid_if = decoder.vds_invalid_if;
-                vds.invalid_arp = decoder.vds_invalid_arp;
-                vds.trap_no_if = decoder.vds_trap_no_if;
-                vds.nowhere_to_go = decoder.vds_nowhere_to_go;
-                vds.flow_queue_limit_exceeded =
-                    decoder.vds_flow_queue_limit_exceeded;
-                vds.flow_no_memory = decoder.vds_flow_no_memory;
-                vds.flow_invalid_protocol = decoder.vds_flow_invalid_protocol;
-                vds.flow_nat_no_rflow = decoder.vds_flow_nat_no_rflow;
-                vds.flow_action_drop = decoder.vds_flow_action_drop;
-                vds.flow_action_invalid = decoder.vds_flow_action_invalid;
-                vds.flow_unusable = decoder.vds_flow_unusable;
-                vds.flow_table_full = decoder.vds_flow_table_full;
-                vds.interface_tx_discard = decoder.vds_interface_tx_discard;
-                vds.interface_drop = decoder.vds_interface_drop;
-                vds.duplicated = decoder.vds_duplicated;
-                vds.push = decoder.vds_push;
-                vds.ttl_exceeded = decoder.vds_ttl_exceeded;
-                vds.invalid_nh = decoder.vds_invalid_nh;
-                vds.invalid_label = decoder.vds_invalid_label;
-                vds.invalid_protocol = decoder.vds_invalid_protocol;
-                vds.interface_rx_discard = decoder.vds_interface_rx_discard;
-                vds.invalid_mcast_source = decoder.vds_invalid_mcast_source;
-                vds.head_alloc_fail = decoder.vds_head_alloc_fail;
-                vds.pcow_fail = decoder.vds_pcow_fail;
-                vds.mcast_df_bit = decoder.vds_mcast_df_bit;
-                vds.mcast_clone_fail = decoder.vds_mcast_clone_fail;
-                vds.no_memory = decoder.vds_no_memory;
-                vds.rewrite_fail = decoder.vds_rewrite_fail;
-                vds.misc = decoder.vds_misc;
-                vds.invalid_packet = decoder.vds_invalid_packet;
-                vds.cksum_err = decoder.vds_cksum_err;
-                vds.no_fmd = decoder.vds_no_fmd;
-                vds.cloned_original = decoder.vds_cloned_original;
-                vds.invalid_vnid = decoder.vds_invalid_vnid;
-                vds.frag_err = decoder.vds_frag_err;
-                vds.invalid_source = decoder.vds_invalid_source;
-                vds.l2_no_route = decoder.vds_l2_no_route;
-                vds.fragment_queue_fail = decoder.vds_fragment_queue_fail;
-                vds.vlan_fwd_tx = decoder.vds_vlan_fwd_tx;
-                vds.vlan_fwd_enq = decoder.vds_vlan_fwd_enq;
-                vds.drop_new_flow = decoder.vds_drop_new_flow;
-                vds.flow_evict = decoder.vds_flow_evict;
-                vds.trap_original = decoder.vds_trap_original;
-                vds.leaf_to_leaf = decoder.vds_leaf_to_leaf;
-                vds.bmac_isid_mismatch = decoder.vds_bmac_isid_mismatch;
-                vds.pkt_loop = decoder.vds_pkt_loop;
-                vds.no_crypt_path = decoder.vds_no_crypt_path;
-                vds.invalid_hbs_pkt = decoder.vds_invalid_hbs_pkt;
-                vds.no_frag_entry = decoder.vds_no_frag_entry;
-                vds.icmp_error = decoder.vds_icmp_error;
-                vds.clone_fail = decoder.vds_clone_fail;
-                Ok(vds)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut vds: DropStats = DropStats::default();
+        vds.read_length = rxfer as usize;
+        vds.op = decoder.h_op.try_into().unwrap();
+        vds.rid = decoder.vds_rid;
+        vds.core = decoder.vds_core;
+        vds.discard = decoder.vds_discard;
+        vds.pcpu_stats_failure_status = decoder.vds_pcpu_stats_failure_status;
+        vds.pull = decoder.vds_pull;
+        vds.invalid_if = decoder.vds_invalid_if;
+        vds.invalid_arp = decoder.vds_invalid_arp;
+        vds.trap_no_if = decoder.vds_trap_no_if;
+        vds.nowhere_to_go = decoder.vds_nowhere_to_go;
+        vds.flow_queue_limit_exceeded = decoder.vds_flow_queue_limit_exceeded;
+        vds.flow_no_memory = decoder.vds_flow_no_memory;
+        vds.flow_invalid_protocol = decoder.vds_flow_invalid_protocol;
+        vds.flow_nat_no_rflow = decoder.vds_flow_nat_no_rflow;
+        vds.flow_action_drop = decoder.vds_flow_action_drop;
+        vds.flow_action_invalid = decoder.vds_flow_action_invalid;
+        vds.flow_unusable = decoder.vds_flow_unusable;
+        vds.flow_table_full = decoder.vds_flow_table_full;
+        vds.interface_tx_discard = decoder.vds_interface_tx_discard;
+        vds.interface_drop = decoder.vds_interface_drop;
+        vds.duplicated = decoder.vds_duplicated;
+        vds.push = decoder.vds_push;
+        vds.ttl_exceeded = decoder.vds_ttl_exceeded;
+        vds.invalid_nh = decoder.vds_invalid_nh;
+        vds.invalid_label = decoder.vds_invalid_label;
+        vds.invalid_protocol = decoder.vds_invalid_protocol;
+        vds.interface_rx_discard = decoder.vds_interface_rx_discard;
+        vds.invalid_mcast_source = decoder.vds_invalid_mcast_source;
+        vds.head_alloc_fail = decoder.vds_head_alloc_fail;
+        vds.pcow_fail = decoder.vds_pcow_fail;
+        vds.mcast_df_bit = decoder.vds_mcast_df_bit;
+        vds.mcast_clone_fail = decoder.vds_mcast_clone_fail;
+        vds.no_memory = decoder.vds_no_memory;
+        vds.rewrite_fail = decoder.vds_rewrite_fail;
+        vds.misc = decoder.vds_misc;
+        vds.invalid_packet = decoder.vds_invalid_packet;
+        vds.cksum_err = decoder.vds_cksum_err;
+        vds.no_fmd = decoder.vds_no_fmd;
+        vds.cloned_original = decoder.vds_cloned_original;
+        vds.invalid_vnid = decoder.vds_invalid_vnid;
+        vds.frag_err = decoder.vds_frag_err;
+        vds.invalid_source = decoder.vds_invalid_source;
+        vds.l2_no_route = decoder.vds_l2_no_route;
+        vds.fragment_queue_fail = decoder.vds_fragment_queue_fail;
+        vds.vlan_fwd_tx = decoder.vds_vlan_fwd_tx;
+        vds.vlan_fwd_enq = decoder.vds_vlan_fwd_enq;
+        vds.drop_new_flow = decoder.vds_drop_new_flow;
+        vds.flow_evict = decoder.vds_flow_evict;
+        vds.trap_original = decoder.vds_trap_original;
+        vds.leaf_to_leaf = decoder.vds_leaf_to_leaf;
+        vds.bmac_isid_mismatch = decoder.vds_bmac_isid_mismatch;
+        vds.pkt_loop = decoder.vds_pkt_loop;
+        vds.no_crypt_path = decoder.vds_no_crypt_path;
+        vds.invalid_hbs_pkt = decoder.vds_invalid_hbs_pkt;
+        vds.no_frag_entry = decoder.vds_no_frag_entry;
+        vds.icmp_error = decoder.vds_icmp_error;
+        vds.clone_fail = decoder.vds_clone_fail;
+        Ok(vds)
     }
 }

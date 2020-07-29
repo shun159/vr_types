@@ -768,18 +768,13 @@ extern "C" {
     pub fn atof(__nptr: *const ::std::os::raw::c_char) -> f64;
 }
 extern "C" {
-    pub fn atoi(__nptr: *const ::std::os::raw::c_char)
-        -> ::std::os::raw::c_int;
+    pub fn atoi(__nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn atol(
-        __nptr: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_long;
+    pub fn atol(__nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    pub fn atoll(
-        __nptr: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_longlong;
+    pub fn atoll(__nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
     pub fn strtod(
@@ -1172,10 +1167,8 @@ pub struct random_data {
     pub end_ptr: *mut i32,
 }
 extern "C" {
-    pub fn random_r(
-        __buf: *mut random_data,
-        __result: *mut i32,
-    ) -> ::std::os::raw::c_int;
+    pub fn random_r(__buf: *mut random_data, __result: *mut i32)
+        -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn srandom_r(
@@ -1204,8 +1197,7 @@ extern "C" {
     pub fn srand(__seed: ::std::os::raw::c_uint);
 }
 extern "C" {
-    pub fn rand_r(__seed: *mut ::std::os::raw::c_uint)
-        -> ::std::os::raw::c_int;
+    pub fn rand_r(__seed: *mut ::std::os::raw::c_uint) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn drand48() -> f64;
@@ -1307,9 +1299,7 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn malloc(
-        __size: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_void;
+    pub fn malloc(__size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
     pub fn calloc(
@@ -1334,9 +1324,7 @@ extern "C" {
     pub fn free(__ptr: *mut ::std::os::raw::c_void);
 }
 extern "C" {
-    pub fn alloca(
-        __size: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_void;
+    pub fn alloca(__size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
     pub fn valloc(__size: usize) -> *mut ::std::os::raw::c_void;
@@ -1388,14 +1376,10 @@ extern "C" {
     pub fn _Exit(__status: ::std::os::raw::c_int);
 }
 extern "C" {
-    pub fn getenv(
-        __name: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn getenv(__name: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn putenv(
-        __string: *mut ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+    pub fn putenv(__string: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn setenv(
@@ -1405,22 +1389,17 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn unsetenv(
-        __name: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+    pub fn unsetenv(__name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn clearenv() -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn mktemp(
-        __template: *mut ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn mktemp(__template: *mut ::std::os::raw::c_char)
+        -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn mkstemp(
-        __template: *mut ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+    pub fn mkstemp(__template: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn mkstemps(
@@ -1434,9 +1413,7 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn system(
-        __command: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+    pub fn system(__command: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn realpath(
@@ -1474,14 +1451,10 @@ extern "C" {
     pub fn labs(__x: ::std::os::raw::c_long) -> ::std::os::raw::c_long;
 }
 extern "C" {
-    pub fn llabs(__x: ::std::os::raw::c_longlong)
-        -> ::std::os::raw::c_longlong;
+    pub fn llabs(__x: ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
-    pub fn div(
-        __numer: ::std::os::raw::c_int,
-        __denom: ::std::os::raw::c_int,
-    ) -> div_t;
+    pub fn div(__numer: ::std::os::raw::c_int, __denom: ::std::os::raw::c_int) -> div_t;
 }
 extern "C" {
     pub fn ldiv(
@@ -1582,10 +1555,8 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn mblen(
-        __s: *const ::std::os::raw::c_char,
-        __n: usize,
-    ) -> ::std::os::raw::c_int;
+    pub fn mblen(__s: *const ::std::os::raw::c_char, __n: usize)
+        -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn mbtowc(
@@ -1615,9 +1586,7 @@ extern "C" {
     ) -> usize;
 }
 extern "C" {
-    pub fn rpmatch(
-        __response: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+    pub fn rpmatch(__response: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn getsubopt(
@@ -1754,9 +1723,7 @@ extern "C" {
     ) -> usize;
 }
 extern "C" {
-    pub fn strdup(
-        __s: *const ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn strdup(__s: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn strndup(
@@ -1821,20 +1788,13 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn strlen(
-        __s: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_ulong;
+    pub fn strlen(__s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_ulong;
 }
 extern "C" {
-    pub fn strnlen(
-        __string: *const ::std::os::raw::c_char,
-        __maxlen: usize,
-    ) -> usize;
+    pub fn strnlen(__string: *const ::std::os::raw::c_char, __maxlen: usize) -> usize;
 }
 extern "C" {
-    pub fn strerror(
-        __errnum: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn strerror(__errnum: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
     #[link_name = "\u{1}__xpg_strerror_r"]
@@ -1865,10 +1825,7 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn bzero(
-        __s: *mut ::std::os::raw::c_void,
-        __n: ::std::os::raw::c_ulong,
-    );
+    pub fn bzero(__s: *mut ::std::os::raw::c_void, __n: ::std::os::raw::c_ulong);
 }
 extern "C" {
     pub fn index(
@@ -1929,9 +1886,7 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn strsignal(
-        __sig: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn strsignal(__sig: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn __stpcpy(
@@ -2032,10 +1987,7 @@ pub struct cmsghdr {
     pub __cmsg_data: __IncompleteArrayField<::std::os::raw::c_uchar>,
 }
 extern "C" {
-    pub fn __cmsg_nxthdr(
-        __mhdr: *mut msghdr,
-        __cmsg: *mut cmsghdr,
-    ) -> *mut cmsghdr;
+    pub fn __cmsg_nxthdr(__mhdr: *mut msghdr, __cmsg: *mut cmsghdr) -> *mut cmsghdr;
 }
 pub const SCM_RIGHTS: _bindgen_ty_2 = 1;
 pub type _bindgen_ty_2 = u32;
@@ -2559,8 +2511,7 @@ pub union ipaddr_s__bindgen_ty_1 {
     _bindgen_union_align: [u32; 4usize],
 }
 pub type ipaddr_t = ipaddr_s;
-pub const ThriftTransportType_T_TRANSPORT_MEMORY_BUFFER: ThriftTransportType =
-    1;
+pub const ThriftTransportType_T_TRANSPORT_MEMORY_BUFFER: ThriftTransportType = 1;
 pub const ThriftTransportType_T_TRANSPORT_FAKE: ThriftTransportType = 2;
 pub const ThriftTransportType_T_TRANSPORT_FILE: ThriftTransportType = 3;
 #[doc = " Enumerated definitions of supported transports"]
@@ -2591,20 +2542,13 @@ pub type ThriftTransport = _ThriftTransport;
 extern "C" {
     pub fn thrift_transport_get_type() -> ThriftTransportType;
 }
-pub const ThriftTransportError_THRIFT_TRANSPORT_ERROR_UNKNOWN:
-    ThriftTransportError = 0;
-pub const ThriftTransportError_THRIFT_TRANSPORT_ERROR_HOST:
-    ThriftTransportError = 1;
-pub const ThriftTransportError_THRIFT_TRANSPORT_ERROR_SOCKET:
-    ThriftTransportError = 2;
-pub const ThriftTransportError_THRIFT_TRANSPORT_ERROR_CONNECT:
-    ThriftTransportError = 3;
-pub const ThriftTransportError_THRIFT_TRANSPORT_ERROR_SEND:
-    ThriftTransportError = 4;
-pub const ThriftTransportError_THRIFT_TRANSPORT_ERROR_RECEIVE:
-    ThriftTransportError = 5;
-pub const ThriftTransportError_THRIFT_TRANSPORT_ERROR_CLOSE:
-    ThriftTransportError = 6;
+pub const ThriftTransportError_THRIFT_TRANSPORT_ERROR_UNKNOWN: ThriftTransportError = 0;
+pub const ThriftTransportError_THRIFT_TRANSPORT_ERROR_HOST: ThriftTransportError = 1;
+pub const ThriftTransportError_THRIFT_TRANSPORT_ERROR_SOCKET: ThriftTransportError = 2;
+pub const ThriftTransportError_THRIFT_TRANSPORT_ERROR_CONNECT: ThriftTransportError = 3;
+pub const ThriftTransportError_THRIFT_TRANSPORT_ERROR_SEND: ThriftTransportError = 4;
+pub const ThriftTransportError_THRIFT_TRANSPORT_ERROR_RECEIVE: ThriftTransportError = 5;
+pub const ThriftTransportError_THRIFT_TRANSPORT_ERROR_CLOSE: ThriftTransportError = 6;
 pub type ThriftTransportError = u32;
 #[doc = " ThriftMemoryBuffer instance."]
 #[repr(C)]
@@ -2730,9 +2674,7 @@ extern "C" {
     pub static mut stderr: *mut FILE;
 }
 extern "C" {
-    pub fn remove(
-        __filename: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+    pub fn remove(__filename: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn rename(
@@ -2752,14 +2694,10 @@ extern "C" {
     pub fn tmpfile() -> *mut FILE;
 }
 extern "C" {
-    pub fn tmpnam(
-        __s: *mut ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn tmpnam(__s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn tmpnam_r(
-        __s: *mut ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn tmpnam_r(__s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn tempnam(
@@ -2837,10 +2775,7 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn printf(
-        __format: *const ::std::os::raw::c_char,
-        ...
-    ) -> ::std::os::raw::c_int;
+    pub fn printf(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn sprintf(
@@ -2907,10 +2842,7 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn scanf(
-        __format: *const ::std::os::raw::c_char,
-        ...
-    ) -> ::std::os::raw::c_int;
+    pub fn scanf(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn sscanf(
@@ -2929,10 +2861,7 @@ extern "C" {
 }
 extern "C" {
     #[link_name = "\u{1}__isoc99_scanf"]
-    pub fn scanf1(
-        __format: *const ::std::os::raw::c_char,
-        ...
-    ) -> ::std::os::raw::c_int;
+    pub fn scanf1(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
 }
 extern "C" {
     #[link_name = "\u{1}__isoc99_sscanf"]
@@ -3010,10 +2939,8 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn putc(
-        __c: ::std::os::raw::c_int,
-        __stream: *mut FILE,
-    ) -> ::std::os::raw::c_int;
+    pub fn putc(__c: ::std::os::raw::c_int, __stream: *mut FILE)
+        -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn putchar(__c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
@@ -3031,18 +2958,14 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn putchar_unlocked(
-        __c: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+    pub fn putchar_unlocked(__c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn getw(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn putw(
-        __w: ::std::os::raw::c_int,
-        __stream: *mut FILE,
-    ) -> ::std::os::raw::c_int;
+    pub fn putw(__w: ::std::os::raw::c_int, __stream: *mut FILE)
+        -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn fgets(
@@ -3145,16 +3068,10 @@ extern "C" {
     pub fn ftello(__stream: *mut FILE) -> __off_t;
 }
 extern "C" {
-    pub fn fgetpos(
-        __stream: *mut FILE,
-        __pos: *mut fpos_t,
-    ) -> ::std::os::raw::c_int;
+    pub fn fgetpos(__stream: *mut FILE, __pos: *mut fpos_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn fsetpos(
-        __stream: *mut FILE,
-        __pos: *const fpos_t,
-    ) -> ::std::os::raw::c_int;
+    pub fn fsetpos(__stream: *mut FILE, __pos: *const fpos_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn clearerr(__stream: *mut FILE);
@@ -3199,9 +3116,7 @@ extern "C" {
     pub fn pclose(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn ctermid(
-        __s: *mut ::std::os::raw::c_char,
-    ) -> *mut ::std::os::raw::c_char;
+    pub fn ctermid(__s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn flockfile(__stream: *mut FILE);
@@ -3627,18 +3542,14 @@ extern "C" {
         transport: *mut ThriftTransport,
     );
 }
-pub const ThriftProtocolError_THRIFT_PROTOCOL_ERROR_UNKNOWN:
-    ThriftProtocolError = 0;
-pub const ThriftProtocolError_THRIFT_PROTOCOL_ERROR_INVALID_DATA:
-    ThriftProtocolError = 1;
-pub const ThriftProtocolError_THRIFT_PROTOCOL_ERROR_NEGATIVE_SIZE:
-    ThriftProtocolError = 2;
-pub const ThriftProtocolError_THRIFT_PROTOCOL_ERROR_SIZE_LIMIT:
-    ThriftProtocolError = 3;
-pub const ThriftProtocolError_THRIFT_PROTOCOL_ERROR_BAD_VERSION:
-    ThriftProtocolError = 4;
-pub const ThriftProtocolError_THRIFT_PROTOCOL_ERROR_NOT_IMPLEMENTED:
-    ThriftProtocolError = 5;
+pub const ThriftProtocolError_THRIFT_PROTOCOL_ERROR_UNKNOWN: ThriftProtocolError = 0;
+pub const ThriftProtocolError_THRIFT_PROTOCOL_ERROR_INVALID_DATA: ThriftProtocolError = 1;
+pub const ThriftProtocolError_THRIFT_PROTOCOL_ERROR_NEGATIVE_SIZE: ThriftProtocolError =
+    2;
+pub const ThriftProtocolError_THRIFT_PROTOCOL_ERROR_SIZE_LIMIT: ThriftProtocolError = 3;
+pub const ThriftProtocolError_THRIFT_PROTOCOL_ERROR_BAD_VERSION: ThriftProtocolError = 4;
+pub const ThriftProtocolError_THRIFT_PROTOCOL_ERROR_NOT_IMPLEMENTED: ThriftProtocolError =
+    5;
 pub type ThriftProtocolError = u32;
 pub type ThriftBinaryProtocol = ThriftProtocol;
 extern "C" {
@@ -3707,18 +3618,14 @@ pub struct sandesh_info_s {
             arg4: *mut ::std::os::raw::c_int,
         ) -> i32,
     >,
-    pub process: ::std::option::Option<
-        unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void),
-    >,
-    pub free: ::std::option::Option<
-        unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void),
-    >,
+    pub process:
+        ::std::option::Option<unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void)>,
+    pub free:
+        ::std::option::Option<unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void)>,
 }
 pub type sandesh_info_t = sandesh_info_s;
 pub type sandesh_find_info_fn = ::std::option::Option<
-    unsafe extern "C" fn(
-        name: *const ::std::os::raw::c_char,
-    ) -> *mut sandesh_info_t,
+    unsafe extern "C" fn(name: *const ::std::os::raw::c_char) -> *mut sandesh_info_t,
 >;
 extern "C" {
     pub fn sandesh_find_info(
@@ -4147,9 +4054,7 @@ extern "C" {
     pub fn vr_interface_req_free(fsandesh: *mut ::std::os::raw::c_void);
 }
 extern "C" {
-    pub fn vr_interface_req_process(
-        pvr_interface_req: *mut ::std::os::raw::c_void,
-    );
+    pub fn vr_interface_req_process(pvr_interface_req: *mut ::std::os::raw::c_void);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -4608,9 +4513,7 @@ extern "C" {
     pub fn vr_vrf_assign_req_free(fsandesh: *mut ::std::os::raw::c_void);
 }
 extern "C" {
-    pub fn vr_vrf_assign_req_process(
-        pvr_vrf_assign_req: *mut ::std::os::raw::c_void,
-    );
+    pub fn vr_vrf_assign_req_process(pvr_vrf_assign_req: *mut ::std::os::raw::c_void);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -4717,9 +4620,7 @@ extern "C" {
     pub fn vr_vrf_stats_req_free(fsandesh: *mut ::std::os::raw::c_void);
 }
 extern "C" {
-    pub fn vr_vrf_stats_req_process(
-        pvr_vrf_stats_req: *mut ::std::os::raw::c_void,
-    );
+    pub fn vr_vrf_stats_req_process(pvr_vrf_stats_req: *mut ::std::os::raw::c_void);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -5084,9 +4985,7 @@ extern "C" {
     pub fn vr_mem_stats_req_free(fsandesh: *mut ::std::os::raw::c_void);
 }
 extern "C" {
-    pub fn vr_mem_stats_req_process(
-        pvr_mem_stats_req: *mut ::std::os::raw::c_void,
-    );
+    pub fn vr_mem_stats_req_process(pvr_mem_stats_req: *mut ::std::os::raw::c_void);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -5207,9 +5106,7 @@ extern "C" {
     pub fn vr_pkt_drop_log_req_free(fsandesh: *mut ::std::os::raw::c_void);
 }
 extern "C" {
-    pub fn vr_pkt_drop_log_req_process(
-        pvr_pkt_drop_log_req: *mut ::std::os::raw::c_void,
-    );
+    pub fn vr_pkt_drop_log_req_process(pvr_pkt_drop_log_req: *mut ::std::os::raw::c_void);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -5364,9 +5261,7 @@ extern "C" {
     pub fn vr_drop_stats_req_free(fsandesh: *mut ::std::os::raw::c_void);
 }
 extern "C" {
-    pub fn vr_drop_stats_req_process(
-        pvr_drop_stats_req: *mut ::std::os::raw::c_void,
-    );
+    pub fn vr_drop_stats_req_process(pvr_drop_stats_req: *mut ::std::os::raw::c_void);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -5552,9 +5447,7 @@ extern "C" {
     pub fn vr_flow_response_free(fsandesh: *mut ::std::os::raw::c_void);
 }
 extern "C" {
-    pub fn vr_flow_response_process(
-        pvr_flow_response: *mut ::std::os::raw::c_void,
-    );
+    pub fn vr_flow_response_process(pvr_flow_response: *mut ::std::os::raw::c_void);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -5630,9 +5523,7 @@ extern "C" {
     pub fn vr_flow_table_data_free(fsandesh: *mut ::std::os::raw::c_void);
 }
 extern "C" {
-    pub fn vr_flow_table_data_process(
-        pvr_flow_table_data: *mut ::std::os::raw::c_void,
-    );
+    pub fn vr_flow_table_data_process(pvr_flow_table_data: *mut ::std::os::raw::c_void);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -5745,9 +5636,7 @@ extern "C" {
     pub fn vr_hugepage_config_free(fsandesh: *mut ::std::os::raw::c_void);
 }
 extern "C" {
-    pub fn vr_hugepage_config_process(
-        pvr_hugepage_config: *mut ::std::os::raw::c_void,
-    );
+    pub fn vr_hugepage_config_process(pvr_hugepage_config: *mut ::std::os::raw::c_void);
 }
 extern "C" {
     pub fn vr_find_sandesh_info(

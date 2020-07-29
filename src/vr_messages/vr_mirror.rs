@@ -33,31 +33,23 @@ impl MirrorRequest {
         encoder.mirr_marker = self.marker;
         encoder.mirr_vni = self.vni;
         encoder.mirr_vlan = self.vlan;
-
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<MirrorRequest, CodecError> {
         let decoder: vr_mirror_req = vr_mirror_req::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut mirr: MirrorRequest = MirrorRequest::default();
-                mirr.read_length = rxfer as usize;
-                mirr.op = decoder.h_op.try_into().unwrap();
-                mirr.index = decoder.mirr_index;
-                mirr.rid = decoder.mirr_rid;
-                mirr.nhid = decoder.mirr_nhid;
-                mirr.users = decoder.mirr_users;
-                mirr.flags = decoder.mirr_flags;
-                mirr.marker = decoder.mirr_marker;
-                mirr.vni = decoder.mirr_vni;
-                mirr.vlan = decoder.mirr_vlan;
-                Ok(mirr)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut mirr: MirrorRequest = MirrorRequest::default();
+        mirr.read_length = rxfer as usize;
+        mirr.op = decoder.h_op.try_into().unwrap();
+        mirr.index = decoder.mirr_index;
+        mirr.rid = decoder.mirr_rid;
+        mirr.nhid = decoder.mirr_nhid;
+        mirr.users = decoder.mirr_users;
+        mirr.flags = decoder.mirr_flags;
+        mirr.marker = decoder.mirr_marker;
+        mirr.vni = decoder.mirr_vni;
+        mirr.vlan = decoder.mirr_vlan;
+        Ok(mirr)
     }
 }

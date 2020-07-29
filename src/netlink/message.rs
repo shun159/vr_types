@@ -33,14 +33,11 @@ impl<P: Serialize> NetlinkMessage<P> {
     }
 
     // Generic NETLINK message specfic shortcut fucntion
-    pub fn recv_nl(
-        socket: &Socket,
-    ) -> NetlinkMessage<GenericNetlinkMessage<Vec<u8>>> {
+    pub fn recv_nl(socket: &Socket) -> NetlinkMessage<GenericNetlinkMessage<Vec<u8>>> {
         let mut buffer = [0; 1000];
         let reply_len = socket.recv(&mut buffer, 0).unwrap();
         let nl_msg = NetlinkMessage::deserialize(&buffer[..reply_len]);
-        let genl_msg =
-            GenericNetlinkMessage::deserialize(nl_msg.payload).unwrap();
+        let genl_msg = GenericNetlinkMessage::deserialize(nl_msg.payload).unwrap();
         NetlinkMessage::new(
             nl_msg.ty,
             nl_msg.flags,
@@ -76,8 +73,7 @@ impl<'a> NetlinkMessage<&'a [u8]> {
     pub fn deserialize(buf: &'a [u8]) -> Self {
         let header_len = NLMSG_LENGTH(0) as usize;
         let (header, payload) = buf.split_at(header_len);
-        let header =
-            LayoutVerified::<_, nlmsghdr>::new(header).expect("invalid buffer");
+        let header = LayoutVerified::<_, nlmsghdr>::new(header).expect("invalid buffer");
         Self {
             ty: header.nlmsg_type,
             flags: header.nlmsg_flags,

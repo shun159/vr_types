@@ -31,29 +31,22 @@ impl FlowResponse {
         encoder.fresp_packets = self.packets;
         encoder.fresp_stats_oflow = self.stats_oflow;
         encoder.fresp_gen_id = self.gen_id;
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<FlowResponse, CodecError> {
         let decoder: vr_flow_response = vr_flow_response::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut fresp: FlowResponse = FlowResponse::default();
-                fresp.read_length = rxfer as usize;
-                fresp.op = decoder.fresp_op.try_into().unwrap();
-                fresp.rid = decoder.fresp_rid;
-                fresp.flags = decoder.fresp_flags;
-                fresp.index = decoder.fresp_index;
-                fresp.bytes = decoder.fresp_bytes;
-                fresp.packets = decoder.fresp_packets;
-                fresp.stats_oflow = decoder.fresp_stats_oflow;
-                fresp.gen_id = decoder.fresp_gen_id;
-                Ok(fresp)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut fresp: FlowResponse = FlowResponse::default();
+        fresp.read_length = rxfer as usize;
+        fresp.op = decoder.fresp_op.try_into().unwrap();
+        fresp.rid = decoder.fresp_rid;
+        fresp.flags = decoder.fresp_flags;
+        fresp.index = decoder.fresp_index;
+        fresp.bytes = decoder.fresp_bytes;
+        fresp.packets = decoder.fresp_packets;
+        fresp.stats_oflow = decoder.fresp_stats_oflow;
+        fresp.gen_id = decoder.fresp_gen_id;
+        Ok(fresp)
     }
 }

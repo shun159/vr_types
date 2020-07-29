@@ -31,28 +31,21 @@ impl VrfRequest {
         encoder.vrf_hbfl_vif_idx = self.hbfl_vif_idx;
         encoder.vrf_hbfr_vif_idx = self.hbfr_vif_idx;
         encoder.vrf_marker = self.marker;
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<VrfRequest, CodecError> {
         let decoder: vr_vrf_req = vr_vrf_req::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut vrf: VrfRequest = VrfRequest::default();
-                vrf.read_length = rxfer as usize;
-                vrf.op = decoder.h_op.try_into().unwrap();
-                vrf.rid = decoder.vrf_rid;
-                vrf.idx = decoder.vrf_idx;
-                vrf.flags = decoder.vrf_flags;
-                vrf.hbfl_vif_idx = decoder.vrf_hbfl_vif_idx;
-                vrf.hbfr_vif_idx = decoder.vrf_hbfr_vif_idx;
-                vrf.marker = decoder.vrf_marker;
-                Ok(vrf)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut vrf: VrfRequest = VrfRequest::default();
+        vrf.read_length = rxfer as usize;
+        vrf.op = decoder.h_op.try_into().unwrap();
+        vrf.rid = decoder.vrf_rid;
+        vrf.idx = decoder.vrf_idx;
+        vrf.flags = decoder.vrf_flags;
+        vrf.hbfl_vif_idx = decoder.vrf_hbfl_vif_idx;
+        vrf.hbfr_vif_idx = decoder.vrf_hbfr_vif_idx;
+        vrf.marker = decoder.vrf_marker;
+        Ok(vrf)
     }
 }

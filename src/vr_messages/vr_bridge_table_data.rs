@@ -27,27 +27,20 @@ impl BridgeTableData {
         encoder.btable_size = self.size;
         encoder.btable_dev = self.dev;
         encoder.btable_file_path = Self::write_cstring(&self.file_path);
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<BridgeTableData, CodecError> {
         let decoder: vr_bridge_table_data = vr_bridge_table_data::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut btable: BridgeTableData = BridgeTableData::default();
-                btable.read_length = rxfer as usize;
-                btable.op = decoder.btable_op.try_into().unwrap();
-                btable.rid = decoder.btable_rid;
-                btable.size = decoder.btable_size;
-                btable.dev = decoder.btable_dev;
-                btable.file_path = Self::read_cstring(decoder.btable_file_path);
-                Ok(btable)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut btable: BridgeTableData = BridgeTableData::default();
+        btable.read_length = rxfer as usize;
+        btable.op = decoder.btable_op.try_into().unwrap();
+        btable.rid = decoder.btable_rid;
+        btable.size = decoder.btable_size;
+        btable.dev = decoder.btable_dev;
+        btable.file_path = Self::read_cstring(decoder.btable_file_path);
+        Ok(btable)
     }
 
     // private functions

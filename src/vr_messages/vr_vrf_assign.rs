@@ -29,28 +29,21 @@ impl VrfAssignRequest {
         encoder.var_vlan_id = self.vlan_id;
         encoder.var_marker = self.marker;
         encoder.var_nh_id = self.nh_id;
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<VrfAssignRequest, CodecError> {
         let decoder: vr_vrf_assign_req = vr_vrf_assign_req::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut var: VrfAssignRequest = VrfAssignRequest::default();
-                var.read_length = rxfer as usize;
-                var.op = decoder.h_op.try_into().unwrap();
-                var.rid = decoder.var_rid;
-                var.vif_index = decoder.var_vif_index;
-                var.vif_vrf = decoder.var_vif_vrf;
-                var.vlan_id = decoder.var_vlan_id;
-                var.marker = decoder.var_marker;
-                var.nh_id = decoder.var_nh_id;
-                Ok(var)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut var: VrfAssignRequest = VrfAssignRequest::default();
+        var.read_length = rxfer as usize;
+        var.op = decoder.h_op.try_into().unwrap();
+        var.rid = decoder.var_rid;
+        var.vif_index = decoder.var_vif_index;
+        var.vif_vrf = decoder.var_vif_vrf;
+        var.vlan_id = decoder.var_vlan_id;
+        var.marker = decoder.var_marker;
+        var.nh_id = decoder.var_nh_id;
+        Ok(var)
     }
 }

@@ -26,7 +26,7 @@
 
 # Maximum width of each line.
 # Default: 100
-max_width = 80
+max_width = 90
 
 # Ideal width of each line.
 # Default: 80
@@ -88,7 +88,7 @@ max_width = 80
 # Location of return type in function declaration.
 # Values: WithArgs | WithWhereClause
 # Default: WithArgs
-#   fn_return_indent = 
+#   fn_return_indent = WithWhereClause
 
 # If function argument parenthesis goes on a newline.
 # Default: true
@@ -97,7 +97,7 @@ max_width = 80
 # Argument density in functions.
 # Values: Compressed | Tall | CompressedIfEmpty | Vertical
 # Default: Tall
-#   fn_args_density = 
+# fn_args_density = CompressedIfEmpty
 
 # Layout of function arguments.
 # Values: Visual | Block | BlockAlways
@@ -180,7 +180,7 @@ max_width = 80
 # Indent on chain base.
 # Values: Inherit | Tabbed | Visual
 # Default: Tabbed
-#   chain_base_indent = 
+# chain_base_indent = Visual
 
 # Indentation of chain.
 # Values: Inherit | Tabbed | Visual

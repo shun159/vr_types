@@ -59,10 +59,7 @@ pub fn write_mac(mac_addr: MacAddress) -> *mut i8 {
 
 pub fn write_ip4(ip: Ipv4Addr) -> u32 {
     let v = ip.octets().to_vec();
-    ((v[0] as u32) << 24)
-        | ((v[1] as u32) << 16)
-        | ((v[2] as u32) << 8)
-        | (v[3] as u32)
+    ((v[0] as u32) << 24) | ((v[1] as u32) << 16) | ((v[2] as u32) << 8) | (v[3] as u32)
 }
 
 pub fn write_ip6(ip: Ipv6Addr) -> u128 {

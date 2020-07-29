@@ -28,8 +28,8 @@ impl<P: Serialize> Serialize for GenericNetlinkMessage<P> {
     fn serialize(&self, buf: &mut [u8]) {
         let header_len = GENL_HDRLEN as usize;
         let (header, payload) = buf.split_at_mut(header_len);
-        let mut header = LayoutVerified::<_, genlmsghdr>::new(header)
-            .expect("invalid buffer");
+        let mut header =
+            LayoutVerified::<_, genlmsghdr>::new(header).expect("invalid buffer");
         header.cmd = self.cmd;
         header.version = self.version;
         header.reserved = 0;
@@ -44,8 +44,8 @@ impl<'a> GenericNetlinkMessage<&'a [u8]> {
             return Err(InvalidBuffer::Header(buf.len()));
         }
         let (header, payload) = buf.split_at(header_len);
-        let header = LayoutVerified::<_, genlmsghdr>::new(header)
-            .expect("invalid buffer");
+        let header =
+            LayoutVerified::<_, genlmsghdr>::new(header).expect("invalid buffer");
         Ok(Self {
             cmd: header.cmd,
             version: header.version,
@@ -56,8 +56,6 @@ impl<'a> GenericNetlinkMessage<&'a [u8]> {
 
 #[derive(Debug, Error)]
 pub enum InvalidBuffer {
-    #[error(
-        "insufficient buffer for generic netlink header, got buffer size {0}"
-    )]
+    #[error("insufficient buffer for generic netlink header, got buffer size {0}")]
     Header(usize),
 }

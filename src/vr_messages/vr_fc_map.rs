@@ -37,44 +37,25 @@ impl FcMapRequest {
         encoder.fmr_queue_id = utils::into_mut_ptr(&self.queue_id);
         encoder.fmr_queue_id_size = self.queue_id.len() as u32;
         encoder.fmr_marker = self.marker;
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<FcMapRequest, CodecError> {
         let decoder: vr_fc_map_req = vr_fc_map_req::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut fmr: FcMapRequest = FcMapRequest::default();
-                fmr.read_length = rxfer as usize;
-                fmr.op = decoder.h_op.try_into().unwrap();
-                fmr.rid = decoder.fmr_rid;
-                fmr.id = utils::free_buf(
-                    decoder.fmr_id,
-                    decoder.fmr_id_size as usize,
-                );
-                fmr.dscp = utils::free_buf(
-                    decoder.fmr_dscp,
-                    decoder.fmr_dscp_size as usize,
-                );
-                fmr.mpls_qos = utils::free_buf(
-                    decoder.fmr_mpls_qos,
-                    decoder.fmr_mpls_qos_size as usize,
-                );
-                fmr.dotonep = utils::free_buf(
-                    decoder.fmr_dotonep,
-                    decoder.fmr_dotonep_size as usize,
-                );
-                fmr.queue_id = utils::free_buf(
-                    decoder.fmr_queue_id,
-                    decoder.fmr_queue_id_size as usize,
-                );
-                fmr.marker = decoder.fmr_marker;
-                Ok(fmr)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut fmr: FcMapRequest = FcMapRequest::default();
+        fmr.read_length = rxfer as usize;
+        fmr.op = decoder.h_op.try_into().unwrap();
+        fmr.rid = decoder.fmr_rid;
+        fmr.id = utils::free_buf(decoder.fmr_id, decoder.fmr_id_size as usize);
+        fmr.dscp = utils::free_buf(decoder.fmr_dscp, decoder.fmr_dscp_size as usize);
+        fmr.mpls_qos =
+            utils::free_buf(decoder.fmr_mpls_qos, decoder.fmr_mpls_qos_size as usize);
+        fmr.dotonep =
+            utils::free_buf(decoder.fmr_dotonep, decoder.fmr_dotonep_size as usize);
+        fmr.queue_id =
+            utils::free_buf(decoder.fmr_queue_id, decoder.fmr_queue_id_size as usize);
+        fmr.marker = decoder.fmr_marker;
+        Ok(fmr)
     }
 }

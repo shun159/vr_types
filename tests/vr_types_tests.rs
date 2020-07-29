@@ -148,10 +148,7 @@ mod test_encode_types {
     fn vr_flow_table_data() {
         let req = vr_flow_table_data::new();
         let res = req.write().unwrap();
-        assert_eq!(
-            "vr_flow_table_data",
-            sandesh_info_t::sname_from_bytes(&res)
-        );
+        assert_eq!("vr_flow_table_data", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(163, res.len())
     }
 
@@ -170,10 +167,7 @@ mod test_encode_types {
     fn vr_hugepage_config() {
         let req = vr_hugepage_config::new();
         let res = req.write().unwrap();
-        assert_eq!(
-            "vr_hugepage_config",
-            sandesh_info_t::sname_from_bytes(&res)
-        );
+        assert_eq!("vr_hugepage_config", sandesh_info_t::sname_from_bytes(&res));
         assert_eq!(77, res.len())
     }
 

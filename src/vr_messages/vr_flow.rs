@@ -25,10 +25,8 @@ pub const VR_FLOW_FLAG_SNAT: u16 = 0x2;
 pub const VR_FLOW_FLAG_SPAT: u16 = 0x4;
 pub const VR_FLOW_FLAG_DNAT: u16 = 0x8;
 pub const VR_FLOW_FLAG_DPAT: u16 = 0x10;
-pub const VR_FLOW_FLAG_NAT_MASK: u16 = (VR_FLOW_FLAG_SNAT
-    | VR_FLOW_FLAG_SPAT
-    | VR_FLOW_FLAG_DNAT
-    | VR_FLOW_FLAG_DPAT);
+pub const VR_FLOW_FLAG_NAT_MASK: u16 =
+    VR_FLOW_FLAG_SNAT | VR_FLOW_FLAG_SPAT | VR_FLOW_FLAG_DNAT | VR_FLOW_FLAG_DPAT;
 
 // for TRAP
 pub const VR_FLOW_FLAG_TRAP_ECMP: u16 = 0x20;
@@ -134,42 +132,26 @@ impl TryFrom<u16> for FlowDropReason {
 
     fn try_from(v: u16) -> Result<Self, Self::Error> {
         match v {
-            x if x == FlowDropReason::Unknown as u16 => {
-                Ok(FlowDropReason::Unknown)
-            }
+            x if x == FlowDropReason::Unknown as u16 => Ok(FlowDropReason::Unknown),
             x if x == FlowDropReason::UnavailableIntf as u16 => {
                 Ok(FlowDropReason::UnavailableIntf)
             }
-            x if x == FlowDropReason::Ipv4FwdDis as u16 => {
-                Ok(FlowDropReason::Ipv4FwdDis)
-            }
+            x if x == FlowDropReason::Ipv4FwdDis as u16 => Ok(FlowDropReason::Ipv4FwdDis),
             x if x == FlowDropReason::UnavailableVrf as u16 => {
                 Ok(FlowDropReason::UnavailableVrf)
             }
-            x if x == FlowDropReason::NoSrcRoute as u16 => {
-                Ok(FlowDropReason::NoSrcRoute)
-            }
-            x if x == FlowDropReason::NoDstRoute as u16 => {
-                Ok(FlowDropReason::NoDstRoute)
-            }
-            x if x == FlowDropReason::AuditEntry as u16 => {
-                Ok(FlowDropReason::AuditEntry)
-            }
-            x if x == FlowDropReason::VrfChange as u16 => {
-                Ok(FlowDropReason::VrfChange)
-            }
+            x if x == FlowDropReason::NoSrcRoute as u16 => Ok(FlowDropReason::NoSrcRoute),
+            x if x == FlowDropReason::NoDstRoute as u16 => Ok(FlowDropReason::NoDstRoute),
+            x if x == FlowDropReason::AuditEntry as u16 => Ok(FlowDropReason::AuditEntry),
+            x if x == FlowDropReason::VrfChange as u16 => Ok(FlowDropReason::VrfChange),
             x if x == FlowDropReason::NoReverseFlow as u16 => {
                 Ok(FlowDropReason::NoReverseFlow)
             }
             x if x == FlowDropReason::ReverseFlowChange as u16 => {
                 Ok(FlowDropReason::ReverseFlowChange)
             }
-            x if x == FlowDropReason::NatChange as u16 => {
-                Ok(FlowDropReason::NatChange)
-            }
-            x if x == FlowDropReason::FlowLimit as u16 => {
-                Ok(FlowDropReason::FlowLimit)
-            }
+            x if x == FlowDropReason::NatChange as u16 => Ok(FlowDropReason::NatChange),
+            x if x == FlowDropReason::FlowLimit as u16 => Ok(FlowDropReason::FlowLimit),
             x if x == FlowDropReason::LinkLocalSrcNat as u16 => {
                 Ok(FlowDropReason::LinkLocalSrcNat)
             }
@@ -179,9 +161,7 @@ impl TryFrom<u16> for FlowDropReason {
             x if x == FlowDropReason::InvalidL2Flow as u16 => {
                 Ok(FlowDropReason::InvalidL2Flow)
             }
-            x if x == FlowDropReason::FlowOnTsn as u16 => {
-                Ok(FlowDropReason::FlowOnTsn)
-            }
+            x if x == FlowDropReason::FlowOnTsn as u16 => Ok(FlowDropReason::FlowOnTsn),
             x if x == FlowDropReason::NoMirrorEntry as u16 => {
                 Ok(FlowDropReason::NoMirrorEntry)
             }
@@ -197,23 +177,15 @@ impl TryFrom<u16> for FlowDropReason {
             x if x == FlowDropReason::FatFlowNatConflict as u16 => {
                 Ok(FlowDropReason::FatFlowNatConflict)
             }
-            x if x == FlowDropReason::Policy as u16 => {
-                Ok(FlowDropReason::Policy)
-            }
-            x if x == FlowDropReason::OutPolicy as u16 => {
-                Ok(FlowDropReason::OutPolicy)
-            }
+            x if x == FlowDropReason::Policy as u16 => Ok(FlowDropReason::Policy),
+            x if x == FlowDropReason::OutPolicy as u16 => Ok(FlowDropReason::OutPolicy),
             x if x == FlowDropReason::Sg as u16 => Ok(FlowDropReason::Sg),
             x if x == FlowDropReason::OutSg as u16 => Ok(FlowDropReason::OutSg),
-            x if x == FlowDropReason::ReverseSg as u16 => {
-                Ok(FlowDropReason::ReverseSg)
-            }
+            x if x == FlowDropReason::ReverseSg as u16 => Ok(FlowDropReason::ReverseSg),
             x if x == FlowDropReason::ReverseOutSg as u16 => {
                 Ok(FlowDropReason::ReverseOutSg)
             }
-            x if x == FlowDropReason::FwPolicy as u16 => {
-                Ok(FlowDropReason::FwPolicy)
-            }
+            x if x == FlowDropReason::FwPolicy as u16 => Ok(FlowDropReason::FwPolicy),
             x if x == FlowDropReason::OutFwPolicy as u16 => {
                 Ok(FlowDropReason::OutFwPolicy)
             }
@@ -352,8 +324,7 @@ impl FlowRequest {
         let mirror_sip = Self::write_ip(&Some(self.mirror_sip)).1 as u32;
         encoder.fr_mir_sip = mirror_sip;
         encoder.fr_mir_sport = self.mirror_sport;
-        encoder.fr_pcap_meta_data =
-            utils::into_mut_ptr(&self.pcap_meta_data) as *mut i8;
+        encoder.fr_pcap_meta_data = utils::into_mut_ptr(&self.pcap_meta_data) as *mut i8;
         encoder.fr_pcap_meta_data_size = self.pcap_meta_data.len() as u32;
         encoder.fr_mir_vrf = self.mirror_vrf;
         encoder.fr_ecmp_nh_index = self.ecmp_nh_index;
@@ -374,70 +345,62 @@ impl FlowRequest {
         encoder.fr_ttl = self.ttl;
         encoder.fr_extflags = self.extflags;
         encoder.fr_flags1 = self.flags1;
-
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<FlowRequest, CodecError> {
         let decoder: vr_flow_req = vr_flow_req::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut fr: FlowRequest = FlowRequest::default();
-                fr.read_length = rxfer as usize;
-                fr.op = decoder.fr_op.try_into().unwrap();
-                fr.rid = decoder.fr_rid;
-                fr.index = decoder.fr_index;
-                fr.action = decoder.fr_action.try_into().unwrap();
-                fr.rindex = decoder.fr_rindex;
-                fr.family = decoder.fr_family;
-                fr.flow_sip = Self::read_ip(
-                    decoder.fr_family,
-                    decoder.fr_flow_sip_u,
-                    decoder.fr_flow_sip_l,
-                );
-                fr.flow_dip = Self::read_ip(
-                    decoder.fr_family,
-                    decoder.fr_flow_dip_u,
-                    decoder.fr_flow_dip_l,
-                );
-                fr.flow_sport = decoder.fr_flow_sport;
-                fr.flow_dport = decoder.fr_flow_dport;
-                fr.flow_proto = decoder.fr_flow_proto;
-                fr.flow_vrf = decoder.fr_flow_vrf;
-                fr.flow_dvrf = decoder.fr_flow_dvrf;
-                fr.mirror_id = decoder.fr_mir_id;
-                fr.sec_mirror_id = decoder.fr_sec_mir_id;
-                fr.mirror_sip = Self::read_ip4(decoder.fr_mir_sip as u128);
-                fr.mirror_sport = decoder.fr_mir_sport;
-                fr.ecmp_nh_index = decoder.fr_ecmp_nh_index;
-                fr.src_nh_index = decoder.fr_src_nh_index;
-                fr.flow_nh_id = decoder.fr_flow_nh_id;
-                fr.drop_reason = decoder.fr_drop_reason.try_into().unwrap();
-                fr.gen_id = decoder.fr_gen_id;
-                fr.reverse_flow_sip = Self::read_ip(
-                    decoder.fr_family,
-                    decoder.fr_rflow_sip_u,
-                    decoder.fr_rflow_sip_l,
-                );
-                fr.reverse_flow_dip = Self::read_ip(
-                    decoder.fr_family,
-                    decoder.fr_rflow_dip_u,
-                    decoder.fr_rflow_dip_l,
-                );
-                fr.reverse_flow_nh_id = decoder.fr_rflow_nh_id;
-                fr.reverse_flow_sport = decoder.fr_rflow_sport;
-                fr.reverse_flow_dport = decoder.fr_rflow_dport;
-                fr.qos_id = decoder.fr_qos_id;
-                fr.ttl = decoder.fr_ttl;
-                fr.extflags = decoder.fr_extflags;
-                fr.flags1 = decoder.fr_flags1;
-                Ok(fr)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut fr: FlowRequest = FlowRequest::default();
+        fr.read_length = rxfer as usize;
+        fr.op = decoder.fr_op.try_into().unwrap();
+        fr.rid = decoder.fr_rid;
+        fr.index = decoder.fr_index;
+        fr.action = decoder.fr_action.try_into().unwrap();
+        fr.rindex = decoder.fr_rindex;
+        fr.family = decoder.fr_family;
+        fr.flow_sip = Self::read_ip(
+            decoder.fr_family,
+            decoder.fr_flow_sip_u,
+            decoder.fr_flow_sip_l,
+        );
+        fr.flow_dip = Self::read_ip(
+            decoder.fr_family,
+            decoder.fr_flow_dip_u,
+            decoder.fr_flow_dip_l,
+        );
+        fr.flow_sport = decoder.fr_flow_sport;
+        fr.flow_dport = decoder.fr_flow_dport;
+        fr.flow_proto = decoder.fr_flow_proto;
+        fr.flow_vrf = decoder.fr_flow_vrf;
+        fr.flow_dvrf = decoder.fr_flow_dvrf;
+        fr.mirror_id = decoder.fr_mir_id;
+        fr.sec_mirror_id = decoder.fr_sec_mir_id;
+        fr.mirror_sip = Self::read_ip4(decoder.fr_mir_sip as u128);
+        fr.mirror_sport = decoder.fr_mir_sport;
+        fr.ecmp_nh_index = decoder.fr_ecmp_nh_index;
+        fr.src_nh_index = decoder.fr_src_nh_index;
+        fr.flow_nh_id = decoder.fr_flow_nh_id;
+        fr.drop_reason = decoder.fr_drop_reason.try_into().unwrap();
+        fr.gen_id = decoder.fr_gen_id;
+        fr.reverse_flow_sip = Self::read_ip(
+            decoder.fr_family,
+            decoder.fr_rflow_sip_u,
+            decoder.fr_rflow_sip_l,
+        );
+        fr.reverse_flow_dip = Self::read_ip(
+            decoder.fr_family,
+            decoder.fr_rflow_dip_u,
+            decoder.fr_rflow_dip_l,
+        );
+        fr.reverse_flow_nh_id = decoder.fr_rflow_nh_id;
+        fr.reverse_flow_sport = decoder.fr_rflow_sport;
+        fr.reverse_flow_dport = decoder.fr_rflow_dport;
+        fr.qos_id = decoder.fr_qos_id;
+        fr.ttl = decoder.fr_ttl;
+        fr.extflags = decoder.fr_extflags;
+        fr.flags1 = decoder.fr_flags1;
+        Ok(fr)
     }
 
     fn write_ip(ip: &Option<IpAddr>) -> (u64, u64) {
@@ -449,8 +412,7 @@ impl FlowRequest {
             }
             Some(IpAddr::V6(ip)) => {
                 let ip = utils::write_ip6(*ip);
-                let ip_u =
-                    ((ip & 0xffffffffffffffff_0000000000000000) >> 64) as u64;
+                let ip_u = ((ip & 0xffffffffffffffff_0000000000000000) >> 64) as u64;
                 let ip_l = (ip & 0x0000000000000000_ffffffffffffffff) as u64;
                 (ip_u, ip_l)
             }

@@ -87,94 +87,90 @@ pub enum Message {
 impl Message {
     pub fn from_bytes(buf: Vec<u8>) -> Result<Message, CodecError> {
         match buf.clone().try_into().unwrap() {
-            MessageType::BridgeTableData => match BridgeTableData::read(buf) {
-                Ok(req) => Ok(Message::BridgeTableData(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::DropStats => match DropStats::read(buf) {
-                Ok(req) => Ok(Message::DropStats(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::FcMapRequest => match FcMapRequest::read(buf) {
-                Ok(req) => Ok(Message::FcMapRequest(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::FlowResponse => match FlowResponse::read(buf) {
-                Ok(req) => Ok(Message::FlowResponse(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::FlowRequest => match FlowRequest::read(buf) {
-                Ok(req) => Ok(Message::FlowRequest(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::FlowTableData => match FlowTableData::read(buf) {
-                Ok(req) => Ok(Message::FlowTableData(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::HugepageConfig => match HugepageConfig::read(buf) {
-                Ok(req) => Ok(Message::HugepageConfig(req)),
-                Err(e) => Err(e),
-            },
+            MessageType::BridgeTableData => {
+                let req = BridgeTableData::read(buf)?;
+                Ok(Message::BridgeTableData(req))
+            }
+            MessageType::DropStats => {
+                let req = DropStats::read(buf)?;
+                Ok(Message::DropStats(req))
+            }
+            MessageType::FcMapRequest => {
+                let req = FcMapRequest::read(buf)?;
+                Ok(Message::FcMapRequest(req))
+            }
+            MessageType::FlowResponse => {
+                let req = FlowResponse::read(buf)?;
+                Ok(Message::FlowResponse(req))
+            }
+            MessageType::FlowRequest => {
+                let req = FlowRequest::read(buf)?;
+                Ok(Message::FlowRequest(req))
+            }
+            MessageType::FlowTableData => {
+                let req = FlowTableData::read(buf)?;
+                Ok(Message::FlowTableData(req))
+            }
+            MessageType::HugepageConfig => {
+                let req = HugepageConfig::read(buf)?;
+                Ok(Message::HugepageConfig(req))
+            }
             MessageType::InterfaceRequest => {
-                match InterfaceRequest::read(buf) {
-                    Ok(req) => Ok(Message::InterfaceRequest(req)),
-                    Err(e) => Err(e),
-                }
+                let req = InterfaceRequest::read(buf)?;
+                Ok(Message::InterfaceRequest(req))
             }
-            MessageType::MemStatsRequest => match MemStatsRequest::read(buf) {
-                Ok(req) => Ok(Message::MemStatsRequest(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::MirrorRequest => match MirrorRequest::read(buf) {
-                Ok(req) => Ok(Message::MirrorRequest(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::MplsRequest => match MplsRequest::read(buf) {
-                Ok(req) => Ok(Message::MplsRequest(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::NexthopRequest => match NexthopRequest::read(buf) {
-                Ok(req) => Ok(Message::NexthopRequest(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::PktDropLog => match PktDropLog::read(buf) {
-                Ok(req) => Ok(Message::PktDropLog(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::QosMapRequest => match QosMapRequest::read(buf) {
-                Ok(req) => Ok(Message::QosMapRequest(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::VrResponse => match VrResponse::read(buf) {
-                Ok(req) => Ok(Message::VrResponse(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::RouteRequest => match RouteRequest::read(buf) {
-                Ok(req) => Ok(Message::RouteRequest(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::VrfRequest => match VrfRequest::read(buf) {
-                Ok(req) => Ok(Message::VrfRequest(req)),
-                Err(e) => Err(e),
-            },
+            MessageType::MemStatsRequest => {
+                let req = MemStatsRequest::read(buf)?;
+                Ok(Message::MemStatsRequest(req))
+            }
+            MessageType::MirrorRequest => {
+                let req = MirrorRequest::read(buf)?;
+                Ok(Message::MirrorRequest(req))
+            }
+            MessageType::MplsRequest => {
+                let req = MplsRequest::read(buf)?;
+                Ok(Message::MplsRequest(req))
+            }
+            MessageType::NexthopRequest => {
+                let req = NexthopRequest::read(buf)?;
+                Ok(Message::NexthopRequest(req))
+            }
+            MessageType::PktDropLog => {
+                let req = PktDropLog::read(buf)?;
+                Ok(Message::PktDropLog(req))
+            }
+            MessageType::QosMapRequest => {
+                let req = QosMapRequest::read(buf)?;
+                Ok(Message::QosMapRequest(req))
+            }
+            MessageType::VrResponse => {
+                let req = VrResponse::read(buf)?;
+                Ok(Message::VrResponse(req))
+            }
+            MessageType::RouteRequest => {
+                let req = RouteRequest::read(buf)?;
+                Ok(Message::RouteRequest(req))
+            }
+            MessageType::VrfRequest => {
+                let req = VrfRequest::read(buf)?;
+                Ok(Message::VrfRequest(req))
+            }
             MessageType::VrfAssignRequest => {
-                match VrfAssignRequest::read(buf) {
-                    Ok(req) => Ok(Message::VrfAssignRequest(req)),
-                    Err(e) => Err(e),
-                }
+                let req = VrfAssignRequest::read(buf)?;
+                Ok(Message::VrfAssignRequest(req))
             }
-            MessageType::VrfStatsRequest => match VrfStatsRequest::read(buf) {
-                Ok(req) => Ok(Message::VrfStatsRequest(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::VxlanRequest => match VxlanRequest::read(buf) {
-                Ok(req) => Ok(Message::VxlanRequest(req)),
-                Err(e) => Err(e),
-            },
-            MessageType::VrouterOps => match VrouterOps::read(buf) {
-                Ok(req) => Ok(Message::VrouterOps(req)),
-                Err(e) => Err(e),
-            },
+            MessageType::VrfStatsRequest => {
+                let req = VrfStatsRequest::read(buf)?;
+                Ok(Message::VrfStatsRequest(req))
+            }
+            MessageType::VxlanRequest => {
+                let req = VxlanRequest::read(buf)?;
+                Ok(Message::VxlanRequest(req))
+            }
+            MessageType::VrouterOps => {
+                let req = VrouterOps::read(buf)?;
+                Ok(Message::VrouterOps(req))
+            }
             MessageType::Unknown => Err(CodecError::UnknownMessageType),
         }
     }

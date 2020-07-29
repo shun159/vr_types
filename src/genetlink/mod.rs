@@ -20,16 +20,11 @@ pub const NETLINK_VERSION: u8 = 2;
 
 pub fn resolve_family_id(name: &str) -> Result<u16, NetlinkError> {
     let cstr_name = &CString::new(name).unwrap();
-    let nl_attr =
-        &[NetlinkAttr::new(CTRL_ATTR_FAMILY_NAME, cstr_name)] as &[_];
+    let nl_attr = &[NetlinkAttr::new(CTRL_ATTR_FAMILY_NAME, cstr_name)] as &[_];
     let nl_msg = NetlinkMessage::new(
         GENL_ID_CTRL,
         NLM_F_REQUEST,
-        GenericNetlinkMessage::new(
-            CTRL_CMD_GETFAMILY,
-            NETLINK_VERSION,
-            nl_attr,
-        ),
+        GenericNetlinkMessage::new(CTRL_CMD_GETFAMILY, NETLINK_VERSION, nl_attr),
     );
     let socket = &Socket::new(Generic).unwrap();
     nl_msg.send_nl(socket);
@@ -44,11 +39,8 @@ pub fn resolve_family_id(name: &str) -> Result<u16, NetlinkError> {
     Ok(0)
 }
 
-pub fn send_sandesh_msg(
-    payload: Message,
-) -> Result<Vec<Message>, MessageHandleError> {
-    let nl_attr =
-        &[NetlinkAttr::new(NL_ATTR_VR_MESSAGE_PROTOCOL, payload)] as &[_];
+pub fn send_sandesh_msg(payload: Message) -> Result<Vec<Message>, MessageHandleError> {
+    let nl_attr = &[NetlinkAttr::new(NL_ATTR_VR_MESSAGE_PROTOCOL, payload)] as &[_];
     let nl_msg = NetlinkMessage::new(
         resolve_family_id(VROUTER_GENETLINK_FAMILY_NAME).unwrap(),
         NLM_F_REQUEST,
@@ -68,9 +60,7 @@ pub fn send_sandesh_msg(
 
 // private functions
 
-fn handle_sandesh_reply(
-    buf: Vec<u8>,
-) -> Result<Vec<Message>, MessageHandleError> {
+fn handle_sandesh_reply(buf: Vec<u8>) -> Result<Vec<Message>, MessageHandleError> {
     let vec: &mut Vec<Message> = &mut Vec::new();
     let resp = decode_header_message(&buf)?;
     for message in decode_messages(resp.read_length(), &buf[..]) {
@@ -81,9 +71,7 @@ fn handle_sandesh_reply(
 
 fn decode_header_message(buf: &Vec<u8>) -> Result<Message, MessageHandleError> {
     match Message::from_bytes(buf.to_vec())? {
-        Message::VrResponse(resp) if resp.code == 0 => {
-            Ok(Message::VrResponse(resp))
-        }
+        Message::VrResponse(resp) if resp.code == 0 => Ok(Message::VrResponse(resp)),
         Message::VrResponse(resp) if resp.code.abs() == libc::ENODEV => {
             Err(MessageHandleError::RequestError(OperationError::ENODEV))
         }
@@ -96,11 +84,9 @@ fn decode_header_message(buf: &Vec<u8>) -> Result<Message, MessageHandleError> {
         Message::VrResponse(resp) if resp.code.abs() == libc::EINVAL => {
             Err(MessageHandleError::RequestError(OperationError::EINVAL))
         }
-        Message::VrResponse(resp) if resp.code < 0 => {
-            Err(MessageHandleError::RequestError(OperationError::UNKNOWN(
-                resp.code,
-            )))
-        }
+        Message::VrResponse(resp) if resp.code < 0 => Err(
+            MessageHandleError::RequestError(OperationError::UNKNOWN(resp.code)),
+        ),
         _ => Err(MessageHandleError::MessageOutOfOrder),
     }
 }

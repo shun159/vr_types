@@ -42,49 +42,33 @@ impl QosMapRequest {
         encoder.qmr_dotonep_fc_id = utils::into_mut_ptr(&self.dotonep_fc_id);
         encoder.qmr_dotonep_fc_id_size = self.dotonep_fc_id.len() as u32;
         encoder.qmr_marker = self.marker;
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<QosMapRequest, CodecError> {
         let decoder: vr_qos_map_req = vr_qos_map_req::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut qmr: QosMapRequest = QosMapRequest::default();
-                qmr.read_length = rxfer as usize;
-                qmr.op = decoder.h_op.try_into().unwrap();
-                qmr.rid = decoder.qmr_rid;
-                qmr.dscp = utils::free_buf(
-                    decoder.qmr_dscp,
-                    decoder.qmr_dscp_size as usize,
-                );
-                qmr.dscp_fc_id = utils::free_buf(
-                    decoder.qmr_dscp_fc_id,
-                    decoder.qmr_dscp_fc_id_size as usize,
-                );
-                qmr.mpls_qos = utils::free_buf(
-                    decoder.qmr_mpls_qos,
-                    decoder.qmr_mpls_qos_size as usize,
-                );
-                qmr.mpls_qos_fc_id = utils::free_buf(
-                    decoder.qmr_mpls_qos_fc_id,
-                    decoder.qmr_mpls_qos_fc_id_size as usize,
-                );
-                qmr.dotonep = utils::free_buf(
-                    decoder.qmr_dotonep,
-                    decoder.qmr_dotonep_size as usize,
-                );
-                qmr.dotonep_fc_id = utils::free_buf(
-                    decoder.qmr_dotonep_fc_id,
-                    decoder.qmr_dotonep_fc_id_size as usize,
-                );
-                qmr.id = decoder.qmr_id;
-                qmr.marker = decoder.qmr_marker;
-                Ok(qmr)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut qmr: QosMapRequest = QosMapRequest::default();
+        qmr.read_length = rxfer as usize;
+        qmr.op = decoder.h_op.try_into().unwrap();
+        qmr.rid = decoder.qmr_rid;
+        qmr.dscp = utils::free_buf(decoder.qmr_dscp, decoder.qmr_dscp_size as usize);
+        qmr.dscp_fc_id =
+            utils::free_buf(decoder.qmr_dscp_fc_id, decoder.qmr_dscp_fc_id_size as usize);
+        qmr.mpls_qos =
+            utils::free_buf(decoder.qmr_mpls_qos, decoder.qmr_mpls_qos_size as usize);
+        qmr.mpls_qos_fc_id = utils::free_buf(
+            decoder.qmr_mpls_qos_fc_id,
+            decoder.qmr_mpls_qos_fc_id_size as usize,
+        );
+        qmr.dotonep =
+            utils::free_buf(decoder.qmr_dotonep, decoder.qmr_dotonep_size as usize);
+        qmr.dotonep_fc_id = utils::free_buf(
+            decoder.qmr_dotonep_fc_id,
+            decoder.qmr_dotonep_fc_id_size as usize,
+        );
+        qmr.id = decoder.qmr_id;
+        qmr.marker = decoder.qmr_marker;
+        Ok(qmr)
     }
 }

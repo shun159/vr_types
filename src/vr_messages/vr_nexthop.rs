@@ -211,81 +211,61 @@ impl NexthopRequest {
             libc::ETH_ALEN as u32
         };
         encoder.nhr_transport_label = self.transport_label;
-
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<NexthopRequest, CodecError> {
         let decoder = vr_nexthop_req::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut nhr = NexthopRequest::default();
-                nhr.read_length = rxfer as usize;
-                nhr.op = decoder.h_op.try_into().unwrap();
-                nhr._type = decoder.nhr_type.try_into().unwrap();
-                nhr.family = decoder.nhr_family;
-                nhr.id = decoder.nhr_id;
-                nhr.rid = decoder.nhr_rid;
-                nhr.encap_oif_id = decoder.nhr_encap_oif_id;
-                nhr.encap_len = decoder.nhr_encap_len as usize;
-                nhr.encap_family = decoder.nhr_encap_family;
-                nhr.vrf = decoder.nhr_vrf;
-                nhr.tun_sip = Ipv4Addr::from(decoder.nhr_tun_sip);
-                nhr.tun_dip = Ipv4Addr::from(decoder.nhr_tun_dip);
-                nhr.tun_sport = decoder.nhr_tun_sport;
-                nhr.tun_dport = decoder.nhr_tun_dport;
-                nhr.ref_cnt = decoder.nhr_ref_cnt;
-                nhr.marker = decoder.nhr_marker;
-                nhr.flags = decoder.nhr_flags;
-                nhr.encap = utils::free_buf::<i8>(
-                    decoder.nhr_encap as *mut i8,
-                    nhr.encap_len,
-                );
-                nhr.nh_list = utils::free_buf::<i32>(
-                    decoder.nhr_nh_list as *mut i32,
-                    decoder.nhr_nh_list_size as usize,
-                );
-                nhr.nh_count = decoder.nhr_nh_count;
-                nhr.label_list = utils::free_buf::<i32>(
-                    decoder.nhr_label_list as *mut i32,
-                    decoder.nhr_label_list_size as usize,
-                );
+        let rxfer = decoder.read(&buf)?;
+        let mut nhr = NexthopRequest::default();
+        nhr.read_length = rxfer as usize;
+        nhr.op = decoder.h_op.try_into().unwrap();
+        nhr._type = decoder.nhr_type.try_into().unwrap();
+        nhr.family = decoder.nhr_family;
+        nhr.id = decoder.nhr_id;
+        nhr.rid = decoder.nhr_rid;
+        nhr.encap_oif_id = decoder.nhr_encap_oif_id;
+        nhr.encap_len = decoder.nhr_encap_len as usize;
+        nhr.encap_family = decoder.nhr_encap_family;
+        nhr.vrf = decoder.nhr_vrf;
+        nhr.tun_sip = Ipv4Addr::from(decoder.nhr_tun_sip);
+        nhr.tun_dip = Ipv4Addr::from(decoder.nhr_tun_dip);
+        nhr.tun_sport = decoder.nhr_tun_sport;
+        nhr.tun_dport = decoder.nhr_tun_dport;
+        nhr.ref_cnt = decoder.nhr_ref_cnt;
+        nhr.marker = decoder.nhr_marker;
+        nhr.flags = decoder.nhr_flags;
+        nhr.encap = utils::free_buf::<i8>(decoder.nhr_encap as *mut i8, nhr.encap_len);
+        nhr.nh_list = utils::free_buf::<i32>(
+            decoder.nhr_nh_list as *mut i32,
+            decoder.nhr_nh_list_size as usize,
+        );
+        nhr.nh_count = decoder.nhr_nh_count;
+        nhr.label_list = utils::free_buf::<i32>(
+            decoder.nhr_label_list as *mut i32,
+            decoder.nhr_label_list_size as usize,
+        );
 
-                // Decode tunnel in6addr
-                nhr.tun_sip6 = Self::read_tun_ip6(
-                    decoder.nhr_tun_sip6,
-                    decoder.nhr_tun_sip6_size,
-                );
+        // Decode tunnel in6addr
+        nhr.tun_sip6 =
+            Self::read_tun_ip6(decoder.nhr_tun_sip6, decoder.nhr_tun_sip6_size);
 
-                nhr.tun_dip6 = Self::read_tun_ip6(
-                    decoder.nhr_tun_dip6,
-                    decoder.nhr_tun_dip6_size,
-                );
+        nhr.tun_dip6 =
+            Self::read_tun_ip6(decoder.nhr_tun_dip6, decoder.nhr_tun_dip6_size);
 
-                nhr.ecmp_config_hash = decoder.nhr_ecmp_config_hash;
+        nhr.ecmp_config_hash = decoder.nhr_ecmp_config_hash;
 
-                // MAC Address
-                nhr.pbb_mac = utils::read_mac_addr(
-                    decoder.nhr_pbb_mac,
-                    decoder.nhr_pbb_mac_size,
-                );
+        // MAC Address
+        nhr.pbb_mac = utils::read_mac_addr(decoder.nhr_pbb_mac, decoder.nhr_pbb_mac_size);
 
-                nhr.encap_crypt_oif_id = decoder.nhr_encap_crypt_oif_id;
-                nhr.crypt_traffic = decoder.nhr_crypt_traffic;
-                nhr.crypt_path_available = decoder.nhr_crypt_path_available;
-                nhr.rw_dst_mac = utils::read_mac_addr(
-                    decoder.nhr_rw_dst_mac,
-                    decoder.nhr_rw_dst_mac_size,
-                );
-                nhr.transport_label = decoder.nhr_transport_label;
+        nhr.encap_crypt_oif_id = decoder.nhr_encap_crypt_oif_id;
+        nhr.crypt_traffic = decoder.nhr_crypt_traffic;
+        nhr.crypt_path_available = decoder.nhr_crypt_path_available;
+        nhr.rw_dst_mac =
+            utils::read_mac_addr(decoder.nhr_rw_dst_mac, decoder.nhr_rw_dst_mac_size);
+        nhr.transport_label = decoder.nhr_transport_label;
 
-                Ok(nhr)
-            }
-        }
+        Ok(nhr)
     }
 
     fn mac_to_vec(addr: MacAddress) -> *mut i8 {
@@ -322,8 +302,7 @@ impl NexthopRequest {
 
     fn read_tun_ip6(tun_ip6: *mut i8, ip6_size: u32) -> Ipv6Addr {
         if ip6_size == VR_IP6_ADDRESS_LEN {
-            let ip6_v: Vec<i8> =
-                utils::free_buf(tun_ip6, VR_IP6_ADDRESS_LEN as usize);
+            let ip6_v: Vec<i8> = utils::free_buf(tun_ip6, VR_IP6_ADDRESS_LEN as usize);
             Ipv6Addr::from(
                 ((ip6_v[0] as u128) << 120)
                     | ((ip6_v[1] as u128) << 112)

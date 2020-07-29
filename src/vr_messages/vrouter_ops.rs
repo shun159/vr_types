@@ -147,86 +147,74 @@ impl VrouterOps {
         encoder.vo_memory_alloc_checks = self.memory_alloc_checks;
         encoder.vo_priority_tagging = self.priority_tagging;
         encoder.vo_vif_bridge_entries = self.vif_bridge_entries;
-        encoder.vo_vif_oflow_bridge_entries =
-            self.vif_overflow_flow_bridge_entries;
+        encoder.vo_vif_oflow_bridge_entries = self.vif_overflow_flow_bridge_entries;
         encoder.vo_packet_dump = self.packet_dump;
         encoder.vo_pkt_droplog_bufsz = self.pkt_droplog_bufsz;
         encoder.vo_pkt_droplog_buf_en = self.pkt_droplog_buf_en;
         encoder.vo_pkt_droplog_en = self.pkt_droplog_en;
         encoder.vo_pkt_droplog_min_en = self.pkt_droplog_min_en;
         encoder.vo_close_flow_on_tcp_rst = self.close_flow_on_tcp_rst;
-
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<VrouterOps, CodecError> {
         let decoder: vrouter_ops = vrouter_ops::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut vo: VrouterOps = VrouterOps::default();
-                vo.read_length = rxfer as usize;
-                vo.op = decoder.h_op.try_into().unwrap();
-                vo.rid = decoder.vo_rid;
-                vo.mpls_labels = decoder.vo_mpls_labels;
-                vo.nexthops = decoder.vo_nexthops;
-                vo.bridge_entries = decoder.vo_bridge_entries;
-                vo.overflow_flow_bridge_entries =
-                    decoder.vo_oflow_bridge_entries;
-                vo.flow_entries = decoder.vo_flow_entries;
-                vo.overflow_flow_entries = decoder.vo_oflow_entries;
-                vo.interfaces = decoder.vo_interfaces;
-                vo.mirror_entries = decoder.vo_mirror_entries;
-                vo.vrfs = decoder.vo_vrfs;
-                vo.build_info = Self::read_cstring(decoder.vo_build_info);
-                vo.log_level = decoder.vo_log_level;
-                vo.log_type_enable = utils::free_buf(
-                    decoder.vo_log_type_enable,
-                    decoder.vo_log_type_enable_size as usize,
-                );
-                vo.log_type_disable = utils::free_buf(
-                    decoder.vo_log_type_disable,
-                    decoder.vo_log_type_disable_size as usize,
-                );
-                vo.perfr = decoder.vo_perfr;
-                vo.perfs = decoder.vo_perfs;
-                vo.from_vm_mss_adj = decoder.vo_from_vm_mss_adj;
-                vo.to_vm_mss_adj = decoder.vo_to_vm_mss_adj;
-                vo.perfr1 = decoder.vo_perfr1;
-                vo.perfr2 = decoder.vo_perfr2;
-                vo.perfr3 = decoder.vo_perfr3;
-                vo.perfp = decoder.vo_perfp;
-                vo.perfq1 = decoder.vo_perfq1;
-                vo.perfq2 = decoder.vo_perfq2;
-                vo.perfq3 = decoder.vo_perfq3;
-                vo.udp_coff = decoder.vo_udp_coff;
-                vo.flow_hold_limit = decoder.vo_flow_hold_limit;
-                vo.mudp = decoder.vo_mudp;
-                vo.flow_used_entries = decoder.vo_flow_used_entries;
-                vo.flow_used_overflow_entries = decoder.vo_flow_used_oentries;
-                vo.bridge_used_entries = decoder.vo_bridge_used_entries;
-                vo.bridge_used_overflow_entries =
-                    decoder.vo_bridge_used_oentries;
-                vo.burst_tokens = decoder.vo_burst_tokens;
-                vo.burst_interval = decoder.vo_burst_interval;
-                vo.burst_step = decoder.vo_burst_step;
-                vo.memory_alloc_checks = decoder.vo_memory_alloc_checks;
-                vo.priority_tagging = decoder.vo_priority_tagging;
-                vo.vif_bridge_entries = decoder.vo_vif_bridge_entries;
-                vo.vif_overflow_flow_bridge_entries =
-                    decoder.vo_vif_oflow_bridge_entries;
-                vo.packet_dump = decoder.vo_packet_dump;
-                vo.pkt_droplog_bufsz = decoder.vo_pkt_droplog_bufsz;
-                vo.pkt_droplog_buf_en = decoder.vo_pkt_droplog_buf_en;
-                vo.pkt_droplog_en = decoder.vo_pkt_droplog_en;
-                vo.pkt_droplog_min_en = decoder.vo_pkt_droplog_min_en;
-                vo.close_flow_on_tcp_rst = decoder.vo_close_flow_on_tcp_rst;
-                Ok(vo)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut vo: VrouterOps = VrouterOps::default();
+        vo.read_length = rxfer as usize;
+        vo.op = decoder.h_op.try_into().unwrap();
+        vo.rid = decoder.vo_rid;
+        vo.mpls_labels = decoder.vo_mpls_labels;
+        vo.nexthops = decoder.vo_nexthops;
+        vo.bridge_entries = decoder.vo_bridge_entries;
+        vo.overflow_flow_bridge_entries = decoder.vo_oflow_bridge_entries;
+        vo.flow_entries = decoder.vo_flow_entries;
+        vo.overflow_flow_entries = decoder.vo_oflow_entries;
+        vo.interfaces = decoder.vo_interfaces;
+        vo.mirror_entries = decoder.vo_mirror_entries;
+        vo.vrfs = decoder.vo_vrfs;
+        vo.build_info = Self::read_cstring(decoder.vo_build_info);
+        vo.log_level = decoder.vo_log_level;
+        vo.log_type_enable = utils::free_buf(
+            decoder.vo_log_type_enable,
+            decoder.vo_log_type_enable_size as usize,
+        );
+        vo.log_type_disable = utils::free_buf(
+            decoder.vo_log_type_disable,
+            decoder.vo_log_type_disable_size as usize,
+        );
+        vo.perfr = decoder.vo_perfr;
+        vo.perfs = decoder.vo_perfs;
+        vo.from_vm_mss_adj = decoder.vo_from_vm_mss_adj;
+        vo.to_vm_mss_adj = decoder.vo_to_vm_mss_adj;
+        vo.perfr1 = decoder.vo_perfr1;
+        vo.perfr2 = decoder.vo_perfr2;
+        vo.perfr3 = decoder.vo_perfr3;
+        vo.perfp = decoder.vo_perfp;
+        vo.perfq1 = decoder.vo_perfq1;
+        vo.perfq2 = decoder.vo_perfq2;
+        vo.perfq3 = decoder.vo_perfq3;
+        vo.udp_coff = decoder.vo_udp_coff;
+        vo.flow_hold_limit = decoder.vo_flow_hold_limit;
+        vo.mudp = decoder.vo_mudp;
+        vo.flow_used_entries = decoder.vo_flow_used_entries;
+        vo.flow_used_overflow_entries = decoder.vo_flow_used_oentries;
+        vo.bridge_used_entries = decoder.vo_bridge_used_entries;
+        vo.bridge_used_overflow_entries = decoder.vo_bridge_used_oentries;
+        vo.burst_tokens = decoder.vo_burst_tokens;
+        vo.burst_interval = decoder.vo_burst_interval;
+        vo.burst_step = decoder.vo_burst_step;
+        vo.memory_alloc_checks = decoder.vo_memory_alloc_checks;
+        vo.priority_tagging = decoder.vo_priority_tagging;
+        vo.vif_bridge_entries = decoder.vo_vif_bridge_entries;
+        vo.vif_overflow_flow_bridge_entries = decoder.vo_vif_oflow_bridge_entries;
+        vo.packet_dump = decoder.vo_packet_dump;
+        vo.pkt_droplog_bufsz = decoder.vo_pkt_droplog_bufsz;
+        vo.pkt_droplog_buf_en = decoder.vo_pkt_droplog_buf_en;
+        vo.pkt_droplog_en = decoder.vo_pkt_droplog_en;
+        vo.pkt_droplog_min_en = decoder.vo_pkt_droplog_min_en;
+        vo.close_flow_on_tcp_rst = decoder.vo_close_flow_on_tcp_rst;
+        Ok(vo)
     }
 
     // private functions

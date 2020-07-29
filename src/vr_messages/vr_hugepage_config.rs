@@ -35,43 +35,26 @@ impl HugepageConfig {
         encoder.vhp_file_paths_size = self.file_paths.len() as u32;
         encoder.vhp_file_path_sz = utils::into_mut_ptr(&self.file_path_size);
         encoder.vhp_file_path_sz_size = self.file_path_size.len() as u32;
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<HugepageConfig, CodecError> {
         let decoder: vr_hugepage_config = vr_hugepage_config::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut vhp: HugepageConfig = HugepageConfig::default();
-                vhp.read_length = rxfer as usize;
-                vhp.op = decoder.vhp_op.try_into().unwrap();
-                vhp.mem = utils::free_buf(
-                    decoder.vhp_mem,
-                    decoder.vhp_mem_size as usize,
-                );
-                vhp.psize = utils::free_buf(
-                    decoder.vhp_psize,
-                    decoder.vhp_psize_size as usize,
-                );
-                vhp.mem_size = utils::free_buf(
-                    decoder.vhp_mem_sz,
-                    decoder.vhp_mem_sz_size as usize,
-                );
-                vhp.file_paths = utils::free_buf(
-                    decoder.vhp_file_paths,
-                    decoder.vhp_file_paths_size as usize,
-                );
-                vhp.file_path_size = utils::free_buf(
-                    decoder.vhp_file_path_sz,
-                    decoder.vhp_file_path_sz_size as usize,
-                );
-                vhp.resp = decoder.vhp_resp;
-                Ok(vhp)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut vhp: HugepageConfig = HugepageConfig::default();
+        vhp.read_length = rxfer as usize;
+        vhp.op = decoder.vhp_op.try_into().unwrap();
+        vhp.mem = utils::free_buf(decoder.vhp_mem, decoder.vhp_mem_size as usize);
+        vhp.psize = utils::free_buf(decoder.vhp_psize, decoder.vhp_psize_size as usize);
+        vhp.mem_size =
+            utils::free_buf(decoder.vhp_mem_sz, decoder.vhp_mem_sz_size as usize);
+        vhp.file_paths =
+            utils::free_buf(decoder.vhp_file_paths, decoder.vhp_file_paths_size as usize);
+        vhp.file_path_size = utils::free_buf(
+            decoder.vhp_file_path_sz,
+            decoder.vhp_file_path_sz_size as usize,
+        );
+        vhp.resp = decoder.vhp_resp;
+        Ok(vhp)
     }
 }

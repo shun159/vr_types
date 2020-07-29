@@ -80,58 +80,48 @@ impl VrfStatsRequest {
         encoder.vsr_l2_receives = self.l2_receives;
         encoder.vsr_uuc_floods = self.uuc_floods;
         encoder.vsr_pbb_tunnels = self.pbb_tunnels;
-        encoder.vsr_udp_mpls_over_mpls_tunnels =
-            self.udp_mpls_over_mpls_tunnels;
-
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.vsr_udp_mpls_over_mpls_tunnels = self.udp_mpls_over_mpls_tunnels;
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<VrfStatsRequest, CodecError> {
         let decoder: vr_vrf_stats_req = vr_vrf_stats_req::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut vsr: VrfStatsRequest = VrfStatsRequest::default();
-                vsr.read_length = rxfer as usize;
-                vsr.op = decoder.h_op.try_into().unwrap();
-                vsr.rid = decoder.vsr_rid;
-                vsr.family = decoder.vsr_family;
-                vsr._type = decoder.vsr_type;
-                vsr.vrf = decoder.vsr_vrf;
-                vsr.discards = decoder.vsr_discards;
-                vsr.resolves = decoder.vsr_resolves;
-                vsr.receives = decoder.vsr_receives;
-                vsr.ecmp_composites = decoder.vsr_ecmp_composites;
-                vsr.l2_mcast_composites = decoder.vsr_l2_mcast_composites;
-                vsr.fabric_composites = decoder.vsr_fabric_composites;
-                vsr.udp_tunnels = decoder.vsr_udp_tunnels;
-                vsr.udp_mpls_tunnels = decoder.vsr_udp_mpls_tunnels;
-                vsr.gre_mpls_tunnels = decoder.vsr_gre_mpls_tunnels;
-                vsr.l2_encaps = decoder.vsr_l2_encaps;
-                vsr.encaps = decoder.vsr_encaps;
-                vsr.marker = decoder.vsr_marker;
-                vsr.gros = decoder.vsr_gros;
-                vsr.diags = decoder.vsr_diags;
-                vsr.encap_composites = decoder.vsr_encap_composites;
-                vsr.evpn_composites = decoder.vsr_evpn_composites;
-                vsr.vrf_translates = decoder.vsr_vrf_translates;
-                vsr.vxlan_tunnels = decoder.vsr_vxlan_tunnels;
-                vsr.arp_virtual_proxy = decoder.vsr_arp_virtual_proxy;
-                vsr.arp_virtual_stitch = decoder.vsr_arp_virtual_stitch;
-                vsr.arp_virtual_flood = decoder.vsr_arp_virtual_flood;
-                vsr.arp_physical_stitch = decoder.vsr_arp_physical_stitch;
-                vsr.arp_tor_proxy = decoder.vsr_arp_tor_proxy;
-                vsr.arp_physical_flood = decoder.vsr_arp_physical_flood;
-                vsr.l2_receives = decoder.vsr_l2_receives;
-                vsr.uuc_floods = decoder.vsr_uuc_floods;
-                vsr.pbb_tunnels = decoder.vsr_pbb_tunnels;
-                vsr.udp_mpls_over_mpls_tunnels =
-                    decoder.vsr_udp_mpls_over_mpls_tunnels;
-                Ok(vsr)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut vsr: VrfStatsRequest = VrfStatsRequest::default();
+        vsr.read_length = rxfer as usize;
+        vsr.op = decoder.h_op.try_into().unwrap();
+        vsr.rid = decoder.vsr_rid;
+        vsr.family = decoder.vsr_family;
+        vsr._type = decoder.vsr_type;
+        vsr.vrf = decoder.vsr_vrf;
+        vsr.discards = decoder.vsr_discards;
+        vsr.resolves = decoder.vsr_resolves;
+        vsr.receives = decoder.vsr_receives;
+        vsr.ecmp_composites = decoder.vsr_ecmp_composites;
+        vsr.l2_mcast_composites = decoder.vsr_l2_mcast_composites;
+        vsr.fabric_composites = decoder.vsr_fabric_composites;
+        vsr.udp_tunnels = decoder.vsr_udp_tunnels;
+        vsr.udp_mpls_tunnels = decoder.vsr_udp_mpls_tunnels;
+        vsr.gre_mpls_tunnels = decoder.vsr_gre_mpls_tunnels;
+        vsr.l2_encaps = decoder.vsr_l2_encaps;
+        vsr.encaps = decoder.vsr_encaps;
+        vsr.marker = decoder.vsr_marker;
+        vsr.gros = decoder.vsr_gros;
+        vsr.diags = decoder.vsr_diags;
+        vsr.encap_composites = decoder.vsr_encap_composites;
+        vsr.evpn_composites = decoder.vsr_evpn_composites;
+        vsr.vrf_translates = decoder.vsr_vrf_translates;
+        vsr.vxlan_tunnels = decoder.vsr_vxlan_tunnels;
+        vsr.arp_virtual_proxy = decoder.vsr_arp_virtual_proxy;
+        vsr.arp_virtual_stitch = decoder.vsr_arp_virtual_stitch;
+        vsr.arp_virtual_flood = decoder.vsr_arp_virtual_flood;
+        vsr.arp_physical_stitch = decoder.vsr_arp_physical_stitch;
+        vsr.arp_tor_proxy = decoder.vsr_arp_tor_proxy;
+        vsr.arp_physical_flood = decoder.vsr_arp_physical_flood;
+        vsr.l2_receives = decoder.vsr_l2_receives;
+        vsr.uuc_floods = decoder.vsr_uuc_floods;
+        vsr.pbb_tunnels = decoder.vsr_pbb_tunnels;
+        vsr.udp_mpls_over_mpls_tunnels = decoder.vsr_udp_mpls_over_mpls_tunnels;
+        Ok(vsr)
     }
 }

@@ -23,25 +23,18 @@ impl VxlanRequest {
         encoder.vxlanr_rid = self.rid;
         encoder.vxlanr_vnid = self.vnid;
         encoder.vxlanr_nhid = self.nhid;
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<VxlanRequest, CodecError> {
         let decoder: vr_vxlan_req = vr_vxlan_req::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut vxlanr: VxlanRequest = VxlanRequest::default();
-                vxlanr.read_length = rxfer as usize;
-                vxlanr.op = decoder.h_op.try_into().unwrap();
-                vxlanr.rid = decoder.vxlanr_rid;
-                vxlanr.vnid = decoder.vxlanr_vnid;
-                vxlanr.nhid = decoder.vxlanr_nhid;
-                Ok(vxlanr)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut vxlanr: VxlanRequest = VxlanRequest::default();
+        vxlanr.read_length = rxfer as usize;
+        vxlanr.op = decoder.h_op.try_into().unwrap();
+        vxlanr.rid = decoder.vxlanr_rid;
+        vxlanr.vnid = decoder.vxlanr_vnid;
+        vxlanr.nhid = decoder.vxlanr_nhid;
+        Ok(vxlanr)
     }
 }

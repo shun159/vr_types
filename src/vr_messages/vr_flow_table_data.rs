@@ -53,43 +53,35 @@ impl FlowTableData {
         encoder.ftable_hold_stat_size = self.hold_stat.len() as u32;
         encoder.ftable_burst_free_tokens = self.burst_free_tokens;
         encoder.ftable_hold_entries = self.hold_entries;
-
-        match encoder.write() {
-            Err(e) => Err(e),
-            Ok(v) => Ok(v),
-        }
+        encoder.write()
     }
 
     pub fn read(buf: Vec<u8>) -> Result<FlowTableData, CodecError> {
         let decoder: vr_flow_table_data = vr_flow_table_data::new();
-        match decoder.read(&buf) {
-            Err(e) => Err(e),
-            Ok(rxfer) => {
-                let mut ftable: FlowTableData = FlowTableData::default();
-                ftable.read_length = rxfer as usize;
-                ftable.op = decoder.ftable_op.try_into().unwrap();
-                ftable.rid = decoder.ftable_rid;
-                ftable.size = decoder.ftable_size;
-                ftable.dev = decoder.ftable_dev;
-                ftable.file_path = Self::read_cstring(decoder.ftable_file_path);
-                ftable.used_entries = decoder.ftable_used_entries;
-                ftable.processed = decoder.ftable_processed;
-                ftable.deleted = decoder.ftable_deleted;
-                ftable.added = decoder.ftable_added;
-                ftable.created = decoder.ftable_created;
-                ftable.changed = decoder.ftable_changed;
-                ftable.hold_oflows = decoder.ftable_hold_oflows;
-                ftable.cpus = decoder.ftable_cpus;
-                ftable.oflow_entries = decoder.ftable_oflow_entries;
-                ftable.hold_stat = utils::free_buf(
-                    decoder.ftable_hold_stat,
-                    decoder.ftable_hold_stat_size as usize,
-                );
-                ftable.burst_free_tokens = decoder.ftable_burst_free_tokens;
-                ftable.hold_entries = decoder.ftable_hold_entries;
-                Ok(ftable)
-            }
-        }
+        let rxfer = decoder.read(&buf)?;
+        let mut ftable: FlowTableData = FlowTableData::default();
+        ftable.read_length = rxfer as usize;
+        ftable.op = decoder.ftable_op.try_into().unwrap();
+        ftable.rid = decoder.ftable_rid;
+        ftable.size = decoder.ftable_size;
+        ftable.dev = decoder.ftable_dev;
+        ftable.file_path = Self::read_cstring(decoder.ftable_file_path);
+        ftable.used_entries = decoder.ftable_used_entries;
+        ftable.processed = decoder.ftable_processed;
+        ftable.deleted = decoder.ftable_deleted;
+        ftable.added = decoder.ftable_added;
+        ftable.created = decoder.ftable_created;
+        ftable.changed = decoder.ftable_changed;
+        ftable.hold_oflows = decoder.ftable_hold_oflows;
+        ftable.cpus = decoder.ftable_cpus;
+        ftable.oflow_entries = decoder.ftable_oflow_entries;
+        ftable.hold_stat = utils::free_buf(
+            decoder.ftable_hold_stat,
+            decoder.ftable_hold_stat_size as usize,
+        );
+        ftable.burst_free_tokens = decoder.ftable_burst_free_tokens;
+        ftable.hold_entries = decoder.ftable_hold_entries;
+        Ok(ftable)
     }
 
     // private functions
