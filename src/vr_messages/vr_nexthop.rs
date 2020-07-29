@@ -11,79 +11,90 @@ use eui48::MacAddress;
 use std::convert::{From, TryFrom, TryInto};
 use std::net::{Ipv4Addr, Ipv6Addr};
 
+pub const NH_DEAD: i8 = 0;
+pub const NH_RCV: i8 = 1;
+pub const NH_ENCAP: i8 = 2;
+pub const NH_TUNNEL: i8 = 3;
+pub const NH_RESOLVE: i8 = 4;
+pub const NH_DISCARD: i8 = 5;
+pub const NH_COMPOSITE: i8 = 6;
+pub const NH_VRF_TRANSLATE: i8 = 7;
+pub const NH_L2_RCV: i8 = 8;
+pub const NH_MAX: i8 = 9;
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum NhType {
-    Dead,
-    Rcv,
-    Encap,
-    Tunnel,
-    Resolve,
-    Discard,
-    Composite,
-    VrfTranslate,
-    L2Rcv,
-    Max,
+    Dead = NH_DEAD as isize,
+    Rcv = NH_RCV as isize,
+    Encap = NH_ENCAP as isize,
+    Tunnel = NH_TUNNEL as isize,
+    Resolve = NH_RESOLVE as isize,
+    Discard = NH_DISCARD as isize,
+    Composite = NH_COMPOSITE as isize,
+    VrfTranslate = NH_VRF_TRANSLATE as isize,
+    L2Rcv = NH_L2_RCV as isize,
+    Max = NH_MAX as isize,
 }
 
 impl TryFrom<i8> for NhType {
     type Error = ();
     fn try_from(v: i8) -> Result<Self, Self::Error> {
         match v {
-            x if x == NhType::Dead as i8 => Ok(NhType::Dead),
-            x if x == NhType::Rcv as i8 => Ok(NhType::Rcv),
-            x if x == NhType::Encap as i8 => Ok(NhType::Encap),
-            x if x == NhType::Tunnel as i8 => Ok(NhType::Tunnel),
-            x if x == NhType::Resolve as i8 => Ok(NhType::Resolve),
-            x if x == NhType::Discard as i8 => Ok(NhType::Discard),
-            x if x == NhType::Composite as i8 => Ok(NhType::Composite),
-            x if x == NhType::VrfTranslate as i8 => Ok(NhType::VrfTranslate),
-            x if x == NhType::L2Rcv as i8 => Ok(NhType::L2Rcv),
-            x if x == NhType::Max as i8 => Ok(NhType::Max),
+            NH_DEAD => Ok(NhType::Dead),
+            NH_RCV => Ok(NhType::Rcv),
+            NH_ENCAP => Ok(NhType::Encap),
+            NH_TUNNEL => Ok(NhType::Tunnel),
+            NH_RESOLVE => Ok(NhType::Resolve),
+            NH_DISCARD => Ok(NhType::Discard),
+            NH_COMPOSITE => Ok(NhType::Composite),
+            NH_VRF_TRANSLATE => Ok(NhType::VrfTranslate),
+            NH_L2_RCV => Ok(NhType::L2Rcv),
+            NH_MAX => Ok(NhType::Max),
             _ => Err(()),
         }
     }
 }
 
-// Defined in vr_nexthop.h
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
-pub enum NhEcmpConfigHash {
-    Proto = 0x01,
-    SrcIP = 0x02,
-    SrcPort = 0x04,
-    DstIP = 0x08,
-    DstPort = 0x10,
-}
+pub const NH_ECMP_CONFIG_HASH_BITS: i8 = 5;
+pub const NH_ECMP_CONFIG_HASH_MASK: i8 = (1 << NH_ECMP_CONFIG_HASH_BITS) - 1;
+pub const NH_ECMP_CONFIG_HASH_PROTO: i8 = 0x01;
+pub const NH_ECMP_CONFIG_HASH_SRC_IP: i8 = 0x02;
+pub const NH_ECMP_CONFIG_HASH_SRC_PORT: i8 = 0x04;
+pub const NH_ECMP_CONFIG_HASH_DST_IP: i8 = 0x08;
+pub const NH_ECMP_CONFIG_HASH_DST_PORT: i8 = 0x10;
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
-pub enum NhFlag {
-    Valid = 0x00000001,
-    PolicyEnabled = 0x00000002,
-    TunnelGre = 0x00000008,
-    TunnelUdp = 0x00000010,
-    Mcast = 0x00000020,
-    TunnelUdpMpls = 0x00000040,
-    TunnelVxlan = 0x00000080,
-    RelaxedPolicy = 0x00000100,
-    CompositeFabric = 0x00000200,
-    CompositeEcmp = 0x00000400,
-    CompositeLuEcmp = 0x00000800,
-    CompositeEvpn = 0x00001000,
-    CompositeEncap = 0x00002000,
-    CompositeTor = 0x00004000,
-    RouteLookUP = 0x00008000,
-    UnknownUcFlood = 0x00010000,
-    TunnelSipCopy = 0x00020000,
-    FlowLookup = 0x00040000,
-    TunnelPbb = 0x00080000,
-    MacLearn = 0x00100000,
-    EtreeRoot = 0x00200000,
-    Indirect = 0x00400000,
-    L2ControlData = 0x00800000,
-    CryptTraffic = 0x01000000,
-    L3Vxlan = 0x02000000,
-    TunnelMplsOMpls = 0x04000000,
-    ValidateMcastSrc = 0x08000000,
-}
+pub const NH_FLAG_VALID: u32 = 0x000001;
+pub const NH_FLAG_POLICY_ENABLED: u32 = 0x000002;
+/*: u32 = 0x000004 is free */
+pub const NH_FLAG_TUNNEL_GRE: u32 = 0x000008;
+pub const NH_FLAG_TUNNEL_UDP: u32 = 0x000010;
+/*
+ * Mcast flag can be appended to any type of nexthop, either an Encap,
+ * composite etc
+ */
+pub const NH_FLAG_MCAST: u32 = 0x000020;
+pub const NH_FLAG_TUNNEL_UDP_MPLS: u32 = 0x000040;
+pub const NH_FLAG_TUNNEL_VXLAN: u32 = 0x000080;
+pub const NH_FLAG_RELAXED_POLICY: u32 = 0x000100;
+pub const NH_FLAG_COMPOSITE_FABRIC: u32 = 0x000200;
+pub const NH_FLAG_COMPOSITE_ECMP: u32 = 0x000400;
+pub const NH_FLAG_COMPOSITE_LU_ECMP: u32 = 0x000800;
+pub const NH_FLAG_COMPOSITE_EVPN: u32 = 0x001000;
+pub const NH_FLAG_COMPOSITE_ENCAP: u32 = 0x002000;
+pub const NH_FLAG_COMPOSITE_TOR: u32 = 0x004000;
+pub const NH_FLAG_ROUTE_LOOKUP: u32 = 0x008000;
+pub const NH_FLAG_UNKNOWN_UC_FLOOD: u32 = 0x010000;
+pub const NH_FLAG_TUNNEL_SIP_COPY: u32 = 0x020000;
+pub const NH_FLAG_FLOW_LOOKUP: u32 = 0x040000;
+pub const NH_FLAG_TUNNEL_PBB: u32 = 0x080000;
+pub const NH_FLAG_MAC_LEARN: u32 = 0x100000;
+pub const NH_FLAG_ETREE_ROOT: u32 = 0x200000;
+pub const NH_FLAG_INDIRECT: u32 = 0x400000;
+pub const NH_FLAG_L2_CONTROL_DATA: u32 = 0x800000;
+pub const NH_FLAG_CRYPT_TRAFFIC: u32 = 0x01000000;
+pub const NH_FLAG_L3_VXLAN: u32 = 0x02000000;
+pub const NH_FLAG_TUNNEL_MPLS_O_MPLS: u32 = 0x04000000;
+pub const NH_FLAG_VALIDATE_MCAST_SRC: u32 = 0x08000000;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct NexthopRequest {

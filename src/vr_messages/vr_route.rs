@@ -11,17 +11,6 @@ use std::convert::TryInto;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub enum RouteFlag {
-    Valid = 0x01,
-    LabelVaild = 0x02,
-    FloodDhcp = 0x04,
-    MacMoved = 0x08,
-    L2ControlData = 0x10,
-    MacNew = 0x20,
-    EvpnControlProcessing = 0x40,
-}
-
-#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct RouteRequest {
     pub op: SandeshOp,
     pub read_length: usize,

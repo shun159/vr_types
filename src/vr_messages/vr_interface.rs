@@ -17,19 +17,31 @@ pub const VIF_MAX_MIRROR_MD_SIZE: u32 = 0xFF;
 pub const IPV6_UPPER_MASK: u128 = 0xffffffffffffffff_0000000000000000;
 pub const IPV6_LOWER_MASK: u128 = 0x0000000000000000_ffffffffffffffff;
 
+pub const VIF_TYPE_HOST: i32 = 0;
+pub const VIF_TYPE_AGENT: i32 = 1;
+pub const VIF_TYPE_PHYSICAL: i32 = 2;
+pub const VIF_TYPE_VIRTUAL: i32 = 3;
+pub const VIF_TYPE_XEN_LL_HOST: i32 = 4;
+pub const VIF_TYPE_GATEWAY: i32 = 5;
+pub const VIF_TYPE_VIRTUAL_VLAN: i32 = 6;
+pub const VIF_TYPE_STATS: i32 = 7;
+pub const VIF_TYPE_VLAN: i32 = 8;
+pub const VIF_TYPE_MONITORING: i32 = 9;
+pub const VIF_TYPE_MAX: i32 = 10;
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum IfType {
-    Host = 0,
-    Agent = 1,
-    Physical = 2,
-    Virtual = 3,
-    XenLlHost = 4,
-    Gateway = 5,
-    VirtualVlan = 6,
-    Stats = 7,
-    Vlan = 8,
-    Monitoring = 9,
-    Max = 10,
+    Host = VIF_TYPE_HOST as isize,
+    Agent = VIF_TYPE_AGENT as isize,
+    Physical = VIF_TYPE_PHYSICAL as isize,
+    Virtual = VIF_TYPE_VIRTUAL as isize,
+    XenLlHost = VIF_TYPE_XEN_LL_HOST as isize,
+    Gateway = VIF_TYPE_GATEWAY as isize,
+    VirtualVlan = VIF_TYPE_VIRTUAL_VLAN as isize,
+    Stats = VIF_TYPE_STATS as isize,
+    Vlan = VIF_TYPE_VLAN as isize,
+    Monitoring = VIF_TYPE_MONITORING as isize,
+    Max = VIF_TYPE_MAX as isize,
 }
 
 impl Default for IfType {
@@ -42,63 +54,68 @@ impl TryFrom<i32> for IfType {
     type Error = ();
     fn try_from(v: i32) -> Result<Self, Self::Error> {
         match v {
-            x if x == IfType::Host as i32 => Ok(IfType::Host),
-            x if x == IfType::Agent as i32 => Ok(IfType::Agent),
-            x if x == IfType::Physical as i32 => Ok(IfType::Physical),
-            x if x == IfType::Virtual as i32 => Ok(IfType::Virtual),
-            x if x == IfType::XenLlHost as i32 => Ok(IfType::XenLlHost),
-            x if x == IfType::Gateway as i32 => Ok(IfType::Gateway),
-            x if x == IfType::VirtualVlan as i32 => Ok(IfType::VirtualVlan),
-            x if x == IfType::Stats as i32 => Ok(IfType::Stats),
-            x if x == IfType::Vlan as i32 => Ok(IfType::Vlan),
-            x if x == IfType::Monitoring as i32 => Ok(IfType::Monitoring),
-            x if x == IfType::Max as i32 => Ok(IfType::Max),
+            VIF_TYPE_HOST => Ok(IfType::Host),
+            VIF_TYPE_AGENT => Ok(IfType::Agent),
+            VIF_TYPE_PHYSICAL => Ok(IfType::Physical),
+            VIF_TYPE_VIRTUAL => Ok(IfType::Virtual),
+            VIF_TYPE_XEN_LL_HOST => Ok(IfType::XenLlHost),
+            VIF_TYPE_GATEWAY => Ok(IfType::Gateway),
+            VIF_TYPE_VIRTUAL_VLAN => Ok(IfType::VirtualVlan),
+            VIF_TYPE_STATS => Ok(IfType::Stats),
+            VIF_TYPE_VLAN => Ok(IfType::Vlan),
+            VIF_TYPE_MONITORING => Ok(IfType::Monitoring),
+            VIF_TYPE_MAX => Ok(IfType::Max),
             _ => Err(()),
         }
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub enum IfFlag {
-    PolicyEnabled = 0x0000001,
-    Xconnect = 0x0000002,
-    ServiceIf = 0x0000004,
-    MirrorRx = 0x0000008,
-    MirrorTx = 0x0000010,
-    TxCsumOffload = 0x0000020,
-    L3Enabled = 0x0000040,
-    L2Enabled = 0x0000080,
-    DhcpEnabled = 0x0000100,
-    // The physical interface corresponds to a vhost interface
-    VhostPhys = 0x0000200,
-    Promiscous = 0x0000400,
-    // untagged packet should be treated as packets with tag 0.
-    NativeVlanTag = 0x0000800,
-    NoArpProxy = 0x0001000,
-    Pmd = 0x0002000,
-    // The physical interface supports hardware filtering.
-    FilteringOffload = 0x0004000,
-    /*
-     * The interface is being monitored,
-     * so we copy all the packets to another interface.
-     */
-    Monitored = 0x0008000,
-    UnknownUcFlood = 0x0010000,
-    VlanOffload = 0x0020000,
-    /*
-     * The interface is marked to drop new incoming flows
-     * marked by vrouter agent to enforce flow-limit.
-     */
-    DropNewFlows = 0x0040000,
-    MacLearn = 0x0080000,
-    MacProxy = 0x0100000,
-    EtreeRoot = 0x0200000,
-    GroNeeded = 0x0400000,
-    MrgRxBuf = 0x0800000,
-    MirrorNotag = 0x1000000,
-    IgmpEnabled = 0x2000000,
-    MockDevice = 0x4000000,
-}
+pub const VIF_FLAG_POLICY_ENABLED: i32 = 0x1;
+pub const VIF_FLAG_XCONNECT: i32 = 0x2;
+pub const VIF_FLAG_SERVICE_IF: i32 = 0x4;
+pub const VIF_FLAG_MIRROR_RX: i32 = 0x8;
+pub const VIF_FLAG_MIRROR_TX: i32 = 0x10;
+pub const VIF_FLAG_TX_CSUM_OFFLOAD: i32 = 0x20;
+pub const VIF_FLAG_L3_ENABLED: i32 = 0x40;
+pub const VIF_FLAG_L2_ENABLED: i32 = 0x80;
+pub const VIF_FLAG_DHCP_ENABLED: i32 = 0x100;
+/* The physical interface corresponds to a vhost interface */
+pub const VIF_FLAG_VHOST_PHYS: i32 = 0x200;
+pub const VIF_FLAG_PROMISCOUS: i32 = 0x400;
+/* untagged packets should be treated as packets with tag 0 */
+pub const VIF_FLAG_NATIVE_VLAN_TAG: i32 = 0x800;
+pub const VIF_FLAG_NO_ARP_PROXY: i32 = 0x1000;
+pub const VIF_FLAG_PMD: i32 = 0x2000;
+/* The physical interface supports hardware filtering */
+pub const VIF_FLAG_FILTERING_OFFLOAD: i32 = 0x4000;
+/*
+ * The interface is being monitored,;
+ * so we copy all the packets to another interface;
+ */
+pub const VIF_FLAG_MONITORED: i32 = 0x8000;
+pub const VIF_FLAG_UNKNOWN_UC_FLOOD: i32 = 0x10000;
+pub const VIF_FLAG_VLAN_OFFLOAD: i32 = 0x20000;
+/*
+ * The interface is marked to drop new incoming flows;
+ * marked by vrouter agent to enforce flow-limit;
+ */
+pub const VIF_FLAG_DROP_NEW_FLOWS: i32 = 0x40000;
+pub const VIF_FLAG_MAC_LEARN: i32 = 0x80000;
+pub const VIF_FLAG_MAC_PROXY: i32 = 0x100000;
+pub const VIF_FLAG_ETREE_ROOT: i32 = 0x200000;
+pub const VIF_FLAG_GRO_NEEDED: i32 = 0x400000;
+pub const VIF_FLAG_MRG_RXBUF: i32 = 0x800000;
+pub const VIF_FLAG_MIRROR_NOTAG: i32 = 0x1000000;
+pub const VIF_FLAG_IGMP_ENABLED: i32 = 0x2000000;
+
+/* Mock physical would be used for simulating physical/vhost;
+ * interface in vtest */
+pub const VIF_FLAG_MOCK_DEVICE: i32 = 0x4000000;
+pub const VIF_FLAG_HBS_LEFT: i32 = 0x8000000;
+pub const VIF_FLAG_HBS_RIGHT: i32 = 0x10000000;
+
+/* When vRouter act as gateway, allow traffic between fabric-fabric */
+pub const VIF_FLAG_FAB_GW_MODE: i32 = 0x20000000;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct InterfaceRequest {

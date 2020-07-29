@@ -2,7 +2,7 @@
 ## SPDX-License-Identifier: Apache-2.0
 
 GENC_SRCDIR	= gen-c/
-BINDGEN_OPTS = -o src/vr_types_binding.rs \
+BINDGEN_OPTS = -o src/vr_messages/vr_types_binding.rs \
 		 					 --no-layout-tests \
 							 --use-array-pointers-in-arguments \
 							 --generate-block -- \
