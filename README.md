@@ -11,7 +11,7 @@ Example:
 
 1. Add an veth interface to the vrouter and put its result on stdout.
 
-```rustfmt
+```rust
 fn add_interface() {
     let mut req = InterfaceRequest::default();
     req.name = "veth0".to_string();
