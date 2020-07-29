@@ -1,4 +1,3 @@
-pub mod family;
 pub mod message;
 pub mod raw;
 
