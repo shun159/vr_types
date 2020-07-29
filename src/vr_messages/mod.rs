@@ -85,7 +85,7 @@ pub enum Message {
 }
 
 impl Message {
-    pub fn from_bytes<'a>(buf: Vec<u8>) -> Result<Message, CodecError> {
+    pub fn from_bytes(buf: Vec<u8>) -> Result<Message, CodecError> {
         match buf.clone().try_into().unwrap() {
             MessageType::BridgeTableData => match BridgeTableData::read(buf) {
                 Ok(req) => Ok(Message::BridgeTableData(req)),
@@ -175,9 +175,7 @@ impl Message {
                 Ok(req) => Ok(Message::VrouterOps(req)),
                 Err(e) => Err(e),
             },
-            MessageType::Unknown => {
-                Err(CodecError::UnknownMessageType)
-            }
+            MessageType::Unknown => Err(CodecError::UnknownMessageType),
         }
     }
 
@@ -204,6 +202,32 @@ impl Message {
             Message::VrfStatsRequest(vsr) => vsr.write(),
             Message::VxlanRequest(vxlanr) => vxlanr.write(),
             Message::VrouterOps(vo) => vo.write(),
+        }
+    }
+
+    pub fn read_length(&self) -> usize {
+        match self {
+            Message::BridgeTableData(btable) => btable.read_length,
+            Message::DropStats(vds) => vds.read_length,
+            Message::FcMapRequest(fmr) => fmr.read_length,
+            Message::FlowRequest(fr) => fr.read_length,
+            Message::FlowResponse(fresp) => fresp.read_length,
+            Message::FlowTableData(ftable) => ftable.read_length,
+            Message::HugepageConfig(vhp) => vhp.read_length,
+            Message::InterfaceRequest(ifreq) => ifreq.read_length,
+            Message::MemStatsRequest(vms) => vms.read_length,
+            Message::MirrorRequest(mirr) => mirr.read_length,
+            Message::MplsRequest(mr) => mr.read_length,
+            Message::NexthopRequest(nhreq) => nhreq.read_length,
+            Message::PktDropLog(vdl) => vdl.read_length,
+            Message::QosMapRequest(qmr) => qmr.read_length,
+            Message::VrResponse(resp) => resp.read_length,
+            Message::RouteRequest(rtr) => rtr.read_length,
+            Message::VrfRequest(vrf) => vrf.read_length,
+            Message::VrfAssignRequest(var) => var.read_length,
+            Message::VrfStatsRequest(vsr) => vsr.read_length,
+            Message::VxlanRequest(vxlanr) => vxlanr.read_length,
+            Message::VrouterOps(vo) => vo.read_length,
         }
     }
 }

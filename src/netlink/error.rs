@@ -2,7 +2,7 @@ use std::io;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum NetlinkReadError {
+pub enum NetlinkError {
     #[error("io")]
     Io(#[from] io::Error),
     #[error("invalid netlink message")]

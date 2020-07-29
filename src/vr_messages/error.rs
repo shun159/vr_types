@@ -10,7 +10,7 @@ pub enum CodecError {
     #[error("Failed to read binary. return {0}")]
     Read(i32),
     #[error("Unknown message type.")]
-    UnknownMessageType
+    UnknownMessageType,
 }
 
 #[derive(Debug, Error)]
