@@ -10,7 +10,7 @@ build   = "build.rs"
 cc = "^1.0"
 
 [lib]
-crate-type = ["lib", "staticlib"]
+crate-type = ["lib"]
 
 [dependencies]
 netlink-packet-core = "0.2.0"

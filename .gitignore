@@ -4,3 +4,5 @@
 /sandesh
 **/*.rs.bk
 Cargo.lock
+**/*.o
+**/*.d
