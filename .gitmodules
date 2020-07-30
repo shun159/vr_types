@@ -1,3 +1,0 @@
-[submodule "sandesh"]
-	path = sandesh
-	url = git@github.com:Juniper/contrail-sandesh.git

@@ -31,7 +31,10 @@ BINDGEN_OPTS := -o src/vr_messages/vr_types_binding.rs \
 BINDING := gen-c/vr_types.h
 BINDING_EXISTS := $(shell find -wholename $(BINDING))
 
-all: build-sandesh generate-c
+all: sandesh
+
+sandesh: generate-c
+	@$(MAKE) build-sandesh
 
 build-sandesh: $(SANDESH_DEP)
 	@$(MAKE) $(SANDESH_OBJ)
@@ -43,7 +46,7 @@ build-sandesh: $(SANDESH_DEP)
 
 %: %.d
 
-generate-c: build-sandesh
+generate-c:
 	./sandesh_idl --gen c priv/vr.sandesh
 
 generate-bindgen:
