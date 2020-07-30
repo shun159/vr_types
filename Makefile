@@ -6,7 +6,7 @@ CC := gcc
 SANDESH_SRC := $(wildcard sandesh/library/c/*.c)
 SANDESH_SRC += $(wildcard sandesh/library/c/*/*.c)
 SANDESH_SRC += $(wildcard gen-c/*.c)
-SANDESH_SRC += empty_handler.c
+SANDESH_SRC += dummy_handler.c
 SANDESH_OBJ := $(patsubst %.c,%.o,$(SANDESH_SRC))
 SANDESH_DEP := $(patsubst %.c,%.d,$(SANDESH_SRC))
 SANDESH_PROG := $(patsubst %.c,%,$(SANDESH_SRC))
@@ -23,10 +23,10 @@ CFLAGS += -Wno-sign-compare
 CFLAGS += -Wno-format
 
 BINDGEN_OPTS := -o src/vr_messages/vr_types_binding.rs \
-		 					 --no-layout-tests \
-							 --use-array-pointers-in-arguments \
-							 --generate-block -- \
-						   -I.
+                --no-layout-tests \
+                --use-array-pointers-in-arguments \
+                --generate-block -- \
+                -I.
 
 BINDING := gen-c/vr_types.h
 BINDING_EXISTS := $(shell find -wholename $(BINDING))
