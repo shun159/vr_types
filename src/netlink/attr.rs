@@ -36,9 +36,7 @@ impl<P: Serialize> Serialize for NetlinkAttr<P> {
     }
 }
 
-pub fn deserialize_attrs(buf: &[u8]) -> AttrsIter<'_> {
-    AttrsIter { buf }
-}
+pub fn deserialize_attrs(buf: &[u8]) -> AttrsIter<'_> { AttrsIter { buf } }
 
 pub struct AttrsIter<'a> {
     buf: &'a [u8],

@@ -79,17 +79,11 @@ pub const fn NLMSG_ALIGN(len: u32) -> u32 {
 }
 pub const NLMSG_HDRLEN: u32 = size_of::<nlmsghdr>() as u32;
 #[inline]
-pub const fn NLMSG_LENGTH(len: u32) -> u32 {
-    len + NLMSG_HDRLEN
-}
+pub const fn NLMSG_LENGTH(len: u32) -> u32 { len + NLMSG_HDRLEN }
 #[inline]
-pub const fn NLMSG_SPACE(len: u32) -> u32 {
-    NLMSG_ALIGN(NLMSG_LENGTH(len))
-}
+pub const fn NLMSG_SPACE(len: u32) -> u32 { NLMSG_ALIGN(NLMSG_LENGTH(len)) }
 #[inline]
-pub fn NLMSG_DATA(data: &[u8]) -> &[u8] {
-    &data[NLMSG_LENGTH(0) as usize..]
-}
+pub fn NLMSG_DATA(data: &[u8]) -> &[u8] { &data[NLMSG_LENGTH(0) as usize..] }
 
 type _nlmsg_type = u32;
 pub const NLMSG_NOOP: _nlmsg_type = 1;
@@ -177,9 +171,7 @@ pub const NLA_TYPE_MASK: u16 = !(NLA_F_NESTED | NLA_F_NET_BYTEORDER);
 
 pub const NLA_HDRLEN: u16 = NLA_ALIGN(size_of::<nlattr>() as u16);
 pub const NLA_ALIGNTO: u16 = 4;
-pub const fn NLA_ALIGN(len: u16) -> u16 {
-    (len + NLA_ALIGNTO - 1) & !(NLA_ALIGNTO - 1)
-}
+pub const fn NLA_ALIGN(len: u16) -> u16 { (len + NLA_ALIGNTO - 1) & !(NLA_ALIGNTO - 1) }
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

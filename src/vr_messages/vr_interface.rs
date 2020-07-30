@@ -45,9 +45,7 @@ pub enum IfType {
 }
 
 impl Default for IfType {
-    fn default() -> IfType {
-        IfType::Host
-    }
+    fn default() -> IfType { IfType::Host }
 }
 
 impl TryFrom<i32> for IfType {
@@ -688,9 +686,7 @@ impl InterfaceRequest {
         return ip_list;
     }
 
-    fn write_string(s: &String) -> *mut i8 {
-        Self::write_cstring(s) as *mut i8
-    }
+    fn write_string(s: &String) -> *mut i8 { Self::write_cstring(s) as *mut i8 }
 
     fn write_cstring(s: &String) -> *mut c_char {
         let cs = CString::new(s.as_str()).unwrap();

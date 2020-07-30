@@ -51,9 +51,7 @@ impl<P: Serialize> NetlinkMessage<P> {
 }
 
 impl<P: Serialize> Serialize for NetlinkMessage<P> {
-    fn len(&self) -> u32 {
-        NLMSG_LENGTH(self.payload.len())
-    }
+    fn len(&self) -> u32 { NLMSG_LENGTH(self.payload.len()) }
 
     fn serialize(&self, buf: &mut [u8]) {
         let header_len = NLMSG_LENGTH(0) as usize;

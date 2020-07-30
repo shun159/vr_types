@@ -55,9 +55,7 @@ impl TryFrom<flow_op> for FlowOp {
 }
 
 impl Default for FlowOp {
-    fn default() -> FlowOp {
-        FlowOp::Set
-    }
+    fn default() -> FlowOp { FlowOp::Set }
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
@@ -83,9 +81,7 @@ impl TryFrom<i16> for FlowAction {
 }
 
 impl Default for FlowAction {
-    fn default() -> FlowAction {
-        FlowAction::Drop
-    }
+    fn default() -> FlowAction { FlowAction::Drop }
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
@@ -213,9 +209,7 @@ impl TryFrom<u16> for FlowDropReason {
 }
 
 impl Default for FlowDropReason {
-    fn default() -> FlowDropReason {
-        FlowDropReason::Unknown
-    }
+    fn default() -> FlowDropReason { FlowDropReason::Unknown }
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -428,9 +422,7 @@ impl FlowRequest {
         }
     }
 
-    fn read_ip6(ip: u128) -> IpAddr {
-        IpAddr::V6(Ipv6Addr::from(ip as u128))
-    }
+    fn read_ip6(ip: u128) -> IpAddr { IpAddr::V6(Ipv6Addr::from(ip as u128)) }
 
     fn read_ip4(ip: u128) -> IpAddr {
         IpAddr::V4(Ipv4Addr::from((ip & 0x00000000_ffffffff) as u32))

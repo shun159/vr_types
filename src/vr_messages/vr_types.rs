@@ -20,9 +20,7 @@ pub trait VrSandesh {
 
     fn new() -> Self::Type;
 
-    fn obj_len(&self) -> usize {
-        4usize * size_of::<Self::Type>()
-    }
+    fn obj_len(&self) -> usize { 4usize * size_of::<Self::Type>() }
 
     fn write(&self) -> Result<Vec<u8>, CodecError> {
         unsafe {
@@ -74,21 +72,15 @@ pub trait VrSandesh {
 }
 
 impl Default for vr_nexthop_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_nexthop_req {
     type Type = vr_nexthop_req;
 
-    fn new() -> Self {
-        vr_nexthop_req::default()
-    }
+    fn new() -> Self { vr_nexthop_req::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -138,21 +130,15 @@ impl VrSandesh for vr_nexthop_req {
 }
 
 impl Default for vr_interface_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_interface_req {
     type Type = vr_interface_req;
 
-    fn new() -> Self {
-        vr_interface_req::default()
-    }
+    fn new() -> Self { vr_interface_req::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -190,21 +176,15 @@ impl VrSandesh for vr_interface_req {
 }
 
 impl Default for vr_vxlan_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_vxlan_req {
     type Type = vr_vxlan_req;
 
-    fn new() -> Self {
-        vr_vxlan_req::default()
-    }
+    fn new() -> Self { vr_vxlan_req::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -231,21 +211,15 @@ impl VrSandesh for vr_vxlan_req {
 }
 
 impl Default for vr_route_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_route_req {
     type Type = vr_route_req;
 
-    fn new() -> Self {
-        vr_route_req::default()
-    }
+    fn new() -> Self { vr_route_req::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -272,21 +246,15 @@ impl VrSandesh for vr_route_req {
 }
 
 impl Default for vr_mpls_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_mpls_req {
     type Type = vr_mpls_req;
 
-    fn new() -> Self {
-        vr_mpls_req::default()
-    }
+    fn new() -> Self { vr_mpls_req::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -313,21 +281,15 @@ impl VrSandesh for vr_mpls_req {
 }
 
 impl Default for vr_mirror_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_mirror_req {
     type Type = vr_mirror_req;
 
-    fn new() -> Self {
-        vr_mirror_req::default()
-    }
+    fn new() -> Self { vr_mirror_req::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -354,21 +316,15 @@ impl VrSandesh for vr_mirror_req {
 }
 
 impl Default for vr_vrf_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_vrf_req {
     type Type = vr_vrf_req;
 
-    fn new() -> Self {
-        vr_vrf_req::default()
-    }
+    fn new() -> Self { vr_vrf_req::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -395,21 +351,15 @@ impl VrSandesh for vr_vrf_req {
 }
 
 impl Default for vr_flow_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_flow_req {
     type Type = vr_flow_req;
 
-    fn new() -> Self {
-        vr_flow_req::default()
-    }
+    fn new() -> Self { vr_flow_req::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -436,21 +386,15 @@ impl VrSandesh for vr_flow_req {
 }
 
 impl Default for vr_vrf_assign_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_vrf_assign_req {
     type Type = vr_vrf_assign_req;
 
-    fn new() -> Self {
-        vr_vrf_assign_req::default()
-    }
+    fn new() -> Self { vr_vrf_assign_req::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -477,21 +421,15 @@ impl VrSandesh for vr_vrf_assign_req {
 }
 
 impl Default for vr_vrf_stats_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_vrf_stats_req {
     type Type = vr_vrf_stats_req;
 
-    fn new() -> Self {
-        vr_vrf_stats_req::default()
-    }
+    fn new() -> Self { vr_vrf_stats_req::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -518,21 +456,15 @@ impl VrSandesh for vr_vrf_stats_req {
 }
 
 impl Default for vr_response {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_response {
     type Type = vr_response;
 
-    fn new() -> Self {
-        vr_response::default()
-    }
+    fn new() -> Self { vr_response::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -559,21 +491,15 @@ impl VrSandesh for vr_response {
 }
 
 impl Default for vrouter_ops {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vrouter_ops {
     type Type = vrouter_ops;
 
-    fn new() -> Self {
-        vrouter_ops::default()
-    }
+    fn new() -> Self { vrouter_ops::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -600,21 +526,15 @@ impl VrSandesh for vrouter_ops {
 }
 
 impl Default for vr_mem_stats_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_mem_stats_req {
     type Type = vr_mem_stats_req;
 
-    fn new() -> Self {
-        vr_mem_stats_req::default()
-    }
+    fn new() -> Self { vr_mem_stats_req::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     fn write_binary_fn(
         &self,
@@ -640,9 +560,7 @@ impl VrSandesh for vr_mem_stats_req {
 }
 
 impl Default for vr_pkt_drop_log_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 #[repr(C)]
@@ -684,9 +602,7 @@ impl VrSandesh for vr_pkt_drop_log_req {
         req
     }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -720,21 +636,15 @@ impl VrSandesh for vr_pkt_drop_log_req {
 }
 
 impl Default for vr_drop_stats_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_drop_stats_req {
     type Type = vr_drop_stats_req;
 
-    fn new() -> Self {
-        vr_drop_stats_req::default()
-    }
+    fn new() -> Self { vr_drop_stats_req::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -761,21 +671,15 @@ impl VrSandesh for vr_drop_stats_req {
 }
 
 impl Default for vr_qos_map_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_qos_map_req {
     type Type = vr_qos_map_req;
 
-    fn new() -> Self {
-        vr_qos_map_req::default()
-    }
+    fn new() -> Self { vr_qos_map_req::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -813,21 +717,15 @@ impl VrSandesh for vr_qos_map_req {
 }
 
 impl Default for vr_fc_map_req {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_fc_map_req {
     type Type = vr_fc_map_req;
 
-    fn new() -> Self {
-        vr_fc_map_req::default()
-    }
+    fn new() -> Self { vr_fc_map_req::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -854,21 +752,15 @@ impl VrSandesh for vr_fc_map_req {
 }
 
 impl Default for vr_flow_response {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_flow_response {
     type Type = vr_flow_response;
 
-    fn new() -> Self {
-        vr_flow_response::default()
-    }
+    fn new() -> Self { vr_flow_response::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -895,21 +787,15 @@ impl VrSandesh for vr_flow_response {
 }
 
 impl Default for vr_flow_table_data {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_flow_table_data {
     type Type = vr_flow_table_data;
 
-    fn new() -> Self {
-        vr_flow_table_data::default()
-    }
+    fn new() -> Self { vr_flow_table_data::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -936,21 +822,15 @@ impl VrSandesh for vr_flow_table_data {
 }
 
 impl Default for vr_bridge_table_data {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_bridge_table_data {
     type Type = vr_bridge_table_data;
 
-    fn new() -> Self {
-        vr_bridge_table_data::default()
-    }
+    fn new() -> Self { vr_bridge_table_data::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(
@@ -977,21 +857,15 @@ impl VrSandesh for vr_bridge_table_data {
 }
 
 impl Default for vr_hugepage_config {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
+    fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
 
 impl VrSandesh for vr_hugepage_config {
     type Type = vr_hugepage_config;
 
-    fn new() -> Self {
-        vr_hugepage_config::default()
-    }
+    fn new() -> Self { vr_hugepage_config::default() }
 
-    fn as_c_void(&self) -> *mut c_void {
-        utils::into_raw_ptr(&*self) as *mut c_void
-    }
+    fn as_c_void(&self) -> *mut c_void { utils::into_raw_ptr(&*self) as *mut c_void }
 
     // write_binary_to_buffer function
     fn write_binary_fn(

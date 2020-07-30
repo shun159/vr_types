@@ -13,9 +13,7 @@ pub trait Serialize {
 }
 
 impl<'a, P: Serialize> Serialize for &'a [P] {
-    fn len(&self) -> u32 {
-        self.iter().map(|item| item.len()).sum()
-    }
+    fn len(&self) -> u32 { self.iter().map(|item| item.len()).sum() }
 
     fn serialize(&self, buf: &mut [u8]) {
         let mut remaining = buf;
@@ -29,49 +27,31 @@ impl<'a, P: Serialize> Serialize for &'a [P] {
 }
 
 impl<'a> Serialize for &'a CString {
-    fn len(&self) -> u32 {
-        self.to_bytes_with_nul().len() as u32
-    }
+    fn len(&self) -> u32 { self.to_bytes_with_nul().len() as u32 }
 
-    fn serialize(&self, buf: &mut [u8]) {
-        buf.copy_from_slice(self.to_bytes_with_nul());
-    }
+    fn serialize(&self, buf: &mut [u8]) { buf.copy_from_slice(self.to_bytes_with_nul()); }
 }
 
 impl Serialize for u32 {
-    fn len(&self) -> u32 {
-        size_of::<Self>() as u32
-    }
+    fn len(&self) -> u32 { size_of::<Self>() as u32 }
 
-    fn serialize(&self, buf: &mut [u8]) {
-        buf.copy_from_slice(&self.to_ne_bytes())
-    }
+    fn serialize(&self, buf: &mut [u8]) { buf.copy_from_slice(&self.to_ne_bytes()) }
 }
 
 impl Serialize for u8 {
-    fn len(&self) -> u32 {
-        size_of::<Self>() as u32
-    }
+    fn len(&self) -> u32 { size_of::<Self>() as u32 }
 
-    fn serialize(&self, buf: &mut [u8]) {
-        buf.copy_from_slice(&self.to_ne_bytes())
-    }
+    fn serialize(&self, buf: &mut [u8]) { buf.copy_from_slice(&self.to_ne_bytes()) }
 }
 
 impl Serialize for Vec<u8> {
-    fn len(&self) -> u32 {
-        self.len() as u32
-    }
+    fn len(&self) -> u32 { self.len() as u32 }
 
-    fn serialize(&self, buf: &mut [u8]) {
-        buf.copy_from_slice(&self[..])
-    }
+    fn serialize(&self, buf: &mut [u8]) { buf.copy_from_slice(&self[..]) }
 }
 
 impl Serialize for Message {
-    fn len(&self) -> u32 {
-        self.to_bytes().unwrap().len() as u32
-    }
+    fn len(&self) -> u32 { self.to_bytes().unwrap().len() as u32 }
 
     fn serialize(&self, buf: &mut [u8]) {
         let bytes = self.to_bytes().unwrap();

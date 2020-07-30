@@ -1,8 +1,19 @@
 // Copyright 2020 Eishun Kondoh
 // SPDX-License-Identifier: Apache-2.0
 
-use super::vr_types_binding;
+use super::vr_types_binding::{
+    _sandesh_op_SANDESH_OP_ADD, _sandesh_op_SANDESH_OP_DEL, _sandesh_op_SANDESH_OP_DUMP,
+    _sandesh_op_SANDESH_OP_GET, _sandesh_op_SANDESH_OP_RESET,
+    _sandesh_op_SANDESH_OP_RESPONSE, sandesh_op,
+};
 use std::convert::TryFrom;
+
+pub const SANDESH_OP_ADD: u32 = _sandesh_op_SANDESH_OP_ADD;
+pub const SANDESH_OP_GET: u32 = _sandesh_op_SANDESH_OP_GET;
+pub const SANDESH_OP_DEL: u32 = _sandesh_op_SANDESH_OP_DEL;
+pub const SANDESH_OP_DUMP: u32 = _sandesh_op_SANDESH_OP_DUMP;
+pub const SANDESH_OP_RESPONSE: u32 = _sandesh_op_SANDESH_OP_RESPONSE;
+pub const SANDESH_OP_RESET: u32 = _sandesh_op_SANDESH_OP_RESET;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum SandeshOp {
@@ -15,22 +26,20 @@ pub enum SandeshOp {
 }
 
 impl Default for SandeshOp {
-    fn default() -> SandeshOp {
-        SandeshOp::Add
-    }
+    fn default() -> SandeshOp { SandeshOp::Add }
 }
 
-impl TryFrom<vr_types_binding::sandesh_op> for SandeshOp {
+impl TryFrom<sandesh_op> for SandeshOp {
     type Error = ();
 
-    fn try_from(v: u32) -> Result<Self, Self::Error> {
+    fn try_from(v: sandesh_op) -> Result<Self, Self::Error> {
         match v {
-            x if x == SandeshOp::Add as u32 => Ok(SandeshOp::Add),
-            x if x == SandeshOp::Get as u32 => Ok(SandeshOp::Get),
-            x if x == SandeshOp::Del as u32 => Ok(SandeshOp::Del),
-            x if x == SandeshOp::Dump as u32 => Ok(SandeshOp::Dump),
-            x if x == SandeshOp::Response as u32 => Ok(SandeshOp::Response),
-            x if x == SandeshOp::Reset as u32 => Ok(SandeshOp::Reset),
+            SANDESH_OP_ADD => Ok(SandeshOp::Add),
+            SANDESH_OP_GET => Ok(SandeshOp::Get),
+            SANDESH_OP_DEL => Ok(SandeshOp::Del),
+            SANDESH_OP_DUMP => Ok(SandeshOp::Dump),
+            SANDESH_OP_RESPONSE => Ok(SandeshOp::Response),
+            SANDESH_OP_RESET => Ok(SandeshOp::Reset),
             _ => Err(()),
         }
     }

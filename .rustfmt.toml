@@ -83,7 +83,7 @@ max_width = 90
 
 # Put single-expression functions on a single line.
 # Default: false
-#   fn_single_line = 
+fn_single_line = true
 
 # Location of return type in function declaration.
 # Values: WithArgs | WithWhereClause
@@ -290,3 +290,11 @@ max_width = 90
 # Replace strings of _ wildcards by a single .. in tuple patterns.
 # Default: false
 #   condense_wildcard_suffices =
+
+# Force multiline closure and match arm bodies to be wrapped in a block
+# Default: false
+#force_multiline_blocks = true
+
+unstable_features = true
+
+indent_style = "Block"

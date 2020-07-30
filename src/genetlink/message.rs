@@ -21,9 +21,7 @@ impl<P: Serialize> GenericNetlinkMessage<P> {
 }
 
 impl<P: Serialize> Serialize for GenericNetlinkMessage<P> {
-    fn len(&self) -> u32 {
-        GENL_HDRLEN + self.payload.len()
-    }
+    fn len(&self) -> u32 { GENL_HDRLEN + self.payload.len() }
 
     fn serialize(&self, buf: &mut [u8]) {
         let header_len = GENL_HDRLEN as usize;
