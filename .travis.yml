@@ -1,0 +1,12 @@
+dist: bionic
+language: rust
+git:
+  submodules: true
+rust:
+  - 1.45.0
+cache: cargo
+before_cache:
+  - rm -rf "$TRAVIS_HOME/.cargo/registry/src"
+script:
+  - cargo build --verbose --all
+  - cargo test --verbose --all

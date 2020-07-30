@@ -34,6 +34,7 @@ BINDING_EXISTS := $(shell find -wholename $(BINDING))
 all: sandesh
 
 sandesh: generate-c
+	@$(RM) gen-c/*.a
 	@$(MAKE) build-sandesh
 
 build-sandesh: $(SANDESH_DEP)
@@ -54,4 +55,4 @@ generate-bindgen:
 
 clean:
 	@$(RM) ${SANDESH_DEP} $(SANDESH_OBJ) $(SANDESH_PROG)
-	@$(RM) gen-c/*.c gen-c/*.h
+	@$(RM) gen-c/*.c gen-c/*.h gen-c/*.a
