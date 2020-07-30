@@ -8,6 +8,7 @@ use crate::netlink::NetlinkError;
 use crate::netlink::{deserialize_attrs, deserialize_u16};
 use crate::netlink::{NetlinkAttr, NetlinkMessage};
 pub use crate::vr_messages::*;
+use libc::{EINVAL, ENODEV, ENOENT, ENOMEM};
 use netlink_sys::Protocol::Generic;
 use netlink_sys::Socket;
 use std::ffi::CString;
@@ -71,22 +72,22 @@ fn handle_sandesh_reply(buf: Vec<u8>) -> Result<Vec<Message>, MessageHandleError
 
 fn decode_header_message(buf: &Vec<u8>) -> Result<Message, MessageHandleError> {
     match Message::from_bytes(buf.to_vec())? {
-        Message::VrResponse(resp) if resp.code == 0 => Ok(Message::VrResponse(resp)),
-        Message::VrResponse(resp) if resp.code.abs() == libc::ENODEV => {
+        Message::VrResponse(resp) if resp.code >= 0 => Ok(Message::VrResponse(resp)),
+        Message::VrResponse(resp) if resp.code == -ENODEV => {
             Err(MessageHandleError::RequestError(OperationError::ENODEV))
         }
-        Message::VrResponse(resp) if resp.code.abs() == libc::ENOMEM => {
+        Message::VrResponse(resp) if resp.code == -ENOMEM => {
             Err(MessageHandleError::RequestError(OperationError::ENOMEM))
         }
-        Message::VrResponse(resp) if resp.code.abs() == libc::ENOENT => {
+        Message::VrResponse(resp) if resp.code == -ENOENT => {
             Err(MessageHandleError::RequestError(OperationError::ENOENT))
         }
-        Message::VrResponse(resp) if resp.code.abs() == libc::EINVAL => {
+        Message::VrResponse(resp) if resp.code == -EINVAL => {
             Err(MessageHandleError::RequestError(OperationError::EINVAL))
         }
-        Message::VrResponse(resp) if resp.code < 0 => Err(
-            MessageHandleError::RequestError(OperationError::UNKNOWN(resp.code)),
-        ),
+        Message::VrResponse(resp) => Err(MessageHandleError::RequestError(
+            OperationError::UNKNOWN(resp.code),
+        )),
         _ => Err(MessageHandleError::MessageOutOfOrder),
     }
 }
