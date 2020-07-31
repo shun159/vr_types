@@ -3,28 +3,7 @@
 
 #[cfg(test)]
 mod test_vr_messages {
-    use vr_type::vr_messages::vr_bridge_table_data::BridgeTableData;
-    use vr_type::vr_messages::vr_drop_stats::DropStats;
-    use vr_type::vr_messages::vr_fc_map::FcMapRequest;
-    use vr_type::vr_messages::vr_flow::FlowRequest;
-    use vr_type::vr_messages::vr_flow_response::FlowResponse;
-    use vr_type::vr_messages::vr_flow_table_data::FlowTableData;
-    use vr_type::vr_messages::vr_hugepage_config::HugepageConfig;
-    use vr_type::vr_messages::vr_interface::InterfaceRequest;
-    use vr_type::vr_messages::vr_mem_stats::MemStatsRequest;
-    use vr_type::vr_messages::vr_mirror::MirrorRequest;
-    use vr_type::vr_messages::vr_mpls::MplsRequest;
-    use vr_type::vr_messages::vr_nexthop::NexthopRequest;
-    use vr_type::vr_messages::vr_pkt_droplog::PktDropLog;
-    use vr_type::vr_messages::vr_qos_map::QosMapRequest;
-    use vr_type::vr_messages::vr_response::VrResponse;
-    use vr_type::vr_messages::vr_route::RouteRequest;
-    use vr_type::vr_messages::vr_vrf::VrfRequest;
-    use vr_type::vr_messages::vr_vrf_assign::VrfAssignRequest;
-    use vr_type::vr_messages::vr_vrf_stats::VrfStatsRequest;
-    use vr_type::vr_messages::vr_vxlan::VxlanRequest;
-    use vr_type::vr_messages::vrouter_ops::VrouterOps;
-    use vr_type::vr_messages::Message;
+    use vr_type::vr_messages::*;
 
     #[test]
     fn bridge_table_data() {
@@ -276,5 +255,29 @@ mod test_vr_messages {
             Message::VrouterOps(expected),
             Message::from_bytes(bytes).unwrap()
         );
+    }
+
+    #[test]
+    fn vrouter_ops_request() {
+        use vr_type::genetlink::resolve_family_id;
+
+        let mut vrouter_ops_body: VrouterOps = VrouterOps::default();
+        vrouter_ops_body.op = SandeshOp::Get;
+        match resolve_family_id("vrouter") {
+            Ok(family) if family > 0 => {
+                let vrouter_ops_req = Message::VrouterOps(vrouter_ops_body);
+                let vrouter_ops_rep: Vec<Message> = vrouter_ops_req.send_nl().unwrap();
+                match &vrouter_ops_rep[0] {
+                    Message::VrouterOps(vrouter) =>
+                        assert_eq!(vrouter.rid, 0),
+                    _ =>
+                        assert!(false)
+                }
+            }
+            _ => {
+                // If the vrouter.ko has not inserted, this test will skip.
+                assert!(true)
+            }
+        }
     }
 }

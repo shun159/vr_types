@@ -58,6 +58,7 @@ pub use vr_vrf_assign::VrfAssignRequest;
 pub use vr_vrf_stats::VrfStatsRequest;
 pub use vr_vxlan::VxlanRequest;
 pub use vrouter_ops::VrouterOps;
+use crate::genetlink::{MessageHandleError, send_sandesh_msg};
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Message {
@@ -225,5 +226,9 @@ impl Message {
             Message::VxlanRequest(vxlanr) => vxlanr.read_length,
             Message::VrouterOps(vo) => vo.read_length,
         }
+    }
+
+    pub fn send_nl(&self) -> Result<Vec<Message>, MessageHandleError> {
+        send_sandesh_msg(self)
     }
 }

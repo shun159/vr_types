@@ -40,7 +40,7 @@ pub fn resolve_family_id(name: &str) -> Result<u16, NetlinkError> {
     Ok(0)
 }
 
-pub fn send_sandesh_msg(payload: Message) -> Result<Vec<Message>, MessageHandleError> {
+pub fn send_sandesh_msg(payload: &Message) -> Result<Vec<Message>, MessageHandleError> {
     let nl_attr = &[NetlinkAttr::new(NL_ATTR_VR_MESSAGE_PROTOCOL, payload)] as &[_];
     let nl_msg = NetlinkMessage::new(
         resolve_family_id(VROUTER_GENETLINK_FAMILY_NAME).unwrap(),

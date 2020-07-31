@@ -50,7 +50,7 @@ impl Serialize for Vec<u8> {
     fn serialize(&self, buf: &mut [u8]) { buf.copy_from_slice(&self[..]) }
 }
 
-impl Serialize for Message {
+impl<'a> Serialize for &'a Message {
     fn len(&self) -> u32 { self.to_bytes().unwrap().len() as u32 }
 
     fn serialize(&self, buf: &mut [u8]) {
