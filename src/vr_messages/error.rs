@@ -23,6 +23,12 @@ pub enum OperationError {
     ENOENT,
     #[error("Invalid argument")]
     EINVAL,
+    #[error("Device or resouce busy")]
+    EBUSY,
+    #[error("Resource exists")]
+    EEXIST,
+    #[error("No space left on device")]
+    ENOSPC,
     #[error("Unknown Error. return: {0}")]
     UNKNOWN(i32),
 }

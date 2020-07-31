@@ -8,7 +8,7 @@ use crate::netlink::NetlinkError;
 use crate::netlink::{deserialize_attrs, deserialize_u16};
 use crate::netlink::{NetlinkAttr, NetlinkMessage};
 pub use crate::vr_messages::*;
-use libc::{EINVAL, ENODEV, ENOENT, ENOMEM};
+use libc::{EINVAL, ENODEV, ENOENT, ENOMEM, EBUSY, EEXIST, ENOSPC};
 use netlink_sys::Protocol::Generic;
 use netlink_sys::Socket;
 use std::ffi::CString;
@@ -50,7 +50,13 @@ pub fn send_sandesh_msg(payload: &Message) -> Result<Vec<Message>, MessageHandle
     let socket = &Socket::new(Generic).unwrap();
     nl_msg.send_nl(socket);
     let nl_msg = NetlinkMessage::<Vec<u8>>::recv_nl(socket);
-    for attr in deserialize_attrs(&nl_msg.payload.payload[..]) {
+    handle_genl_reply(&nl_msg.payload.payload[..])
+}
+
+// private functions
+
+fn handle_genl_reply<'a>(buf: &'a [u8]) -> Result<Vec<Message>, MessageHandleError> {
+    for attr in deserialize_attrs(&buf) {
         let (ty, value) = attr.unwrap();
         if ty == NL_ATTR_VR_MESSAGE_PROTOCOL {
             return handle_sandesh_reply(value.to_vec());
@@ -59,36 +65,41 @@ pub fn send_sandesh_msg(payload: &Message) -> Result<Vec<Message>, MessageHandle
     return Ok(vec![]);
 }
 
-// private functions
-
 fn handle_sandesh_reply(buf: Vec<u8>) -> Result<Vec<Message>, MessageHandleError> {
     let vec: &mut Vec<Message> = &mut Vec::new();
-    let resp = decode_header_message(&buf)?;
+    let resp = handle_header_message(&buf)?;
     for message in decode_messages(resp.read_length(), &buf[..]) {
         vec.push(message)
     }
     Ok(vec.to_vec())
 }
 
-fn decode_header_message(buf: &Vec<u8>) -> Result<Message, MessageHandleError> {
+fn handle_header_message(buf: &Vec<u8>) -> Result<Message, MessageHandleError> {
     match Message::from_bytes(buf.to_vec())? {
-        Message::VrResponse(resp) if resp.code >= 0 => Ok(Message::VrResponse(resp)),
-        Message::VrResponse(resp) if resp.code == -ENODEV => {
-            Err(MessageHandleError::RequestError(OperationError::ENODEV))
-        }
-        Message::VrResponse(resp) if resp.code == -ENOMEM => {
-            Err(MessageHandleError::RequestError(OperationError::ENOMEM))
-        }
-        Message::VrResponse(resp) if resp.code == -ENOENT => {
-            Err(MessageHandleError::RequestError(OperationError::ENOENT))
-        }
-        Message::VrResponse(resp) if resp.code == -EINVAL => {
-            Err(MessageHandleError::RequestError(OperationError::EINVAL))
-        }
-        Message::VrResponse(resp) => Err(MessageHandleError::RequestError(
-            OperationError::UNKNOWN(resp.code),
-        )),
-        _ => Err(MessageHandleError::MessageOutOfOrder),
+        Message::VrResponse(resp) =>
+            handle_vr_response(resp),
+        _ =>
+            Err(MessageHandleError::MessageOutOfOrder)
+    }
+}
+
+fn handle_vr_response(resp: VrResponse) -> Result<Message, MessageHandleError> {
+    match resp.code {
+        0 => Ok(Message::VrResponse(resp)),
+        code => Err(MessageHandleError::RequestError(handle_error(code)))
+    }
+}
+
+fn handle_error(resp_code: i32) -> OperationError {
+    match resp_code {
+        code if code == -ENODEV => OperationError::ENODEV,
+        code if code == -ENOMEM => OperationError::ENOMEM,
+        code if code == -ENOENT => OperationError::ENOENT,
+        code if code == -EINVAL => OperationError::EINVAL,
+        code if code == -EBUSY => OperationError::EBUSY,
+        code if code == -EEXIST => OperationError::EEXIST,
+        code if code == -ENOSPC => OperationError::ENOSPC,
+        code => OperationError::UNKNOWN(code),
     }
 }
 
