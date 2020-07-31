@@ -1,7 +1,6 @@
 /target
 /gen-c
 /build
-/sandesh
 **/*.rs.bk
 Cargo.lock
 **/*.o

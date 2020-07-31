@@ -1,25 +1,32 @@
-vr_type
+Rust binding to vr.sandesh APIs
 ----
 
-`vr_type` is a Rust wrapper of `tf-vrouter/sandesh/vr.sandesh`.  
-This library provides functionalities for translate between Rust terms and the sandesh binary format and  
-transport sandesh messages to vrouter through `NETLINK_GENERIC`.
+[![Build Status](https://img.shields.io/travis/shun159/vr_types.svg?style=flat-square)](https://travis-ci.org/shun159/vr_types)
 
-Example:
-----
+The purpose of the vr_types project is to provide friendly bindings to various tf-vrouter APIs.  
+The goal is to not provide a 100% unified interface, but to make easy to hack tf-vrouter on your Laptop by yourself.
 
-1. Add a veth interface to the vrouter and put its result on stdout.
+## Supported messages
 
-```rust
-fn add_interface() {
-    let mut req = InterfaceRequest::default();
-    req.name = "veth0".to_string();
-    req.os_idx = 19;
-    req._type = IfType::Virtual;
-    req.transport = 1; // VIF_TRANSPORT_ETH
-    req.mac =
-        MacAddress::from_bytes(&[0xf6, 0xec, 0xca, 0xad, 0x67, 0x91]).unwrap();
-    let res = send_sandesh_msg(Message::InterfaceRequest(req));
-    println!("{:#?}", res);
-}
-```
+The following request messages are supported.
+
+- vr\_bridge\_table\_data
+- vr\_drop\_stats\_req
+- vr\_fc\_map\_req
+- vr\_flow\_response
+- vr\_flow\_req
+- vr\_flow\_table\_data
+- vr\_hugepage\_config
+- vr\_interface\_req
+- vr\_mem\_stats\_req
+- vr\_mirror\_req
+- vr\_mpls\_req
+- vr\_nexthop\_req
+- vr\_pkt\_drop\_log\_req
+- vr\_qos\_map\_req
+- vr\_response
+- vr\_route\_req
+- vr\_vrf\_req
+- vr\_vrf\_assign\_req
+- vr\_vrf\_stats\_req
+- vr\_vxlan\_req
