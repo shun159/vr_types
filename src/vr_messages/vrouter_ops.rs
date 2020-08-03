@@ -10,7 +10,7 @@ use std::convert::TryInto;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
-#[derive(Default, Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Default, Clone, Eq, PartialEq)]
 pub struct VrouterOps {
     pub op: SandeshOp,
     pub read_length: usize,
@@ -99,6 +99,29 @@ pub struct VrouterOps {
     pub pkt_droplog_min_en: i8,
     // Close flow on TCP rst
     pub close_flow_on_tcp_rst: i8,
+}
+
+impl VrouterOps {
+    fn default() -> VrouterOps {
+        VrouterOps {
+            packet_dump: -1,
+            perfr: -1,
+            perfs: -1,
+            to_vm_mss_adj: -1,
+            from_vm_mss_adj: -1,
+            perfr1: -1,
+            perfr2: -1,
+            perfr3: -1,
+            perfp: -1,
+            perfq1: -1,
+            perfq2: -1,
+            perfq3: -1,
+            udp_coff: -1,
+            flow_hold_limit: -1,
+            mudp: -1,
+            ..Default::default()
+        }
+    }
 }
 
 impl VrouterOps {

@@ -260,7 +260,7 @@ impl Default for FlowRequest {
             index: 0,
             action: FlowAction::Drop,
             flags: 0,
-            rindex: 0,
+            rindex: -1,
             family: 0,
             flow_sip: None,
             flow_dip: None,

@@ -27,7 +27,7 @@ pub fn resolve_family_id(name: &str) -> Result<u16, NetlinkError> {
         NLM_F_REQUEST,
         GenericNetlinkMessage::new(CTRL_CMD_GETFAMILY, NETLINK_VERSION, nl_attr),
     );
-    let socket = &Socket::new(Generic).unwrap();
+    let socket = &Socket::new(Generic)?;
     nl_msg.send_nl(socket);
     let nl_msg = NetlinkMessage::<Vec<u8>>::recv_nl(socket);
     for attr in deserialize_attrs(&nl_msg.payload.payload[..]) {
