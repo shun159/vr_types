@@ -29,6 +29,8 @@ pub enum OperationError {
     EEXIST,
     #[error("No space left on device")]
     ENOSPC,
+    #[error("Operation not supported on transport endpoint")]
+    EOPNOTSUPP,
     #[error("Unknown Error. return: {0}")]
     UNKNOWN(i32),
 }

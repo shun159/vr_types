@@ -1,6 +1,6 @@
 use std::env;
-use std::process::Command;
 use std::path::Path;
+use std::process::Command;
 
 fn main() {
     Command::new("make")

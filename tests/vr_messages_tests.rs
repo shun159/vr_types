@@ -268,10 +268,8 @@ mod test_vr_messages {
                 let vrouter_ops_req = Message::VrouterOps(vrouter_ops_body);
                 let vrouter_ops_rep: Vec<Message> = vrouter_ops_req.send_nl().unwrap();
                 match &vrouter_ops_rep[0] {
-                    Message::VrouterOps(vrouter) =>
-                        assert_eq!(vrouter.rid, 0),
-                    _ =>
-                        assert!(false)
+                    Message::VrouterOps(vrouter) => assert_eq!(vrouter.rid, 0),
+                    _ => assert!(false),
                 }
             }
             _ => {

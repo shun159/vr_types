@@ -8,7 +8,7 @@ use crate::netlink::NetlinkError;
 use crate::netlink::{deserialize_attrs, deserialize_u16};
 use crate::netlink::{NetlinkAttr, NetlinkMessage};
 pub use crate::vr_messages::*;
-use libc::{EINVAL, ENODEV, ENOENT, ENOMEM, EBUSY, EEXIST, ENOSPC};
+use libc::{EBUSY, EEXIST, EINVAL, ENODEV, ENOENT, ENOMEM, ENOSPC, EOPNOTSUPP};
 use netlink_sys::Protocol::Generic;
 use netlink_sys::Socket;
 use std::ffi::CString;
@@ -76,17 +76,15 @@ fn handle_sandesh_reply(buf: Vec<u8>) -> Result<Vec<Message>, MessageHandleError
 
 fn handle_header_message(buf: &Vec<u8>) -> Result<Message, MessageHandleError> {
     match Message::from_bytes(buf.to_vec())? {
-        Message::VrResponse(resp) =>
-            handle_vr_response(resp),
-        _ =>
-            Err(MessageHandleError::MessageOutOfOrder)
+        Message::VrResponse(resp) => handle_vr_response(resp),
+        _ => Err(MessageHandleError::MessageOutOfOrder),
     }
 }
 
 fn handle_vr_response(resp: VrResponse) -> Result<Message, MessageHandleError> {
     match resp.code {
         0 => Ok(Message::VrResponse(resp)),
-        code => Err(MessageHandleError::RequestError(handle_error(code)))
+        code => Err(MessageHandleError::RequestError(handle_error(code))),
     }
 }
 
@@ -99,6 +97,7 @@ fn handle_error(resp_code: i32) -> OperationError {
         code if code == -EBUSY => OperationError::EBUSY,
         code if code == -EEXIST => OperationError::EEXIST,
         code if code == -ENOSPC => OperationError::ENOSPC,
+        code if code == -EOPNOTSUPP => OperationError::EOPNOTSUPP,
         code => OperationError::UNKNOWN(code),
     }
 }

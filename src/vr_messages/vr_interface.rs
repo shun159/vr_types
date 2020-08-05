@@ -115,6 +115,11 @@ pub const VIF_FLAG_HBS_RIGHT: i32 = 0x10000000;
 /* When vRouter act as gateway, allow traffic between fabric-fabric */
 pub const VIF_FLAG_FAB_GW_MODE: i32 = 0x20000000;
 
+pub const VIF_TRANSPORT_VIRTUAL: i8 = 0;
+pub const VIF_TRANSPORT_ETH: i8 = 1;
+pub const VIF_TRANSPORT_PMD: i8 = 2;
+pub const VIF_TRANSPORT_SOCKET: i8 = 3;
+
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct InterfaceRequest {
     pub op: SandeshOp,

@@ -33,6 +33,7 @@ pub mod vr_vrf_stats;
 pub mod vr_vxlan;
 pub mod vrouter_ops;
 
+use crate::genetlink::{send_sandesh_msg, MessageHandleError};
 pub use error::*;
 pub use message_type::MessageType;
 pub use sandesh::*;
@@ -58,7 +59,6 @@ pub use vr_vrf_assign::VrfAssignRequest;
 pub use vr_vrf_stats::VrfStatsRequest;
 pub use vr_vxlan::VxlanRequest;
 pub use vrouter_ops::VrouterOps;
-use crate::genetlink::{MessageHandleError, send_sandesh_msg};
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Message {

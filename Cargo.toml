@@ -5,6 +5,11 @@ authors = ["Eishun Kondoh <shun3382@gmail.com>"]
 edition = "2018"
 links   = "vr_types"
 build   = "build.rs"
+homepage = "http://github.com/shun159/vr_type"
+licence = "APLv2"
+readme = "README.md"
+repository = "http://github.com/shun159/vr_type"
+description = "tf-vrouter Rust wrapper API"
 
 [lib]
 crate-type = ["lib"]
