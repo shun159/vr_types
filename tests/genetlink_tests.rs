@@ -11,3 +11,4 @@ mod genetlink_test {
         assert_eq!(result.is_ok(), true);
     }
 }
+

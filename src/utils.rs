@@ -5,6 +5,69 @@ use eui48::MacAddress;
 use std::ffi::{CStr, CString};
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::os::raw::{c_char, c_void};
+use rtnetlink::new_connection;
+use netlink_packet_route::IFF_UP;
+use netlink_packet_route::nlas::link::{InfoKind, Nla, Info};
+use ipnetwork::IpNetwork;
+use tokio::spawn;
+use futures::stream::TryStreamExt;
+
+#[tokio::main]
+pub async fn create_vhost() -> Result<(), String> {
+    let (conn, handle, _) = new_connection().unwrap();
+    spawn(conn);
+    let mut request = handle.link().add();
+    request.message_mut().nlas.push(nla_macaddr());
+    request.message_mut().nlas.push(nla_ifname());
+    request.message_mut().nlas.push(nla_linkinfo());
+    request.message_mut().header.flags |= IFF_UP;
+    request.message_mut().header.change_mask |= IFF_UP;
+    request
+        .execute()
+        .await
+        .map_err(|e| format!("{}", e))
+}
+
+#[tokio::main]
+pub async fn add_vhost_ip(ipstr: String) -> Result<(), String> {
+    let ip: IpNetwork = ipstr.parse().unwrap_or_else(|_| {
+        eprintln!("invalid address");
+        std::process::exit(1);
+    });
+    let (conn, handle, _) = new_connection().unwrap();
+    spawn(conn);
+    let mut links = handle
+        .link()
+        .get()
+        .set_name_filter("vhost0".to_string())
+        .execute();
+    if let Some(link) = links.try_next().await.unwrap() {
+        return handle
+            .address()
+            .add(link.header.index, ip.ip(), ip.prefix())
+            .execute()
+            .await
+            .map_err(|e| format!("{}", e))
+    }
+
+    Ok(())
+}
+
+fn nla_macaddr() -> Nla {
+    Nla::Address(vec![0x00, 0x05, 0x85, 0x00, 0x00, 0x01])
+}
+
+fn nla_ifname() -> Nla {
+    Nla::IfName("vhost0".into())
+}
+
+fn nla_linkinfo() -> Nla {
+    Nla::Info(vec![
+        Info::Kind(
+            InfoKind::Other("vhost".into())
+        )
+    ])
+}
 
 pub fn str_to_cchar(s: &str) -> *const c_char {
     let c_str = CString::new(s).unwrap();

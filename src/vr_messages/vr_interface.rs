@@ -603,13 +603,17 @@ impl InterfaceRequest {
 
     fn read_bytes_as_string(ptr: *mut i8, size: u32) -> String {
         unsafe {
-            String::from(
-                std::str::from_utf8(slice::from_raw_parts(
-                    ptr as *const u8,
-                    size as usize,
-                ))
-                .unwrap(),
-            )
+            let res =
+                std::str::from_utf8(
+                    slice::from_raw_parts(
+                        ptr as *const u8,
+                        size as usize,
+                    )
+                );
+            match res {
+                Ok(s) => String::from(s),
+                Err(_) => "".to_string()
+            }
         }
     }
 
