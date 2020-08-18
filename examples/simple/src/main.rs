@@ -11,11 +11,16 @@ pub mod nexthop;
 pub mod vif;
 
 pub use crate::vif::*;
+pub use crate::nexthop::*;
 
 fn main() {
+    let res = init_nexthop();
+    println!("nexthop result: {:#?}", res);
     // prepare interfaces
     let res = init_ifaces();
-    println!("res: {:#?}", res)
+    println!("interface result: {:#?}", res);
+    let res = get_iface(1);
+    println!("interface result: {:#?}", res);
 }
 
 // private functions
