@@ -49,12 +49,13 @@ pub fn add_veth_iface(name: &str, idx: i32) -> Result<Vec<Message>, MessageHandl
     vifr.op = SandeshOp::Add;
     vifr._type = IfType::Virtual;
     vifr.nh_id = 1;
+    vifr.vrf = 1;
     vifr.name = name.to_string();
     vifr.idx = idx;
     vifr.os_idx = find_ifindex(name).unwrap();
     vifr.mac = find_macaddr(name).unwrap();
     vifr.transport = VIF_TRANSPORT_ETH;
-    vifr.flags = VIF_FLAG_L2_ENABLED | VIF_FLAG_POLICY_ENABLED | VIF_FLAG_DHCP_ENABLED;
+    vifr.flags = VIF_FLAG_L2_ENABLED | VIF_FLAG_NO_ARP_PROXY | VIF_FLAG_MAC_LEARN;
     vifr.mtu = 1514;
     let request = Message::InterfaceRequest(vifr);
     request.send_nl()

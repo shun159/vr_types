@@ -9,9 +9,10 @@ pub fn init_nexthop() -> Result<Vec<Message>, MessageHandleError> {
     let mut nhr: NexthopRequest = NexthopRequest::default();
     nhr.op = SandeshOp::Add;
     nhr.id = 1;
+    nhr.vrf = 1;
     nhr.family = AF_INET as i8;
     nhr._type = NhType::L2Rcv;
-    nhr.flags = NH_FLAG_VALID;
+    nhr.flags = NH_FLAG_VALID | NH_FLAG_MAC_LEARN | NH_FLAG_UNKNOWN_UC_FLOOD | NH_FLAG_ROUTE_LOOKUP;
     let request = Message::NexthopRequest(nhr);
     request.send_nl()
 }
