@@ -106,12 +106,7 @@ pub fn into_mut_ptr<T: Clone>(vec: &Vec<T>) -> *mut T {
 
 pub fn write_mac(mac_addr: MacAddress) -> *mut i8 {
     let v: Vec<i8> = Vec::new();
-    let octets = if mac_addr.is_nil() {
-        vec![]
-    } else {
-        mac_addr.as_bytes().to_vec()
-    };
-
+    let octets = mac_addr.as_bytes().to_vec();
     let mac = octets.iter().fold(v, |mut acc, &o| {
         acc.push(o as i8);
         acc

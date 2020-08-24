@@ -68,11 +68,7 @@ impl RouteRequest {
         encoder.rtr_marker_size = Self::prefix_size(self.marker);
         encoder.rtr_marker_plen = self.marker_prefix_len;
         encoder.rtr_mac = utils::write_mac(self.mac);
-        encoder.rtr_mac_size = if self.mac.is_nil() {
-            0u32
-        } else {
-            libc::ETH_ALEN as u32
-        };
+        encoder.rtr_mac_size = libc::ETH_ALEN as u32;
         encoder.rtr_replace_plen = self.replace_prefix_len;
         encoder.rtr_index = self.index;
         encoder.write()

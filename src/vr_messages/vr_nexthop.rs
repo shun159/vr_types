@@ -175,7 +175,8 @@ impl NexthopRequest {
         encoder.nhr_family = self.family;
         encoder.nhr_id = self.id;
         encoder.nhr_rid = self.rid;
-        encoder.nhr_encap_oif_id = self.encap_crypt_oif_id;
+        encoder.nhr_encap_oif_id = self.encap_oif_id;
+        encoder.nhr_encap_crypt_oif_id = self.encap_crypt_oif_id;
         encoder.nhr_encap_len = self.encap.len() as i32;
         encoder.nhr_encap = utils::into_mut_ptr::<i8>(&self.encap);
         encoder.nhr_encap_size = self.encap.len() as u32;
